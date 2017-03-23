@@ -1,5 +1,5 @@
 {application, exercise1,
- [{description, "An OTP application"},
+ [{description, "Message of the day app"},
   {vsn, "0.1.0"},
   {registered, []},
   {mod, { exercise1_app, []}},
