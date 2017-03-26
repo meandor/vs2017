@@ -5,7 +5,15 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{amsfonts,amsthm, amsmath}
-\usepackage{listings} 
+\usepackage{listings}
+% The following is needed in order to make the code compatible
+% with both latex/dvips and pdflatex.
+\ifx\pdftexversion\undefined
+\usepackage[dvips]{graphicx}
+\else
+\usepackage[pdftex]{graphicx}
+\DeclareGraphicsRule{*}{mps}{*}{}
+\fi
 
 \setlength\parindent{0pt}
 \lstset{language=Erlang}
@@ -16,7 +24,7 @@
 \\
 \textbf{Aufgabenteilung:}\\
 
-\textbf{Quellenangaben:} \\
+\textbf{Quellenangaben:}\\
 \\
 \textbf{Bearbeitungszeitraum:}
 \begin{itemize}
@@ -28,6 +36,12 @@
 \textbf{Änderung des Entwurfs:}\\
 
 \textbf{Entwurf:}\\
-
+Sequenzdiagramm
+\begin{figure}[!htb]
+\centering
+	\includegraphics[width=\textwidth]{sequence-diagram.png}
+\caption[seq-dia]{Sequenzdiagramm bei fehlerfreiem Nachrichtenaustausch}
+\label{fig:goods-flow}
+\end{figure}
 
 \end{document}
