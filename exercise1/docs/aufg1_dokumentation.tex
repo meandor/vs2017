@@ -66,4 +66,33 @@ Die Schnittstelle der HBQ wird nur vom Server verwendet und die Schnittstelle vo
 Das Client-Paket beinhaltet die Client-Module. Diese sind zum einen der Lese Client (Reader-Modul) und der Redakteur
 Client (Editor-Modul). Beide Clients sind als ein Prozess implementiert.
 
+\chapter{Detaillierte Komponentenbeschreibung}
+
+\section{Client}
+Der Client ist ein einzelner Prozess, der sich jedoch in zwei Rollen aufteilt. Im Endlosdurchlauf einer Schleife nimmt er jeweils zwei Zustände an: 
+    Als Redakteur sendet er fünf Nachrichten an den Server, und fragt danach einmal die nächste NNr ab, um eine Lücke in den fortlaufend nummerierten Nachrichten zu produzieren.
+    Als Leser liest er solange Nachrichten vom Server, bis keine weiteren Nachrichten mehr vorhanden sind.
+    \newline
+Der Client wird in drei Module aufgespalten: Client, Reader und Writer. Client ruft in einer Endlosschleife wechselweise die soeben beschriebene Funktionalität in den Modulen Reader und Writer auf.
+
+\section{Server}
+Der Server hat die Aufgaben  
+\begin{enumerate}
+    \item{Sich anfragende Clients mit ProzessID und Zeitstempel zu merken}
+    \item{Clients die ihnen zugehörigen Nachrichten zurückzugeben}
+\end{enumerate}
+Für die erste Aufgabe wird das Modul CMEM verwendet. Zum Senden an die Clients leitet der Server die Nachrichten zunächst an die HBQ weiter. Erscheint eine Anfrage vom Client, erfolgt über die HBQ der Aufruf an die DLQ, die Nachricht zu übermitteln.
+
+\section{CMEM}
+Dieses Modul hat die Aufgabe sich anfragende Clients mittels einer ProzessID und eines Zeitstempels in einer Map-Datenstruktur zu merken, und diese für den Server bereitzustellen.
+
+\section{HBQ}
+Von Redakteur-Clients gesendete Nachrichten werden hier zwischengespeichert. Gibt es keine Lücke in der fortlaufenden Nummerierung der Nachrichten, werden Sie an die DLQ weitergeleitet. Bei einer Überfüllung der HBQ (2/3 der Maximalen Kapazität der DLQ) wird die älteste Lücke in den Nachrichten mit einer künstlichen Nachricht geschlossen, und es werden erneut alle Lückenlosen Nachrichten an die DLQ weitergeleitet. Die HBQ stellt nur ein Interface für den Server bereit.
+
+\section{DLQ}
+Die Delivery - Queue hat die Aufgabe Nachrichten an Clients zuzustellen. Die Nachrichten in der DLQ liegen immer sortiert vor, und es gibt keine Lücken in den NNr’s.
+Bei dem Sendevorgang erhält die DLQ ein Signal von der HBQ mit der PID des Ziel - Clients und der Nachrichtennummer. Daraufhin wird die Nachricht mit dieser NNr an den Client verschickt.
+Wenn diese Nachricht nicht vorhanden ist wird die Nachricht mit der nächst höheren NNr verschickt. Es wird jeweils die Nummer der verschickten Nachricht zurückgegeben.
+
+
 \end{document}
