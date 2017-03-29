@@ -1,5 +1,5 @@
 -module(dlq).
-
+-include_lib("eunit/include/eunit.hrl").
 %% API
 -export([initDLQ/2, delDLQ/1, expectedNr/1, push2DLQ/3, deliverMSG/4]).
 
@@ -8,10 +8,10 @@
 initDLQ(Size,Datei) ->
     {[],Size,Datei}.
 
-delDLQ(Queue)
+delDLQ(Queue) -> ok.
 
-expectedNr(Queue)
+expectedNr(Queue) -> ok.
 
-push2DLQ([NNr,Msg,TSclientout,TShbqin],Queue,Datei)
+push2DLQ([NNr,Msg,TSclientout,TShbqin],Queue,Datei) -> ok.
 
-deliverMSG(MSGNr,ClientPID,Queue,Datei)
+deliverMSG(MSGNr,ClientPID,Queue,Datei) -> ok.
