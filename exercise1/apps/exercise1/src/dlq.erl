@@ -11,7 +11,8 @@ initDLQ(Size,Datei) ->
 delDLQ(Queue) -> ok.
 
 % liefert die Nachrichtennummer, die als nächstes in der DLQ gespeichert werden kann. Bei leerer DLQ ist dies 1.
-expectedNr(Queue) -> ok.
+expectedNr({[],_,_}) -> 1;
+expectedNr({[{NNr, _} | _],_,_}) ->  NNr + 1.
 
 push2DLQ([NNr,Msg,TSclientout,TShbqin],Queue,Datei) -> ok.
 
