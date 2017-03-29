@@ -52,4 +52,18 @@ Komponentendiagramm
 \label{fig:component-diagram}
 \end{figure}
 
+Das Softwareprodukt besteht aus mehreren Modulen und Paketen. Das Client-Paket und das Server-Paket.
+
+Im Server Paket befinden sich das Server-Modul und alle vom Server-Modul verwendeten Datenstrukturen in Modulen.
+Dazu gehören das HBQ-Modul, das DLQ-Modul und das CMEM-Modul.
+
+Die Schnittstellen des DLQ-Moduls und CMEM-Moduls sind als RPC implementiert. Die Schnittstellen des HBQ-Moduls und des
+Server-Moduls sind als entfernte ADT realisiert.
+
+Die DLQ Schnittstelle wird nur von der HBQ konsumiert und die CMEM Schnittstelle wird nur vom Server konsumiert.
+Die Schnittstelle der HBQ wird nur vom Server verwendet und die Schnittstelle vom Server ist nur an den Client angebunden.
+
+Das Client-Paket beinhaltet die Client-Module. Diese sind zum einen der Lese Client (Reader-Modul) und der Redakteur
+Client (Editor-Modul). Beide Clients sind als ein Prozess implementiert.
+
 \end{document}
