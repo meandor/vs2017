@@ -36,7 +36,7 @@
 \textbf{Änderung des Entwurfs:}\\
 
 \textbf{Entwurf:}\\
-Sequenzdiagramm
+{\let\clearpage\relax \chapter{Sequenzdiagramm}}
 \begin{figure}[!htb]
 \centering
 	\includegraphics[width=\textwidth]{sequence-diagram.png}
@@ -44,10 +44,11 @@ Sequenzdiagramm
 \label{fig:sequence-diagram}
 \end{figure}
 
-Komponentendiagramm
+{\let\clearpage\relax \chapter{Komponenten}}
+
 \begin{figure}[!htb]
 \centering
-	\includegraphics[width=\textwidth]{component-diagram.png}
+	\includegraphics[width=0.6\textwidth]{component-diagram.png}
 \caption[seq-dia]{Komponentendiagramm der Message Of The Day App}
 \label{fig:component-diagram}
 \end{figure}
@@ -65,8 +66,6 @@ Die Schnittstelle der HBQ wird nur vom Server verwendet und die Schnittstelle vo
 
 Das Client-Paket beinhaltet die Client-Module. Diese sind zum einen der Lese Client (Reader-Modul) und der Redakteur
 Client (Editor-Modul). Beide Clients sind als ein Prozess implementiert.
-
-\chapter{Detaillierte Komponentenbeschreibung}
 
 \section{Client}
 Der Client ist ein einzelner Prozess, der sich jedoch in zwei Rollen aufteilt. Im Endlosdurchlauf einer Schleife nimmt er jeweils zwei Zustände an: 
