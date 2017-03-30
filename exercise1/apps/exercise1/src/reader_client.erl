@@ -1,5 +1,12 @@
 -module(reader_client).
--export([read/3, calculateNewInterval/1]).
+-export([read/3, calculateNewInterval/1, setup/1]).
+
+loop(Server, Interval, 5) -> io:format("Lese Nachricht...\n"), loop(Server, Interval, 0);
+loop(Server, Interval, NNr) -> ct:sleep(1000),  io:format("Sende nachricht...\n"), loop(Server, Interval, NNr + 1). % Send messages here
+
+% Read messages
+
+setup(ServerAddress) -> ok.
 
 read(Server, Interval, 5) ->
   Server ! {getmessages, self()},

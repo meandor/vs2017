@@ -1,13 +1,10 @@
 -module(client).
 -export([start/2]).
 
+start(ServerAddress, Number) -> logger:create(lists:concat([node(), ".log"])), start_n(ServerAddress, Number).
 
-start(ServerAdress, 1) -> spawn_client(ServerAdress);
-start(ServerAdress, Number) -> spawn_client(ServerAdress), start(ServerAdress, Number - 1).
+start_n(ServerAddress, 1) -> spawn_client(ServerAddress);
+start_n(ServerAddress, Number) -> spawn_client(ServerAddress), start_n(ServerAddress, Number - 1).
 
-spawn_client(ServerAddress) -> io:format("Spawne client...\n"), spawn(?MODULE, setup, [ServerAddress]).
+spawn_client(ServerAddress) -> io:format("Spawne client...\n"), spawn(reader_client, setup, [ServerAddress]).
 
-loop(Server, Interval, NNr) -> ct:sleep(1000),  io:format("Sende nachricht...\n"), loop(Server, Interval, NNr + 1); % Send messages here
-
-loop(Server, Interval, 5) ->io:format("Lese Nachricht...\n"), loop(Server, Interval, 0).
-  % Read messages
