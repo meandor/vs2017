@@ -1,0 +1,2 @@
+-module(writer_client).
+-export([]).
