@@ -35,10 +35,36 @@
 
 \textbf{Änderung des Entwurfs:}\\
 -
+
 \newpage
 \tableofcontents 
 \newpage
+
+\section{Einführung und Ziele}
+Es soll eine Message of the Day Anwendung erstellt werden. Dabei werden von verschiedenen Clients an einen Server verschiedene Nachrichten des Tages gesendet. Die Clients rufen vom Server alle Nachrichten ab, so dass jeder Client alle Nachrichten in einer festen Reihenfolge hat.
+
+\subsection{Randbedingungen}
+Es soll eine Client/Server-Architektur implementiert werden.
+Der Server verwaltet dabei die ihm von den Clients gesendeten Nachrichten. Das beinhaltet eine feste Numerierung der Nachrichten.
+
+Die Clients rufen dabei in bestimmten Abständen die Nachrichten ab. Falls ein Client dem Server schon bekannt ist, bekommt der nur die ihm noch unbekannten (neuen) Nachrichten.
+
+Der Server muss sich also die Clients merken. Es soll mit einer Holdbackqueue und einer Deliveryqueue gearbeitet werden, um die korrekte Auslieferung in einer bestimmten Reihenfolge der Nachrichten zu garantieren.
+
+\subsection{Kontextbegrenzung}
+Das System soll in Erlang umgesetzt werden. Es muss auf Computern mit Linux Betriebssystem lauffähig sein.
+
+\newpage
+
 \section{Gesamtsystem}
+\subsection{Kontextsicht}
+\subsection{Bausteinsicht}
+\subsection{Laufzeitsicht}
+\subsection{Verteilungssicht}
+\subsection{Konfigurationsparameter}
+\subsection{Benutzungsschnittstelle}
+
+
 	\subsection{Architekturüberblick}
 	Komponentendiagramm
 	\begin{figure}[H]
