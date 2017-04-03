@@ -120,18 +120,44 @@ Sequenzdiagramm
 			Erscheint eine Anfrage vom Client, erfolgt über die HBQ der Aufruf an die DLQ, 
 			die Nachricht zu übermitteln.
 		\subsubsection{Entwurfsentscheidungen}
+			Der Server bearbeitet Anfragen per message passing. Die NNr ist ein Zählerwert,
+			der nach jedem Herausgeben an einen Client inkrementiert wird.
 		\subsubsection{Außensicht}
+			Es werden Schnittstellen zur Abfage der aktuellen NNr, zum Holen & Speichern 
+			von Nachrichten bereitgestellt. Nach einer bestimmten, aber nach Außen unbekannten 
+			Zeit werden auch bereits abgeholte Nachrichten ausgeliefert.
 		\subsubsection{Innensicht}
+			Anfragen werden in einer Endlosschleife abgefragt und nur an die jeweiligen 
+			Komponenten weitergeleitet. Fehlerbehandlung erfolgt in den jeweiligen Komponenten.
+			Bei jeder Anfrage erfolgt die Abfrage & Aktualisierung der CMEM,
+			um sich den anfragenden Client zu merken und Anfragen an die HBQ korrekt zu stellen.
+			
 		\subsubsection{Konfigurationsparameter}
+			\begin{enumerate}
+    			\item{Latenzzeit bestimmt die maximale Zeit die der Server ungenutzt läuft.}
+    			\item{Lebenszeit des Clients bestimmt die Zeit, für die sich der Server einen 
+    					Client merkt.}
+    			\item{Name definiert den Namen der Server - Node}
+    			\item{HBQ - Name & Node definieren die Verknüpfung zur HBQ - Node}
+    		\end{enumerate}
 		\subsubsection{Benutzungsschnittstelle}
-		
+			Der Server wird nur durch seine Schnitstellen vom Client verwendet.
 		\subsubsection{Komponente CMEM}
 			\paragraph{Aufgabe und Verantwortung der CMEM}
-				Dieses Modul hat die Aufgabe sich anfragende Clients mittels einer ProzessID und eines Zeitstempels in einer Map-Datenstruktur zu merken, und diese für den Server bereitzustellen.
+				Dieses Modul hat die Aufgabe sich anfragende Clients mittels einer ProzessID und eines Zeitstempels zu merken, und diese für den Server bereitzustellen.
 			\paragraph{Entwurfsentscheidungen}
+				Als Datenstruktur wird ein Dictionary verwendet. Jeder Client wird mittels
+				seiner ProzessID eindeutig auf einen Offset und auf einen Zeitstempel der 
+				letzten Anfrage abgebildet. Der Offset wird verwendet, um sich zu merken, 
+				welche Nachricht als letztes an den Client gesendet wurde.
 			\paragraph{Außensicht}
+				Die CMEM wird nur über Funktionsaufrufe durch den Server aufgerufen.
 			\paragraph{Innensicht}
+				Intern arbeiten die Methoden deleteIdleClients und insertOrUpdateClient
+				auf der Datenstruktur. getTimestampAndOffset gibt für einen Client den Entsprechenden
+				Offset und Timestamp zurück. Nur der Server verarbeitet die zurückgegebenen Werte.
 			\paragraph{Konfigurationsparameter}
+				-
 			
 			
 		\subsubsection{Komponente HBQ}
@@ -141,6 +167,10 @@ Sequenzdiagramm
 			\paragraph{Außensicht}
 			\paragraph{Innensicht}
 			\paragraph{Konfigurationsparameter}
+				\begin{enumerate}
+    				\item{Die Maximalgröße der DLQ wird verwendet um die HBQ bei kritischer 
+    				Überfüllung zu leeren.}
+    			\end{enumerate}
 			
 		\subsubsection{Komponente DLQ}
 			\paragraph{Aufgabe und Verantwortung der DLQ}
@@ -153,6 +183,7 @@ Sequenzdiagramm
 			\paragraph{Außensicht}
 			\paragraph{Innensicht}
 			\paragraph{Konfigurationsparameter}
+				
 
 
 \end{document}
