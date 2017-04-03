@@ -33,10 +33,12 @@ deliverMSG(MSGNr, _ClientPID, [[], _Size], Datei) ->
   % TODO: Sollte die Nachrichtennummer nicht mehr vorhanden sein, wird die nächst größere in der DLQ vorhandene Nachricht gesendet
   werkzeug:logging(Datei, lists:concat(["DLQ>>> message ", MSGNr, " could not be sent because it was not found\n"])),
   fail;
-deliverMSG(MSGNr, ClientPID, [[[MSGNr, _, _, _] | _], _Size], Datei) ->
-  werkzeug:logging(Datei, lists:concat(["DLQ>>> message ", MSGNr, " to Client<", ClientPID, "> sent\n"])),
-  % TODO: sendet die Nachricht MSGNr an den Leser-Client ClientPID. Dabei wird ein Ausgangszeitstempel TSdlqout mit erlang:now() an das Ende der Nachrichtenliste angefügt.
-  MSGNr;
-deliverMSG(MSGNr, ClientPID, [[Message | DLQRest], Size], Datei) ->
-  %io:format(Message),
-  deliverMSG(MSGNr, ClientPID, [DLQRest, Size], Datei).
+deliverMSG(MSGNr, ClientPID, [[[NNr, _, _, _, _] | DLQRest], Size], Datei) ->
+  if
+    NNr == MSGNr ->
+      werkzeug:logging(Datei, lists:concat(["DLQ>>> message ", MSGNr, " to Client<", ClientPID, "> sent\n"])),
+      % TODO: sendet die Nachricht MSGNr an den Leser-Client ClientPID. Dabei wird ein Ausgangszeitstempel TSdlqout mit erlang:now() an das Ende der Nachrichtenliste angefügt.
+      MSGNr;
+    MSGNr /= NNr ->
+      deliverMSG(MSGNr, ClientPID, [DLQRest, Size], Datei)
+  end.
