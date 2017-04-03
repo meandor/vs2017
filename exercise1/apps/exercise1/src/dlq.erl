@@ -5,19 +5,28 @@
 
 % initialisiert die DLQ mit Kapazität Size. Bei Erfolg wird eine leere DLQ zurück geliefert.
 % Datei kann für ein logging genutzt werden.
-initDLQ(Size,Datei) ->
-    dict:new(),
-    [].
+initDLQ(Size, Datei) ->
+  werkzeug:logging(Datei, lists:concat(["DLQ initialized with capacity: ", Size, "\n"])),
+  [[], Size].
 
-delDLQ(Queue) -> ok.
+% Löschen der DLQ
+delDLQ(_) -> ok.
 
 % liefert die Nachrichtennummer, die als nächstes in der DLQ gespeichert werden kann. Bei leerer DLQ ist dies 1.
-expectedNr([]) -> 1;
-expectedNr([[NNr,_,_,_] | _]) ->  NNr + 1.
+expectedNr([[], _]) -> 1;
+expectedNr([[[NNr, _, _, _] | _], _]) -> NNr + 1.
 
 % speichert die Nachricht [NNr,Msg,TSclientout,TShbqin] in der DLQ Queue und fügt ihr einen Eingangszeitstempel an
 % (einmal an die Nachricht Msg und als expliziten Zeitstempel TSdlqin mit erlang:now() an die Liste an. Bei Erfolg wird
 % die modifizierte DLQ zurück geliefert. Datei kann für ein logging genutzt werden.
-push2DLQ([NNr,Msg,TSclientout,TShbqin],Queue,Datei) -> [[NNr,Msg,TSclientout,TShbqin, erlang:now()] | Queue].
+push2DLQ([NNr, Msg, TSclientout, TShbqin], [DLQ, Size], Datei) ->
+  if
+    length(DLQ) < Size ->
+      werkzeug:logging(Datei, lists:concat(["Message number ", NNr, " added\n"])),
+      [[[NNr, Msg, TSclientout, TShbqin, erlang:now()] | DLQ], Size];
+    length(DLQ) == Size ->
+      werkzeug:logging(Datei, lists:concat(["Message number ", NNr, " added\n"])),
+      [[[NNr, Msg, TSclientout, TShbqin, erlang:now()] | lists:droplast(DLQ)], Size]
+  end.
 
-deliverMSG(MSGNr,ClientPID,Queue,Datei) -> ok.
+deliverMSG(_MSGNr, _ClientPID, _Queue, _Datei) -> ok.
