@@ -29,6 +29,7 @@
 \textbf{Bearbeitungszeitraum:}
 \begin{itemize}
 	\item 26.03.2017 (FW,DS)
+	\item 03.04.2017 (DS)
 \end{itemize}
 
 \textbf{Aktueller Stand:}\\
@@ -58,44 +59,39 @@ Das System soll in Erlang umgesetzt werden. Es muss auf Computern mit Linux Betr
 
 \section{Gesamtsystem}
 \subsection{Kontextsicht}
+
 \subsection{Bausteinsicht}
+Das Softwareprodukt besteht aus mehreren Modulen und Paketen (Abbildung \ref{fig:component-diagram}). Diese Pakete setzen sich zusammen aus dem Client-Paket und dem Server-Paket.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{component-diagram.png}
+    \caption[seq-dia]{Komponentendiagramm der Message Of The Day App}
+    \label{fig:component-diagram}
+\end{figure}
+
+Das Server Paket beinhaltet das Server-Modul und alle vom Server-Modul verwendeten Datenstrukturen.\\
+Das Server-Modul ist für alle Funktionalitäten des Servers zuständig. Dazu gehört das Nummerieren und Verwalten der Nachrichten und die Verwaltung der Clients.\\
+Das Server-Modul benutzt daher per Schnittstelle das HBQ-Modul und das CMEM-Modul. Das Server-Modul stellt eine Schnittstelle für die Clients bereit.\\
+\\
+Das CMEM-Modul ist für die Speicherung der Clients und ihrer aktuellen zu erwartenden Nachrichten Nummer zuständig. Das CMEM-Modul soll als lokale ADT realisiert werden. Diese wird nur vom Server angesprochen.\\
+\\
+Das HBQ-Modul ist für die Holdbackqueue zuständig und regelt die Sortierung der einkommenden Nachrichten in die Deliveryqueue und der damit verbundenen Fehlerbehandlung. Dabei ist das HBQ-Modul als entfernte ADT realisiert. Diese wird nur von dem Server-Modul verwendet.\\
+\\
+Das DLQ-Modul realsiert die Deliveryqueue, die für die Auslieferung der Nachrichten in Reihenfolge an die Clients zuständig ist. Die Schnittstelle des DLQ-Moduls wird nur vom HBQ-Modul konsumiert.\\
+\\
+Das Client-Paket beinhaltet die Client-Module. Diese sind zum einen der Lese Client (Reader-Modul) und der Redakteur Client (Editor-Modul). Beide Clients sind als ein Prozess implementiert und verwenden die vom Server bereitgestellte Schnittstelle. Der Redakteur Client ist für das Schicken von Nachrichten zuständig und der Lese Client für das Lesen von Nachrichten.
+
 \subsection{Laufzeitsicht}
-\subsection{Verteilungssicht}
-\subsection{Konfigurationsparameter}
-\subsection{Benutzungsschnittstelle}
-
-
-	\subsection{Architekturüberblick}
-	Komponentendiagramm
-	\begin{figure}[H]
-	\centering
-		\includegraphics[width=\textwidth]{component-diagram.png}
-	\caption[seq-dia]{Komponentendiagramm der Message Of The Day App}
-	\label{fig:component-diagram}
-	\end{figure}
-
-	Das Softwareprodukt besteht aus mehreren Modulen und Paketen. Das Client-Paket und das Server-Paket.
-
-	Im Server Paket befinden sich das Server-Modul und alle vom Server-Modul verwendeten Datenstrukturen in Modulen.
-	Dazu gehören das HBQ-Modul, das DLQ-Modul und das CMEM-Modul.
-
-	Die Schnittstellen des DLQ-Moduls und CMEM-Moduls sind als RPC implementiert. Die Schnittstellen des HBQ-Moduls und des
-	Server-Moduls sind als entfernte ADT realisiert.
-
-	Die DLQ Schnittstelle wird nur von der HBQ konsumiert und die CMEM Schnittstelle wird nur vom Server konsumiert.
-	Die Schnittstelle der HBQ wird nur vom Server verwendet und die Schnittstelle vom Server ist nur an den Client angebunden.
-
-	Das Client-Paket beinhaltet die Client-Module. Diese sind zum einen der Lese Client (Reader-Modul) und der Redakteur
-	Client (Editor-Modul). Beide Clients sind als ein Prozess implementiert.
-	
-	\textbf{Entwurf:}\\
-Sequenzdiagramm
 \begin{figure}[H]
 \centering
-	\includegraphics[width=\textwidth]{sequence-diagram.png}
+\includegraphics[width=\textwidth]{sequence-diagram.png}
 \caption[seq-dia]{Sequenzdiagramm bei fehlerfreiem Nachrichtenaustausch}
 \label{fig:sequence-diagram}
 \end{figure}
+\subsection{Verteilungssicht}
+\subsection{Konfigurationsparameter}
+\subsection{Benutzungsschnittstelle}
 
 
 \section{Subsysteme und Komponenten}
