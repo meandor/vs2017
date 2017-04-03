@@ -6,7 +6,7 @@
 % initialisiert die DLQ mit Kapazität Size. Bei Erfolg wird eine leere DLQ zurück geliefert.
 % Datei kann für ein logging genutzt werden.
 initDLQ(Size, Datei) ->
-  werkzeug:logging(Datei, lists:concat(["DLQ initialized with capacity: ", Size, "\n"])),
+  werkzeug:logging(Datei, lists:concat(["DLQ>>> initialized with capacity: ", Size, ".\n"])),
   [[], Size].
 
 % Löschen der DLQ
@@ -20,12 +20,11 @@ expectedNr([[[NNr, _, _, _] | _], _]) -> NNr + 1.
 % (einmal an die Nachricht Msg und als expliziten Zeitstempel TSdlqin mit erlang:now() an die Liste an. Bei Erfolg wird
 % die modifizierte DLQ zurück geliefert. Datei kann für ein logging genutzt werden.
 push2DLQ([NNr, Msg, TSclientout, TShbqin], [DLQ, Size], Datei) ->
+  werkzeug:logging(Datei, lists:concat(["DLQ>>> message number ", NNr, " added to DLQ\n"])),
   if
     length(DLQ) < Size ->
-      werkzeug:logging(Datei, lists:concat(["Message number ", NNr, " added\n"])),
       [[[NNr, Msg, TSclientout, TShbqin, erlang:now()] | DLQ], Size];
     length(DLQ) == Size ->
-      werkzeug:logging(Datei, lists:concat(["Message number ", NNr, " added\n"])),
       [[[NNr, Msg, TSclientout, TShbqin, erlang:now()] | lists:droplast(DLQ)], Size]
   end.
 
