@@ -29,64 +29,90 @@
 \textbf{Bearbeitungszeitraum:}
 \begin{itemize}
 	\item 26.03.2017 (FW,DS)
+	\item 03.04.2017 (DS)
 \end{itemize}
 
 \textbf{Aktueller Stand:}\\
 
 \textbf{Änderung des Entwurfs:}\\
--
+\begin{itemize}
+	\item Komponentendiagramm erweitert
+\end{itemize}
+
 \newpage
 \tableofcontents 
 \newpage
+
+\section{Einführung und Ziele}
+Es soll eine Message of the Day Anwendung erstellt werden. Dabei werden von verschiedenen Clients an einen Server verschiedene Nachrichten des Tages gesendet. Die Clients rufen vom Server alle Nachrichten ab, so dass jeder Client alle Nachrichten in einer festen Reihenfolge hat.
+
+\subsection{Randbedingungen}
+Es soll eine Client/Server-Architektur implementiert werden.
+Der Server verwaltet dabei die ihm von den Clients gesendeten Nachrichten. Das beinhaltet eine feste Numerierung der Nachrichten.
+
+Die Clients rufen dabei in bestimmten Abständen die Nachrichten ab. Falls ein Client dem Server schon bekannt ist, bekommt der nur die ihm noch unbekannten (neuen) Nachrichten.
+
+Der Server muss sich also die Clients merken. Es soll mit einer Holdbackqueue und einer Deliveryqueue gearbeitet werden, um die korrekte Auslieferung in einer bestimmten Reihenfolge der Nachrichten zu garantieren.
+
+\subsection{Kontextbegrenzung}
+Das System soll in Erlang umgesetzt werden. Es muss auf Computern mit Linux Betriebssystem lauffähig sein.
+
+\newpage
+
 \section{Gesamtsystem}
-	\subsection{Architekturüberblick}
-	Komponentendiagramm
-	\begin{figure}[H]
-	\centering
-		\includegraphics[width=\textwidth]{component-diagram.png}
-	\caption[seq-dia]{Komponentendiagramm der Message Of The Day App}
-	\label{fig:component-diagram}
-	\end{figure}
+\subsection{Kontextsicht}
 
-	Das Softwareprodukt besteht aus mehreren Modulen und Paketen. Das Client-Paket und das Server-Paket.
+\subsection{Bausteinsicht}
+Das Softwareprodukt besteht aus mehreren Modulen und Paketen (Abbildung \ref{fig:component-diagram}). Diese Pakete setzen sich zusammen aus dem Client-Paket und dem Server-Paket.
 
-	Im Server Paket befinden sich das Server-Modul und alle vom Server-Modul verwendeten Datenstrukturen in Modulen.
-	Dazu gehören das HBQ-Modul, das DLQ-Modul und das CMEM-Modul.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{component-diagram.png}
+    \caption[seq-dia]{Komponentendiagramm der Message Of The Day App}
+    \label{fig:component-diagram}
+\end{figure}
 
-	Die Schnittstellen des DLQ-Moduls und CMEM-Moduls sind als RPC implementiert. Die Schnittstellen des HBQ-Moduls und des
-	Server-Moduls sind als entfernte ADT realisiert.
+Das Server Paket beinhaltet das Server-Modul und alle vom Server-Modul verwendeten Datenstrukturen.\\
+Das Server-Modul ist für alle Funktionalitäten des Servers zuständig. Dazu gehört das Nummerieren und Verwalten der Nachrichten und die Verwaltung der Clients.\\
+Das Server-Modul benutzt daher per Schnittstelle das HBQ-Modul und das CMEM-Modul. Das Server-Modul stellt eine Schnittstelle für die Clients bereit.\\
+\\
+Das CMEM-Modul ist für die Speicherung der Clients und ihrer aktuellen zu erwartenden Nachrichten Nummer zuständig. Das CMEM-Modul soll als lokale ADT realisiert werden. Diese wird nur vom Server angesprochen.\\
+\\
+Das HBQ-Modul ist für die Holdbackqueue zuständig und regelt die Sortierung der einkommenden Nachrichten in die Deliveryqueue und der damit verbundenen Fehlerbehandlung. Dabei ist das HBQ-Modul als entfernte ADT realisiert. Diese wird nur von dem Server-Modul verwendet.\\
+\\
+Das DLQ-Modul realsiert die Deliveryqueue, die für die Auslieferung der Nachrichten in Reihenfolge an die Clients zuständig ist. Die Schnittstelle des DLQ-Moduls wird nur vom HBQ-Modul konsumiert.\\
+\\
+Das Client-Paket beinhaltet die Client-Module. Diese sind zum einen der Lese Client (Reader-Modul) und der Redakteur Client (Editor-Modul). Beide Clients sind als ein Prozess implementiert und verwenden die vom Server bereitgestellte Schnittstelle. Der Redakteur Client ist für das Schicken von Nachrichten zuständig und der Lese Client für das Lesen von Nachrichten.
 
-	Die DLQ Schnittstelle wird nur von der HBQ konsumiert und die CMEM Schnittstelle wird nur vom Server konsumiert.
-	Die Schnittstelle der HBQ wird nur vom Server verwendet und die Schnittstelle vom Server ist nur an den Client angebunden.
-
-	Das Client-Paket beinhaltet die Client-Module. Diese sind zum einen der Lese Client (Reader-Modul) und der Redakteur
-	Client (Editor-Modul). Beide Clients sind als ein Prozess implementiert.
-	
-	\textbf{Entwurf:}\\
-Sequenzdiagramm
+\subsection{Laufzeitsicht}
 \begin{figure}[H]
 \centering
-	\includegraphics[width=\textwidth]{sequence-diagram.png}
+\includegraphics[width=\textwidth]{sequence-diagram.png}
 \caption[seq-dia]{Sequenzdiagramm bei fehlerfreiem Nachrichtenaustausch}
 \label{fig:sequence-diagram}
 \end{figure}
 
+\subsection{Verteilungssicht}
 
+
+\subsection{Konfigurationsparameter}
+
+
+\subsection{Benutzungsschnittstelle}
+
+\newpage
 \section{Subsysteme und Komponenten}
-	\subsection{Client}
-		\subsubsection{Aufgabe und Verantwortung des Clients}
-			Der Client ist ein einzelner Prozess, der sich jedoch in zwei Rollen aufteilt. 
-			Im Endlosdurchlauf einer Schleife wechselt er zwischen 
-			Leser und Redakteur - Rolle.
-        		\newline
-			Der Client wird in drei Module aufgespalten: Client, Reader und Writer. 
-			Client ruft in einer Endlosschleife wechselweise die soeben beschriebene 
-			Funktionalität in den Modulen Reader und Writer auf.
-		\subsubsection{Entwurfsentscheidungen}
-		\subsubsection{Außensicht}
-		\subsubsection{Innensicht}
-		\subsubsection{Konfigurationsparameter}
-    	\subsubsection{Komponente Leserclient}
+\subsection{Client}
+\subsubsection{Aufgabe und Verantwortung des Clients}
+Der Client ist ein einzelner Prozess, der sich jedoch in zwei Rollen aufteilt. Im Endlosdurchlauf einer Schleife wechselt er zwischen Leser und Redakteur - Rolle.\\
+
+Der Client wird in drei Module aufgespalten: Client, Reader und Writer. Client ruft in einer Endlosschleife wechselweise die soeben beschriebene Funktionalität in den Modulen Reader und Writer auf.
+
+\subsubsection{Entwurfsentscheidungen}
+\subsubsection{Außensicht}
+\subsubsection{Innensicht}
+\subsubsection{Konfigurationsparameter}
+\subsubsection{Komponente Leserclient}
     	
     		\paragraph{Aufgabe und Verantwortung des Leseclients}
     		Der Leseclient liest solange Nachrichten vom Server, 
@@ -185,5 +211,44 @@ Sequenzdiagramm
 			\paragraph{Konfigurationsparameter}
 				
 
+\subsubsection{Schnittstelle}
+\begin{lstlisting}[language=erlang]
+/* Initialisieren der DLQ */
+initDLQ(Size,Datei): Integer X Atom -> DQueue
+
+/* Abfrage welche Nachrichtennummer in der DLQ gespeichert werden kann */
+expectedNr(Queue) : DQueue -> Integer
+
+/* Speichern einer Nachricht in der DLQ */
+push2DLQ([NNr,Msg,TSclientout,TShbqin],Queue,Datei) :
+    MSG_list X DQueue X Atom -> DQueue
+
+/* Ausliefern einer Nachricht an einen Leser-Client */
+deliverMSG(MSGNr,ClientPID,Queue,Datei):
+    Integer X PID X DQueue X Atom -> Integer
+\end{lstlisting}
+
+\subsubsection{Entwurfsentscheidungen}
+Die Deliveryqueue wird als Erlang Liste realisiert. Das erste Element der Liste ist dabei eine Liste der Nachrichten und das zweite Element der Liste gibt die Kapazität der DLQ an.
+\begin{lstlisting}[language=erlang]
+/* Nachrichten Format */
+/* minimal 3 Elemente, pro Station kommt eins hinzu; maximal 6 Elemente */
+MSG_List := [NNr,Msg,TSclientout,TShbqin,TSdlqin,TSdlqout]:
+    [Integer X String X 3-Tupel X 3-Tupel X 3-Tupel X 3-Tupel]
+
+/* DLQ Format */
+/* Nachrichtenliste ist eine Liste aus Nachrichten und hat */
+/* maximal Kapazitaet Anzahl an  Elementen */
+DLQ := [Nachrichtenliste, Kapazitaet]: [List X Integer]
+\end{lstlisting}
+
+Neue Nachrichten werden am Anfang der Liste angefügt. Das vereinfacht die Nachfrage nach der nächsten zu speichernden Nachrichtennummer in der DLQ. Demnach werden Nachrichten am Ende der Liste entnommen.
+
+Das kann passieren, wenn die Größe der Liste gleich ihrer Kapazität ist und eine Neue Nachricht hinzugefügt werden soll.
+
+\paragraph{Konfigurationsparameter}
+\begin{itemize}
+    \item Kapazität der DLQ
+\end{itemize}
 
 \end{document}
