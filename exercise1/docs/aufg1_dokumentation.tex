@@ -168,9 +168,9 @@ Der Client wird in drei Module aufgespalten: Client, Reader und Writer. Client r
 			\paragraph{Innensicht}
 			\paragraph{Konfigurationsparameter}
 			
-\subsection{DLQ Modul}
+\subsection{DLQ-Modul}
 \subsubsection{Aufgabe und Verantwortung}
-Die Deliveryqueue hat die Aufgabe Nachrichten an Clients zuzustellen und stellt eine Datenstruktur dar, die eine maximale Menge (Kapazität) an Nachrichten hält. Sie verhält sich dabei wie von einer Warteschlange zu erwarten beim Einfügen und Herausholen von Nachrichten (FIFO).
+Die Deliveryqueue hat die Aufgabe Nachrichten an Clients zuzustellen und stellt eine Datenstruktur dar, die eine maximale Menge (Kapazität) an Nachrichten hält. Sie verhält sich dabei wie von einer Warteschlange zu erwarten beim Einfügen und Herausholen von Nachrichten (FIFO). Nur das HBQ-Modul darf auf das DLQ-Modul zugreifen. Das DLQ-Modul sendet über eine Schnittstelle der Clients die Nachrichten an die Clients.
 
 \subsubsection{Schnittstelle}
 \begin{lstlisting}[language=erlang]
