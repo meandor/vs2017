@@ -26,4 +26,17 @@ push2DLQ([NNr, Msg, TSclientout, TShbqin], [DLQ, Size], Datei) ->
       [[[NNr, Msg, TSclientout, TShbqin, erlang:now()] | lists:droplast(DLQ)], Size]
   end.
 
-deliverMSG(_MSGNr, _ClientPID, _Queue, _Datei) -> ok.
+findNextBiggerNNr(NNr, Queue) -> ok.
+
+% Ausliefern einer Nachricht an einen Leser-Client
+deliverMSG(MSGNr, _ClientPID, [[], _Size], Datei) ->
+  % TODO: Sollte die Nachrichtennummer nicht mehr vorhanden sein, wird die nächst größere in der DLQ vorhandene Nachricht gesendet
+  werkzeug:logging(Datei, lists:concat(["DLQ>>> message ", MSGNr, " could not be sent because it was not found\n"])),
+  fail;
+deliverMSG(MSGNr, ClientPID, [[[MSGNr, _, _, _] | _], _Size], Datei) ->
+  werkzeug:logging(Datei, lists:concat(["DLQ>>> message ", MSGNr, " to Client<", ClientPID, "> sent\n"])),
+  % TODO: sendet die Nachricht MSGNr an den Leser-Client ClientPID. Dabei wird ein Ausgangszeitstempel TSdlqout mit erlang:now() an das Ende der Nachrichtenliste angefügt.
+  MSGNr;
+deliverMSG(MSGNr, ClientPID, [[Message | DLQRest], Size], Datei) ->
+  %io:format(Message),
+  deliverMSG(MSGNr, ClientPID, [DLQRest, Size], Datei).
