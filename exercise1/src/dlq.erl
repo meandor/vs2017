@@ -24,7 +24,9 @@ push2DLQ([NNr, Msg, TSclientout, TShbqin], [DLQ, Size], Datei) ->
   if
     length(DLQ) < Size ->
       [[[NNr, Msg, TSclientout, TShbqin, erlang:now()] | DLQ], Size];
-    length(DLQ) == Size ->
+    length(DLQ) =:= Size ->
+      [LastNNr, _Msg, _TSclientout, _TShbqin, _TSdlqin] = lists:last(DLQ),
+      werkzeug:logging(Datei, lists:concat(["DLQ>>> message number ", LastNNr, " dropped from DLQ\n"])),
       [[[NNr, Msg, TSclientout, TShbqin, erlang:now()] | lists:droplast(DLQ)], Size]
   end.
 
