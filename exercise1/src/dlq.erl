@@ -11,8 +11,8 @@ initDLQ(Size, Datei) ->
 delDLQ(_) -> ok.
 
 % liefert die Nachrichtennummer, die als nächstes in der DLQ gespeichert werden kann. Bei leerer DLQ ist dies 1.
-expectedNr([[], _]) -> 1;
-expectedNr([[[NNr, _, _, _] | _], _]) -> NNr + 1.
+expectedNr([[], _Size]) -> 1;
+expectedNr([[[NNr, _Msg, _TSclientout, _TShbqin, _TSdlqin] | _Rest], _Size]) -> NNr + 1.
 
 % speichert die Nachricht [NNr,Msg,TSclientout,TShbqin] in der DLQ Queue und fügt ihr einen Eingangszeitstempel an
 % (einmal an die Nachricht Msg und als expliziten Zeitstempel TSdlqin mit erlang:now() an die Liste an. Bei Erfolg wird
@@ -26,19 +26,25 @@ push2DLQ([NNr, Msg, TSclientout, TShbqin], [DLQ, Size], Datei) ->
       [[[NNr, Msg, TSclientout, TShbqin, erlang:now()] | lists:droplast(DLQ)], Size]
   end.
 
-findNextBiggerNNr(NNr, Queue) -> ok.
+findNextBiggerNNrMessage(NNr, Queue) -> ok.
 
 % Ausliefern einer Nachricht an einen Leser-Client
-deliverMSG(MSGNr, _ClientPID, [[], _Size], Datei) ->
-  % TODO: Sollte die Nachrichtennummer nicht mehr vorhanden sein, wird die nächst größere in der DLQ vorhandene Nachricht gesendet
-  werkzeug:logging(Datei, lists:concat(["DLQ>>> message ", MSGNr, " could not be sent because it was not found\n"])),
-  fail;
-deliverMSG(MSGNr, ClientPID, [[[NNr, _, _, _, _] | DLQRest], Size], Datei) ->
+deliverMSG(MSGNr, ClientPID, Queue, Datei) -> deliverMSG(MSGNr, ClientPID, Queue, Datei, Queue).
+
+% Sollte die Nachrichtennummer nicht mehr vorhanden sein, wird die nächst größere in der DLQ vorhandene Nachricht gesendet
+deliverMSG(MSGNr, ClientPID, Queue, Datei, [[], _Size]) ->
+  [NNr, Msg, TSclientout, TShbqin, TSdlqin] = findNextBiggerNNrMessage(MSGNr, Queue),
+  ClientPID ! {send, [NNr, Msg, TSclientout, TShbqin, TSdlqin, erlang:now()]},
+  werkzeug:logging(Datei, lists:concat(["DLQ>>> message ", NNr, " to Client<", ClientPID, "> sent\n"])),
+  NNr;
+
+% Falls Nachricht mit MSGNr vorhanden ist, senden an Client, ansonsten weitersuchen im DLQRest
+deliverMSG(MSGNr, ClientPID, Queue, Datei, [[[NNr, Msg, TSclientout, TShbqin, TSdlqin] | DLQRest], Size]) ->
   if
     NNr == MSGNr ->
+      ClientPID ! {send, [NNr, Msg, TSclientout, TShbqin, TSdlqin, erlang:now()]},
       werkzeug:logging(Datei, lists:concat(["DLQ>>> message ", MSGNr, " to Client<", ClientPID, "> sent\n"])),
-      % TODO: sendet die Nachricht MSGNr an den Leser-Client ClientPID. Dabei wird ein Ausgangszeitstempel TSdlqout mit erlang:now() an das Ende der Nachrichtenliste angefügt.
       MSGNr;
     MSGNr /= NNr ->
-      deliverMSG(MSGNr, ClientPID, [DLQRest, Size], Datei)
+      deliverMSG(MSGNr, ClientPID, Queue, Datei, [DLQRest, Size])
   end.
