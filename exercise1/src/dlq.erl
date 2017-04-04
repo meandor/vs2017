@@ -51,7 +51,7 @@ deliverMSG(MSGNr, ClientPID, Queue, Datei) -> deliverMSG(MSGNr, ClientPID, Queue
 % Sollte die Nachrichtennummer nicht mehr vorhanden sein, wird die nächst größere in der DLQ vorhandene Nachricht gesendet
 deliverMSG(MSGNr, ClientPID, Queue, Datei, [[], _Size]) ->
   [NNr, Msg, TSclientout, TShbqin, TSdlqin] = findNextBiggerNNrMessage(MSGNr, Queue),
-  %ClientPID ! {send, [NNr, Msg, TSclientout, TShbqin, TSdlqin, erlang:now()]},
+  ClientPID ! {send, [NNr, Msg, TSclientout, TShbqin, TSdlqin, erlang:now()]},
   werkzeug:logging(Datei, lists:concat(["DLQ>>> message ", NNr, " to Client<", ClientPID, "> sent\n"])),
   NNr;
 
@@ -59,7 +59,7 @@ deliverMSG(MSGNr, ClientPID, Queue, Datei, [[], _Size]) ->
 deliverMSG(MSGNr, ClientPID, Queue, Datei, [[[NNr, Msg, TSclientout, TShbqin, TSdlqin] | DLQRest], Size]) ->
   if
     NNr =:= MSGNr ->
-      %ClientPID ! {send, [NNr, Msg, TSclientout, TShbqin, TSdlqin, erlang:now()]},
+      ClientPID ! {send, [NNr, Msg, TSclientout, TShbqin, TSdlqin, erlang:now()]},
       werkzeug:logging(Datei, lists:concat(["DLQ>>> message ", MSGNr, " to Client<", ClientPID, "> sent\n"])),
       MSGNr;
     true ->
