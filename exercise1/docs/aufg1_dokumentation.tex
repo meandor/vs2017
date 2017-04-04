@@ -22,7 +22,11 @@
 
 \textbf{Team:} Falco Winkler (FW), Daniel Schruhl (DS)\\
 \\
-\textbf{Aufgabenteilung:}\\
+\textbf{Aufgabenteilung:}
+\begin{itemize}
+    \item DLQ (DS)
+	\item HBQ (FW)
+\end{itemize}
 
 \textbf{Quellenangaben:}\\
 \\
@@ -30,12 +34,14 @@
 \begin{itemize}
 	\item 26.03.2017 (FW,DS)
 	\item 03.04.2017 (DS)
+	\item 04.04.2017 (DS)
 \end{itemize}
 
 \textbf{Aktueller Stand:}\\
 
-\textbf{Änderung des Entwurfs:}\\
+\textbf{Änderung des Entwurfs:}
 \begin{itemize}
+    \item Formatierung angepasst
 	\item Komponentendiagramm erweitert
 \end{itemize}
 
@@ -94,125 +100,86 @@ Das Client-Paket beinhaltet die Client-Module. Diese sind zum einen der Lese Cli
 
 \subsection{Verteilungssicht}
 
-
-\subsection{Konfigurationsparameter}
-
-
-\subsection{Benutzungsschnittstelle}
-
 \newpage
 \section{Subsysteme und Komponenten}
-\subsection{Client}
-\subsubsection{Aufgabe und Verantwortung des Clients}
-Der Client ist ein einzelner Prozess, der sich jedoch in zwei Rollen aufteilt. Im Endlosdurchlauf einer Schleife wechselt er zwischen Leser und Redakteur - Rolle.\\
 
-Der Client wird in drei Module aufgespalten: Client, Reader und Writer. Client ruft in einer Endlosschleife wechselweise die soeben beschriebene Funktionalität in den Modulen Reader und Writer auf.
+\subsection{Server}
+\subsubsection{Aufgabe und Verantwortung}
+Der Server hat die Aufgaben  
+\begin{enumerate}
+	\item{Sich anfragende Clients mit ProzessID und Zeitstempel zu merken}
+    \item{Clients die ihnen zugehörigen Nachrichten zurückzugeben}
+\end{enumerate}
+Für die erste Aufgabe wird das Modul CMEM verwendet. 
+Zum Senden an die Clients leitet der Server die Nachrichten zunächst an die HBQ weiter. 
+Erscheint eine Anfrage vom Client, erfolgt über die HBQ der Aufruf an die DLQ, die Nachricht zu übermitteln.
 
 \subsubsection{Entwurfsentscheidungen}
+Der Server bearbeitet Anfragen per message passing. Die NNr ist ein Zählerwert, der nach jedem Herausgeben an einen Client inkrementiert wird.
+
 \subsubsection{Außensicht}
+Es werden Schnittstellen zur Abfage der aktuellen NNr, zum Holen \& Speichern von Nachrichten bereitgestellt. Nach einer bestimmten, aber nach Außen unbekannten Zeit werden auch bereits abgeholte Nachrichten ausgeliefert.
+
 \subsubsection{Innensicht}
+Anfragen werden in einer Endlosschleife abgefragt und nur an die jeweiligen Komponenten weitergeleitet. Fehlerbehandlung erfolgt in den jeweiligen Komponenten. Bei jeder Anfrage erfolgt die Abfrage \& Aktualisierung der CMEM, um sich den anfragenden Client zu merken und Anfragen an die HBQ korrekt zu stellen.
+			
 \subsubsection{Konfigurationsparameter}
-\subsubsection{Komponente Leserclient}
-    	
-    		\paragraph{Aufgabe und Verantwortung des Leseclients}
-    		Der Leseclient liest solange Nachrichten vom Server, 
-    		bis keine weiteren Nachrichten mehr vorhanden sind.
-			\paragraph{Entwurfsentscheidungen}
-			\paragraph{Außensicht}
-			\paragraph{Innensicht}
-			\paragraph{Konfigurationsparameter}
-		
-		\subsubsection{Komponente Redakteurclient}
-		
-		    \paragraph{Aufgabe und Verantwortung des Redakteurclients}
-		    Der Redakteurclient sendet fünf Nachrichten an den Server, 
-		    und fragt danach einmal die nächste NNr ab, um eine Lücke in den fortlaufend 
-		    nummerierten Nachrichten zu produzieren.
-			\paragraph{Entwurfsentscheidungen}
-			\paragraph{Außensicht}
-			\paragraph{Innensicht}
-			\paragraph{Konfigurationsparameter}
+\begin{enumerate}
+    \item{Latenzzeit bestimmt die maximale Zeit die der Server ungenutzt läuft.}
+    \item{Lebenszeit des Clients bestimmt die Zeit, für die sich der Server einen Client merkt.}
+    \item{Name definiert den Namen der Server - Node}
+    \item{HBQ - Name \& Node definieren die Verknüpfung zur HBQ - Node}
+\end{enumerate}
+
+\subsubsection{Benutzungsschnittstelle}
+Der Server wird nur durch seine Schnitstellen vom Client verwendet.
+\newpage
+
+\subsection{CMEM-Modul}
+\subsubsection{Aufgabe und Verantwortung}
+Dieses Modul hat die Aufgabe sich anfragende Clients mittels einer ProzessID und eines Zeitstempels zu merken, und diese für den Server bereitzustellen.
+
+\subsubsection{Entwurfsentscheidungen}
+Als Datenstruktur wird ein Dictionary verwendet. Jeder Client wird mittels seiner ProzessID eindeutig auf einen Offset und auf einen Zeitstempel der letzten Anfrage abgebildet. Der Offset wird verwendet, um sich zu merken, welche Nachricht als letztes an den Client gesendet wurde.
+
+\subsubsection{Außensicht}
+Die CMEM wird nur über Funktionsaufrufe durch den Server aufgerufen.
+
+\subsubsection{Innensicht}
+Intern arbeiten die Methoden deleteIdleClients und insertOrUpdateClient auf der Datenstruktur. getTimestampAndOffset gibt für einen Client den Entsprechenden Offset und Timestamp zurück. Nur der Server verarbeitet die zurückgegebenen Werte.
+
+\subsubsection{Konfigurationsparameter}
 			
-	\subsection{Server}
-	
-		\subsubsection{Aufgabe und Verantwortung des Servers}
-			Der Server hat die Aufgaben  
-			\begin{enumerate}
-    			\item{Sich anfragende Clients mit ProzessID und Zeitstempel zu merken}
-    			\item{Clients die ihnen zugehörigen Nachrichten zurückzugeben}
-			\end{enumerate}
-			Für die erste Aufgabe wird das Modul CMEM verwendet. 
-			Zum Senden an die Clients leitet der Server die Nachrichten zunächst an die HBQ weiter. 
-			Erscheint eine Anfrage vom Client, erfolgt über die HBQ der Aufruf an die DLQ, 
-			die Nachricht zu übermitteln.
-		\subsubsection{Entwurfsentscheidungen}
-			Der Server bearbeitet Anfragen per message passing. Die NNr ist ein Zählerwert,
-			der nach jedem Herausgeben an einen Client inkrementiert wird.
-		\subsubsection{Außensicht}
-			Es werden Schnittstellen zur Abfage der aktuellen NNr, zum Holen \& Speichern 
-			von Nachrichten bereitgestellt. Nach einer bestimmten, aber nach Außen unbekannten 
-			Zeit werden auch bereits abgeholte Nachrichten ausgeliefert.
-		\subsubsection{Innensicht}
-			Anfragen werden in einer Endlosschleife abgefragt und nur an die jeweiligen 
-			Komponenten weitergeleitet. Fehlerbehandlung erfolgt in den jeweiligen Komponenten.
-			Bei jeder Anfrage erfolgt die Abfrage \& Aktualisierung der CMEM,
-			um sich den anfragenden Client zu merken und Anfragen an die HBQ korrekt zu stellen.
-			
-		\subsubsection{Konfigurationsparameter}
-			\begin{enumerate}
-    			\item{Latenzzeit bestimmt die maximale Zeit die der Server ungenutzt läuft.}
-    			\item{Lebenszeit des Clients bestimmt die Zeit, für die sich der Server einen 
-    					Client merkt.}
-    			\item{Name definiert den Namen der Server - Node}
-    			\item{HBQ - Name \& Node definieren die Verknüpfung zur HBQ - Node}
-    		\end{enumerate}
-		\subsubsection{Benutzungsschnittstelle}
-			Der Server wird nur durch seine Schnitstellen vom Client verwendet.
-		\subsubsection{Komponente CMEM}
-			\paragraph{Aufgabe und Verantwortung der CMEM}
-				Dieses Modul hat die Aufgabe sich anfragende Clients mittels einer ProzessID und eines Zeitstempels zu merken, und diese für den Server bereitzustellen.
-			\paragraph{Entwurfsentscheidungen}
-				Als Datenstruktur wird ein Dictionary verwendet. Jeder Client wird mittels
-				seiner ProzessID eindeutig auf einen Offset und auf einen Zeitstempel der 
-				letzten Anfrage abgebildet. Der Offset wird verwendet, um sich zu merken, 
-				welche Nachricht als letztes an den Client gesendet wurde.
-			\paragraph{Außensicht}
-				Die CMEM wird nur über Funktionsaufrufe durch den Server aufgerufen.
-			\paragraph{Innensicht}
-				Intern arbeiten die Methoden deleteIdleClients und insertOrUpdateClient
-				auf der Datenstruktur. getTimestampAndOffset gibt für einen Client den Entsprechenden
-				Offset und Timestamp zurück. Nur der Server verarbeitet die zurückgegebenen Werte.
-			\paragraph{Konfigurationsparameter}
-				-
-			
-			
-		\subsubsection{Komponente HBQ}
-			\paragraph{Aufgabe und Verantwortung der HBQ}
-				Von Redakteur-Clients gesendete Nachrichten werden hier zwischengespeichert. Gibt es keine Lücke in der fortlaufenden Nummerierung der Nachrichten, werden Sie an die DLQ weitergeleitet. Bei einer Überfüllung der HBQ (2/3 der Maximalen Kapazität der DLQ) wird die älteste Lücke in den Nachrichten mit einer künstlichen Nachricht geschlossen, und es werden erneut alle Lückenlosen Nachrichten an die DLQ weitergeleitet. Die HBQ stellt nur ein Interface für den Server bereit.
-			\paragraph{Entwurfsentscheidungen}
-				Es wird die Aktuelle NNr gespeichert.
-				Jede Nachricht, die der aktuellen erwarteten NNr entspricht, wird direkt weitergeleitet.
-				Wenn noch auf alte Nachrichten gewartet wird, wird die nachricht in die HBQ eingefügt.
-				Wenn die Nachrichtennummer größer als der erwarteten Nachrichtennummer ist,
-				müssen alle bereits empfangenennachrichten ab der erwarteten Nachrichtennummer durchgegangen werden.
-				Die Nachrichten, die aufeinanderfolgende Sequenznummern haben werden an die
-				DLQ ausgeliefert.
+\subsection{Komponente HBQ}
+\subsubsection{Aufgabe und Verantwortung der HBQ}
+Von Redakteur-Clients gesendete Nachrichten werden hier zwischengespeichert. Gibt es keine Lücke in der fortlaufenden Nummerierung der Nachrichten, werden Sie an die DLQ weitergeleitet. Bei einer Überfüllung der HBQ (2/3 der Maximalen Kapazität der DLQ) wird die älteste Lücke in den Nachrichten mit einer künstlichen Nachricht geschlossen, und es werden erneut alle Lückenlosen Nachrichten an die DLQ weitergeleitet. Die HBQ stellt nur ein Interface für den Server bereit.
+
+\subsubsection{Entwurfsentscheidungen}
+Es wird die Aktuelle NNr gespeichert.
+Jede Nachricht, die der aktuellen erwarteten NNr entspricht, wird direkt weitergeleitet.
+Wenn noch auf alte Nachrichten gewartet wird, wird die nachricht in die HBQ eingefügt.
+Wenn die Nachrichtennummer größer als der erwarteten Nachrichtennummer ist,
+müssen alle bereits empfangenennachrichten ab der erwarteten Nachrichtennummer durchgegangen werden.
+Die Nachrichten, die aufeinanderfolgende Sequenznummern haben werden an die
+DLQ ausgeliefert.
 				
-				if currentNNr == NNr
-					currentNNr +=1
-					pushToDLQ(NNr)
-				else
-					insert(NNr)
-					currentNNr = pushAllConsecutiveFrom(currentNNr) 
+if currentNNr == NNr
+	currentNNr +=1
+	pushToDLQ(NNr)
+else
+	insert(NNr)
+	currentNNr = pushAllConsecutiveFrom(currentNNr) 
 				
-			\paragraph{Außensicht}
-			\paragraph{Innensicht}
-			\paragraph{Konfigurationsparameter}
-				\begin{enumerate}
-    				\item{Die Maximalgröße der DLQ wird verwendet um die HBQ bei kritischer 
-    				Überfüllung zu leeren.}
-    			\end{enumerate}
-			
+\subsubsection{Außensicht}
+
+\subsubsection{Innensicht}
+
+\subsubsection{Konfigurationsparameter}
+\begin{itemize}
+	\item Die Maximalgröße der DLQ wird verwendet um die HBQ bei kritischer Überfüllung zu leeren.
+\end{itemize}
+\newpage
+
 \subsection{DLQ-Modul}
 \subsubsection{Aufgabe und Verantwortung}
 Die Deliveryqueue hat die Aufgabe Nachrichten an Clients zuzustellen und stellt eine Datenstruktur dar, die eine maximale Menge (Kapazität) an Nachrichten hält. Sie verhält sich dabei wie von einer Warteschlange zu erwarten beim Einfügen und Herausholen von Nachrichten (FIFO). Nur das HBQ-Modul darf auf das DLQ-Modul zugreifen. Das DLQ-Modul sendet über eine Schnittstelle der Clients die Nachrichten an die Clients.
@@ -258,9 +225,9 @@ MSG_List := [NNr,Msg,TSclientout,TShbqin,TSdlqin,TSdlqout]:
 DLQ := [Nachrichtenliste, Kapazitaet]: [List X Integer]
 \end{lstlisting}
 
-Neue Nachrichten werden am Anfang der Liste angefügt. Das vereinfacht die Nachfrage nach der nächsten zu speichernden Nachrichtennummer in der DLQ. Demnach werden Nachrichten am Ende der Liste entnommen.
+Neue Nachrichten werden am Anfang der Liste angefügt. Das vereinfacht die Nachfrage nach der nächsten zu speichernden Nachrichtennummer in der DLQ. Demnach werden Nachrichten am Ende der Liste entnommen. Wenn eine Nachricht in die DLQ eingetragen wird, wird ans Ende der Nachricht der aktuelle Zeitstempel zum Zeitpunkt des Einfügens hinzugefügt.
 
-Das kann passieren, wenn die Größe der Liste gleich ihrer Kapazität ist und eine neue Nachricht hinzugefügt werden soll.\\
+Nachrichten werde der DLQ entnommen, wenn die Größe der Liste gleich ihrer Kapazität ist und eine neue Nachricht hinzugefügt werden soll.\\
 
 Beim senden einer Nachricht durch Angabe der Nachrichtennummer wird in der DLQ nach der Nachricht mit der Nachrichtennummer gesucht. Wenn diese gefunden wird, wird die Nachricht an den Client (mit der ClientPID) gesendet und die Nachrichtennummer zurück gegeben. Falls die Nachricht nicht gefunden werden konnte, wird die nächste Nachricht mit der nächst größeren Nachrichtennummer an den Client gesendet.
 
