@@ -1,4 +1,4 @@
--module(dlq_test).
+-module(dlq_tests).
 -include_lib("eunit/include/eunit.hrl").
 
 % Should create an empty DLQ

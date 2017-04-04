@@ -8,7 +8,7 @@
     stdlib
    ]},
   {env,[]},
-  {modules, []},
+  {modules, [exercise1_app, dlq]},
 
   {maintainers, []},
   {licenses, []},
