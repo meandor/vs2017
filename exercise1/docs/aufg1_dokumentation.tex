@@ -149,13 +149,13 @@ Der Client wird in drei Module aufgespalten: Client, Reader und Writer. Client r
 			Der Server bearbeitet Anfragen per message passing. Die NNr ist ein Zählerwert,
 			der nach jedem Herausgeben an einen Client inkrementiert wird.
 		\subsubsection{Außensicht}
-			Es werden Schnittstellen zur Abfage der aktuellen NNr, zum Holen & Speichern 
+			Es werden Schnittstellen zur Abfage der aktuellen NNr, zum Holen \& Speichern 
 			von Nachrichten bereitgestellt. Nach einer bestimmten, aber nach Außen unbekannten 
 			Zeit werden auch bereits abgeholte Nachrichten ausgeliefert.
 		\subsubsection{Innensicht}
 			Anfragen werden in einer Endlosschleife abgefragt und nur an die jeweiligen 
 			Komponenten weitergeleitet. Fehlerbehandlung erfolgt in den jeweiligen Komponenten.
-			Bei jeder Anfrage erfolgt die Abfrage & Aktualisierung der CMEM,
+			Bei jeder Anfrage erfolgt die Abfrage \& Aktualisierung der CMEM,
 			um sich den anfragenden Client zu merken und Anfragen an die HBQ korrekt zu stellen.
 			
 		\subsubsection{Konfigurationsparameter}
@@ -164,7 +164,7 @@ Der Client wird in drei Module aufgespalten: Client, Reader und Writer. Client r
     			\item{Lebenszeit des Clients bestimmt die Zeit, für die sich der Server einen 
     					Client merkt.}
     			\item{Name definiert den Namen der Server - Node}
-    			\item{HBQ - Name & Node definieren die Verknüpfung zur HBQ - Node}
+    			\item{HBQ - Name \& Node definieren die Verknüpfung zur HBQ - Node}
     		\end{enumerate}
 		\subsubsection{Benutzungsschnittstelle}
 			Der Server wird nur durch seine Schnitstellen vom Client verwendet.
@@ -213,18 +213,9 @@ Der Client wird in drei Module aufgespalten: Client, Reader und Writer. Client r
     				Überfüllung zu leeren.}
     			\end{enumerate}
 			
-		\subsubsection{Komponente DLQ}
-			\paragraph{Aufgabe und Verantwortung der DLQ}
-				Die Delivery - Queue hat die Aufgabe Nachrichten an Clients zuzustellen. 
-				Die Nachrichten in der DLQ liegen immer sortiert vor, und es gibt keine Lücken in den NNr’s.
-				Bei dem Sendevorgang erhält die DLQ ein Signal von der HBQ mit der PID des Ziel - Clients und der Nachrichtennummer. Daraufhin wird die Nachricht mit dieser NNr an den Client verschickt.
-				Wenn diese Nachricht nicht vorhanden ist wird die Nachricht mit der nächst höheren NNr verschickt. 
-				Es wird jeweils die Nummer der verschickten Nachricht zurückgegeben.
-			\paragraph{Entwurfsentscheidungen}
-			\paragraph{Außensicht}
-			\paragraph{Innensicht}
-			\paragraph{Konfigurationsparameter}
-				
+\subsection{DLQ-Modul}
+\subsubsection{Aufgabe und Verantwortung}
+Die Deliveryqueue hat die Aufgabe Nachrichten an Clients zuzustellen und stellt eine Datenstruktur dar, die eine maximale Menge (Kapazität) an Nachrichten hält. Sie verhält sich dabei wie von einer Warteschlange zu erwarten beim Einfügen und Herausholen von Nachrichten (FIFO). Nur das HBQ-Modul darf auf das DLQ-Modul zugreifen. Das DLQ-Modul sendet über eine Schnittstelle der Clients die Nachrichten an die Clients.
 
 \subsubsection{Schnittstelle}
 \begin{lstlisting}[language=erlang]
@@ -243,8 +234,18 @@ deliverMSG(MSGNr,ClientPID,Queue,Datei):
     Integer X PID X DQueue X Atom -> Integer
 \end{lstlisting}
 
+\textbf{initDLQ(Size,Datei)}: initialisiert die DLQ mit Kapazität Size. Bei Erfolg wird eine leere DLQ zurück geliefert. Datei kann für ein logging genutzt werden.\\
+
+\textbf{delDLQ(Queue)}: löscht die DLQ. Bei Erfolg wird ok zurück geliefert.\\
+
+\textbf{expectedNr(Queue)}: liefert die Nachrichtennummer, die als nächstes in der DLQ gespeichert werden kann. Bei leerer DLQ ist dies 1.\\
+
+\textbf{push2DLQ([NNr,Msg,TSclientout,TShbqin],Queue,Datei)}: speichert die Nachricht [NNr,Msg,TSclientout,TShbqin] in der DLQ Queue und fügt ihr einen Eingangszeitstempel an (einmal an die Nachricht Msg und als expliziten Zeitstempel TSdlqin mit erlang:now() an die Liste an. Bei Erfolg wird die modifizierte DLQ zurück geliefert. Datei kann für ein logging genutzt werden.\\
+
+\textbf{deliverMSG(MSGNr,ClientPID,Queue,Datei)}: sendet die Nachricht MSGNr an den Leser-Client ClientPID. Dabei wird ein Ausgangszeitstempel TSdlqout mit erlang:now() an das Ende der Nachrichtenliste angefügt. Sollte die Nachrichtennummer nicht mehr vorhanden sein, wird die nächst größere in der DLQ vorhandene Nachricht gesendet. Bei Erfolg wird die tatsächlich gesendete Nachrichtennummer zurück geliefert. Datei kann für ein logging genutzt werden.\\
+
 \subsubsection{Entwurfsentscheidungen}
-Die Deliveryqueue wird als Erlang Liste realisiert. Das erste Element der Liste ist dabei eine Liste der Nachrichten und das zweite Element der Liste gibt die Kapazität der DLQ an.
+Die Deliveryqueue wird als Liste realisiert. Das erste Element der Liste ist dabei eine Liste der Nachrichten und das zweite Element der Liste gibt die Kapazität der DLQ an.
 \begin{lstlisting}[language=erlang]
 /* Nachrichten Format */
 /* minimal 3 Elemente, pro Station kommt eins hinzu; maximal 6 Elemente */
@@ -252,16 +253,18 @@ MSG_List := [NNr,Msg,TSclientout,TShbqin,TSdlqin,TSdlqout]:
     [Integer X String X 3-Tupel X 3-Tupel X 3-Tupel X 3-Tupel]
 
 /* DLQ Format */
-/* Nachrichtenliste ist eine Liste aus Nachrichten und hat */
-/* maximal Kapazitaet Anzahl an  Elementen */
+/* Nachrichtenliste ist eine Liste aus MSG_List und hat */
+/* maximal Kapazitaet Anzahl an Elementen */
 DLQ := [Nachrichtenliste, Kapazitaet]: [List X Integer]
 \end{lstlisting}
 
 Neue Nachrichten werden am Anfang der Liste angefügt. Das vereinfacht die Nachfrage nach der nächsten zu speichernden Nachrichtennummer in der DLQ. Demnach werden Nachrichten am Ende der Liste entnommen.
 
-Das kann passieren, wenn die Größe der Liste gleich ihrer Kapazität ist und eine Neue Nachricht hinzugefügt werden soll.
+Das kann passieren, wenn die Größe der Liste gleich ihrer Kapazität ist und eine neue Nachricht hinzugefügt werden soll.\\
 
-\paragraph{Konfigurationsparameter}
+Beim senden einer Nachricht durch Angabe der Nachrichtennummer wird in der DLQ nach der Nachricht mit der Nachrichtennummer gesucht. Wenn diese gefunden wird, wird die Nachricht an den Client (mit der ClientPID) gesendet und die Nachrichtennummer zurück gegeben. Falls die Nachricht nicht gefunden werden konnte, wird die nächste Nachricht mit der nächst größeren Nachrichtennummer an den Client gesendet.
+
+\subsubsection{Konfigurationsparameter}
 \begin{itemize}
     \item Kapazität der DLQ
 \end{itemize}
