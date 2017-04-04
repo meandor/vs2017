@@ -12,7 +12,7 @@ initHBQ(Size, Datei) ->
 loop(Messages, HBQSize, CurrentNNr) ->
   receive
     {deliverMSG,NNr,ToClient, Datei} ->
-      dlq:deliverMSG(NNr, ToClient, [[], _Size], Datei);
+      dlq:deliverMSG(NNr, ToClient, [[], 3], Datei); % TODO: fix issue with size
     {dellHBQ} ->
       exit("dellHBQ was called"), ok;
     {pushHBQ, {[NNr, Msg, TSclientout, TShbqin], [DLQ, Size], Datei}}  ->
