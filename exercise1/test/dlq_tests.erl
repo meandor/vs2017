@@ -3,6 +3,7 @@
 
 emptyDLQSize3() -> [[], 3].
 twoElementsDLQSize2() -> [[[2, "foobar42", 42, 13, 123], [1, "foobar1", 22, 14, 134]], 2].
+clientPID() -> 3.
 
 % Should create an empty DLQ
 initDLQ_test() -> ?_assert(emptyDLQSize3() =:= dlq:initDLQ(3, 'test.log')).
@@ -25,5 +26,8 @@ push2DLQ_valid_insertion_in_full_dlq_test() ->
   [[[3, "foobar", 1337, 42, Timestamp], [2, "foobar42", 42, 13, _]], 2] = dlq:push2DLQ([3, "foobar", 1337, 42], twoElementsDLQSize2(), 'test.log'),
   Timestamp > 0.
 
-deliverMSG_existent_message_test() ->
-  1 = dlq:deliverMSG(1, 3, twoElementsDLQSize2(), 'test.log').
+deliverMSG_existent_message_test_() ->
+  [
+    ?_assert(1 =:= dlq:deliverMSG(1, clientPID(), twoElementsDLQSize2(), 'test.log')), % message nr exists in dlq
+    ?_assert(1 =:= dlq:deliverMSG(0, clientPID(), twoElementsDLQSize2(), 'test.log')) % message nr does not exist in dlq
+  ].
