@@ -20,13 +20,14 @@ expectedNr([[[NNr, _Msg, _TSclientout, _TShbqin, _TSdlqin] | _Rest], _Size]) -> 
 % (einmal an die Nachricht Msg und als expliziten Zeitstempel TSdlqin mit erlang:now() an die Liste an. Bei Erfolg wird
 % die modifizierte DLQ zurück geliefert. Datei kann für ein logging genutzt werden.
 push2DLQ([NNr, Msg, TSclientout, TShbqin], [DLQ, Size], Datei) ->
-  werkzeug:logging(Datei, lists:concat(["DLQ>>> message number ", NNr, " added to DLQ\n"])),
   if
     length(DLQ) < Size ->
+      werkzeug:logging(Datei, lists:concat(["DLQ>>> message number ", NNr, " added to DLQ\n"])),
       [[[NNr, Msg, TSclientout, TShbqin, erlang:now()] | DLQ], Size];
     length(DLQ) =:= Size ->
       [LastNNr, _Msg, _TSclientout, _TShbqin, _TSdlqin] = lists:last(DLQ),
       werkzeug:logging(Datei, lists:concat(["DLQ>>> message number ", LastNNr, " dropped from DLQ\n"])),
+      werkzeug:logging(Datei, lists:concat(["DLQ>>> message number ", NNr, " added to DLQ\n"])),
       [[[NNr, Msg, TSclientout, TShbqin, erlang:now()] | lists:droplast(DLQ)], Size]
   end.
 
