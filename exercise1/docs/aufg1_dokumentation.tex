@@ -216,8 +216,8 @@ Die Deliveryqueue wird als Liste realisiert. Das erste Element der Liste ist dab
 \begin{lstlisting}[language=erlang]
 /* Nachrichten Format */
 /* minimal 3 Elemente, pro Station kommt eins hinzu; maximal 6 Elemente */
-MSG_List := [NNr,Msg,TSclientout,TShbqin,TSdlqin,TSdlqout]:
-    [Integer X String X 3-Tupel X 3-Tupel X 3-Tupel X 3-Tupel]
+MSG_List := [NNr,Msg,TSclientout,TShbqin,TSdlqin]:
+    [Integer X String X 3-Tupel X 3-Tupel X 3-Tupel]
 
 /* DLQ Format */
 /* Nachrichtenliste ist eine Liste aus MSG_List und hat */
