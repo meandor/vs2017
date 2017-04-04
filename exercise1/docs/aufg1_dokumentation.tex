@@ -177,10 +177,10 @@ CMEM := [ClientList, RemTime]: [List X Integer]
 \end{lstlisting}
 
 Falls beim Aktualisieren eines Clients der Client noch nicht im CMEM steht, wird er hinzugefügt.
-Ansonsten wird er einfach mit den angegebenen Parametern in der CMEM Client Liste aktualisiert.
+Ansonsten wird er einfach mit den angegebenen Parametern in der CMEM Client Liste aktualisiert.\\
 
-Wenn die nächste Nachrichtennummer für einen Client abgerufen wird (getClientNNr), wird ein Check gemacht, ob der Client bekannt ist.
-Ein Client ist bekannt, wenn er in der CMEM Liste steht und wenn die Differenz seines Timestamps mit der aktuellen Zeit als Timestamp nicht größer als die angegebene RemTime ist.
+Wenn die nächste Nachrichtennummer für einen Client abgerufen wird (\texttt{getClientNNr}), wird ein Check gemacht, ob der Client bekannt ist.
+Ein Client ist bekannt, wenn er in der CMEM Liste steht und wenn die Summe seines Timestamps mit der RemTime größer gleich der aktuellen Zeit (als Timestamp) ist.\\
 
 Für bekannte Clients wird die resultierende nächste Nachrichtennummer inkrementiert. Für unbekannte Clients wird 1 als nächste Nachrichtennummer zurück gegeben.
 
