@@ -190,6 +190,21 @@ Der Client wird in drei Module aufgespalten: Client, Reader und Writer. Client r
 			\paragraph{Aufgabe und Verantwortung der HBQ}
 				Von Redakteur-Clients gesendete Nachrichten werden hier zwischengespeichert. Gibt es keine Lücke in der fortlaufenden Nummerierung der Nachrichten, werden Sie an die DLQ weitergeleitet. Bei einer Überfüllung der HBQ (2/3 der Maximalen Kapazität der DLQ) wird die älteste Lücke in den Nachrichten mit einer künstlichen Nachricht geschlossen, und es werden erneut alle Lückenlosen Nachrichten an die DLQ weitergeleitet. Die HBQ stellt nur ein Interface für den Server bereit.
 			\paragraph{Entwurfsentscheidungen}
+				Es wird die Aktuelle NNr gespeichert.
+				Jede Nachricht, die der aktuellen erwarteten NNr entspricht, wird direkt weitergeleitet.
+				Wenn noch auf alte Nachrichten gewartet wird, wird die nachricht in die HBQ eingefügt.
+				Wenn die Nachrichtennummer größer als der erwarteten Nachrichtennummer ist,
+				müssen alle bereits empfangenennachrichten ab der erwarteten Nachrichtennummer durchgegangen werden.
+				Die Nachrichten, die aufeinanderfolgende Sequenznummern haben werden an die
+				DLQ ausgeliefert.
+				
+				if currentNNr == NNr
+					currentNNr +=1
+					pushToDLQ(NNr)
+				else
+					insert(NNr)
+					currentNNr = pushAllConsecutiveFrom(currentNNr) 
+				
 			\paragraph{Außensicht}
 			\paragraph{Innensicht}
 			\paragraph{Konfigurationsparameter}
