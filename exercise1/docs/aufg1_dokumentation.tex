@@ -137,18 +137,59 @@ Der Server wird nur durch seine Schnitstellen vom Client verwendet.
 
 \subsection{CMEM-Modul}
 \subsubsection{Aufgabe und Verantwortung}
-Dieses Modul hat die Aufgabe sich anfragende Clients mittels einer ProzessID und eines Zeitstempels zu merken, und diese für den Server bereitzustellen.
+Dieses Modul hat die Aufgabe sich anfragende Clients, ihre letzte bekommene Nachrichtennummer und den letzten Zeitpunkt ihrer Anfrage zu merken.
+Clients, die sich seit einiger Zeit (Konfigurationsparameter) nicht gemeldet haben, sollen aus dem CMEM-Modul gelöscht werden können.
+
+Die gespeicherten Daten sollen über die Schnittstelle des Moduls vom Server aus abrufbar sein.
+
+\subsubsection{Schnittstelle}
+\begin{lstlisting}[language=erlang]
+/* Initialisieren des CMEM */
+initCMEM(RemTime,Datei): Integer X Atom -> CMem
+
+/* Speichern/Aktualisieren eines Clients in dem CMEM */
+updateClient(CMEM,ClientID,NNr,Datei): Cmem X PID X Integer X Atom -> CMem
+
+/* Abfrage welche Nachrichtennummer der Client als naechstes erhalten darf */
+getClientNNr(CMEM,ClientID) : Cmem X PID -> Integer
+\end{lstlisting}
+
+\textbf{initCMEM(RemTime,Datei)}: initialisiert den CMEM. RemTime gibt dabei die Zeit an, nach der die Clients vergessen werden Bei Erfolg wird ein leeres CMEM zurück geliefert. Datei kann für ein logging genutzt werden.\\
+
+\textbf{updateClient(CMEM,ClientID,NNr,Datei)}: speichert bzw. aktualisiert im CMEM den Client ClientID und die an ihn gesendete Nachrichtenummer NNr. Datei kann für ein logging genutzt werden.\\
+
+\textbf{getClientNNr(CMEM,ClientID)}: gibt die als nächstes vom Client erwartete Nachrichtennummer des Clients ClientID aus CMEM zurück. Ist der Client unbekannt wird 1 zurück gegeben.\\
 
 \subsubsection{Entwurfsentscheidungen}
-Als Datenstruktur wird ein Dictionary verwendet. Jeder Client wird mittels seiner ProzessID eindeutig auf einen Offset und auf einen Zeitstempel der letzten Anfrage abgebildet. Der Offset wird verwendet, um sich zu merken, welche Nachricht als letztes an den Client gesendet wurde.
+Die CMEM wird mit Hilfe einer Liste realisiert. An erster Stelle der CMEM Liste steht die Liste der Clients. Die Elemente der Client Liste sind Tupel, die aus der Client Prozess ID, der zuletzt erhaltenen NNr und einem Timestamp der letzten Aktion in Millisekunden bestehen.
 
-\subsubsection{Außensicht}
-Die CMEM wird nur über Funktionsaufrufe durch den Server aufgerufen.
+An zweiter Stelle der CMEM Liste steht die maximale Zeit, für die ein Client gemerkt wird in Millisekunden.
 
-\subsubsection{Innensicht}
-Intern arbeiten die Methoden deleteIdleClients und insertOrUpdateClient auf der Datenstruktur. getTimestampAndOffset gibt für einen Client den Entsprechenden Offset und Timestamp zurück. Nur der Server verarbeitet die zurückgegebenen Werte.
+\begin{lstlisting}[language=erlang]
+/* Client Tupel Format */
+Client := {ClientPID,NNr,ClientTS}:
+    {PID X Integer X Integer}
+
+/* CMEM Format */
+/* ClientList ist Liste bestehend aus Clients */
+/* RemTime ist Zeit in Millisekunden fuer die Clients gemerkt werden */
+CMEM := [ClientList, RemTime]: [List X Integer]
+\end{lstlisting}
+
+Falls beim Aktualisieren eines Clients der Client noch nicht im CMEM steht, wird er hinzugefügt.
+Ansonsten wird er einfach mit den angegebenen Parametern in der CMEM Client Liste aktualisiert.
+
+Wenn die nächste Nachrichtennummer für einen Client abgerufen wird (getClientNNr), wird ein Check gemacht, ob der Client bekannt ist.
+Ein Client ist bekannt, wenn er in der CMEM Liste steht und wenn die Differenz seines Timestamps mit der aktuellen Zeit als Timestamp nicht größer als die angegebene RemTime ist.
+
+Für bekannte Clients wird die resultierende nächste Nachrichtennummer inkrementiert. Für unbekannte Clients wird 1 als nächste Nachrichtennummer zurück gegeben.
 
 \subsubsection{Konfigurationsparameter}
+\begin{enumerate}
+    \item{Zeit nach der die Clients vergessen werden in Millisekunden (RemTime)}
+\end{enumerate}
+
+\newpage
 			
 \subsection{Komponente HBQ}
 \subsubsection{Aufgabe und Verantwortung der HBQ}
@@ -203,8 +244,6 @@ deliverMSG(MSGNr,ClientPID,Queue,Datei):
 
 \textbf{initDLQ(Size,Datei)}: initialisiert die DLQ mit Kapazität Size. Bei Erfolg wird eine leere DLQ zurück geliefert. Datei kann für ein logging genutzt werden.\\
 
-\textbf{delDLQ(Queue)}: löscht die DLQ. Bei Erfolg wird ok zurück geliefert.\\
-
 \textbf{expectedNr(Queue)}: liefert die Nachrichtennummer, die als nächstes in der DLQ gespeichert werden kann. Bei leerer DLQ ist dies 1.\\
 
 \textbf{push2DLQ([NNr,Msg,TSclientout,TShbqin],Queue,Datei)}: speichert die Nachricht [NNr,Msg,TSclientout,TShbqin] in der DLQ Queue und fügt ihr einen Eingangszeitstempel an (einmal an die Nachricht Msg und als expliziten Zeitstempel TSdlqin mit erlang:now() an die Liste an. Bei Erfolg wird die modifizierte DLQ zurück geliefert. Datei kann für ein logging genutzt werden.\\
@@ -227,15 +266,21 @@ DLQ := [Nachrichtenliste, Kapazitaet]: [List X Integer]
 
 Neue Nachrichten werden am Anfang der Liste angefügt. Das vereinfacht die Nachfrage nach der nächsten zu speichernden Nachrichtennummer in der DLQ. Demnach werden Nachrichten am Ende der Liste entnommen. Wenn eine Nachricht in die DLQ eingetragen wird, wird ans Ende der Nachricht der aktuelle Zeitstempel zum Zeitpunkt des Einfügens hinzugefügt.
 
-Nachrichten werde der DLQ entnommen, wenn die Größe der Liste gleich ihrer Kapazität ist und eine neue Nachricht hinzugefügt werden soll.\\
+Nachrichten werden der DLQ entnommen, wenn die Größe der Liste gleich ihrer Kapazität ist und eine neue Nachricht hinzugefügt werden soll.\\
 
 Beim senden einer Nachricht durch Angabe der Nachrichtennummer wird in der DLQ nach der Nachricht mit der Nachrichtennummer gesucht. Wenn diese gefunden wird, wird die Nachricht an den Client (mit der ClientPID) gesendet und die Nachrichtennummer zurück gegeben.
 
 Falls die Nachricht nicht gefunden werden konnte, wird die nächste Nachricht mit der nächst größeren Nachrichtennummer an den Client gesendet. Diese wird mit einer Hilfsfunktion ermittelt (via reduce/foldl).
 
+Beim senden einer Nachricht wird die Nachricht zusammen mit einem boolean Flag an den Client gesendet. Dieser boolean Flag signalisiert, ob noch weitere Nachrichten folgen.
+
+Das wird mit einer weiteren Hilfsfunktion \texttt{remainingMessagesExist(MsgNr,DLQ)}) ermittelt.
+
+Diese Hilfsfunktion holt sich den Kopf der DLQ Nachrichtenliste (aktuellste Nachricht mit höchster Nachrichtennummer) und vergleicht, ob diese Nachrichtennummer größer ist als die übergebene \texttt{MsgNr}.
+
 \subsubsection{Konfigurationsparameter}
 \begin{itemize}
-    \item Kapazität der DLQ
+    \item Kapazität der DLQ als ganze Zahl
 \end{itemize}
 
 \end{document}
