@@ -211,7 +211,11 @@ Wenn noch auf alte Nachrichten gewartet wird, wird die nachricht in die HBQ eing
 Wenn die Nachrichtennummer größer als der erwarteten Nachrichtennummer ist,
 müssen alle bereits empfangenennachrichten ab der erwarteten Nachrichtennummer durchgegangen werden.
 Die Nachrichten, die aufeinanderfolgende Sequenznummern haben oder eine Dummy Nachricht sind werden an die
-DLQ ausgeliefert. Eine Dummy Nachricht erhält NNR -1 und kann so identifiziert werden.
+DLQ ausgeliefert. 
+
+Die Dummynachrichten schließen Lücken bestehend aus einer oder mehrerer Sequenznummern.
+Eine Dummynachricht wird durch den String "Fehlernachricht" im Inhalt identifiziert.
+Ihre NNr wird auf das Ende des Intervalls, welches Sie abdeckt festgelegt.
 
 Die Liste wird nach jedem Einfügen Sortiert, um die Reihenfolge zu erhalten. Wenn die Liste überfüllt ist,
 wird rekursiv die erste Lücke zwischen Sequenznummern gesucht. Dann wird eine entsprechende 

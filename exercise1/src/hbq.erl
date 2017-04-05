@@ -6,13 +6,13 @@
 %Wenn die HBQ mehr elemente als 2/3 von Size enthält, wird eine nachricht "aufgefüllt"
 initHBQ(Size, Datei) ->
   werkzeug:logging(Datei, lists:concat(["HBQ>>> initialized with capacity: ", Size, "\n"])),
-  loop([], Size, 0, dlq:initDLQ(100, "logging")).
+  loop([], Size, 0, dlq:initDLQ(100, "DLQLog")), ok.
 
 
 loop(Messages, HBQSize, CurrentNNr, DLQ) ->
   receive
     {deliverMSG,NNr,ToClient, Datei} ->
-      dlq:deliverMSG(NNr, ToClient, [Messages, HBQSize], Datei);
+      dlq:deliverMSG(NNr, ToClient, [DLQ, HBQSize], Datei);
     {dellHBQ} ->
       exit("dellHBQ was called"), ok;
     {pushHBQ, {[NNr, Msg, TSclientout, TShbqin], Datei}}  ->
@@ -24,7 +24,6 @@ loop(Messages, HBQSize, CurrentNNr, DLQ) ->
         {CurrentNNr, Messages} = pushAllConsecutiveSequenceNumbers(Messages, DLQ, Datei),
         loop(Messages, HBQSize, CurrentNNr + 1, DLQ);
         Size >= HBQSize * (2 / 3) ->
-          % TODO: The HBQ is full, insert a placeholder message for the last gap and send all older messages than CurrentNNr
         ok
     end
   end
@@ -32,16 +31,17 @@ loop(Messages, HBQSize, CurrentNNr, DLQ) ->
 
 
 %deliverMSG(MSGNr, ClientPID, Queue, Datei)
-pushAllConsecutiveSequenceNumbers([[NNr, _, _, _] | Tail], DLQ, Datei) ->
+pushAllConsecutiveSequenceNumbers([[NNr, MSG, _, _] | Tail], DLQ, Datei) ->
   dlq:push2DLQ(NNr, DLQ, Datei),
   [NNr2, _, _, _] = Tail,
-  if NNr == NNr2  - 1 ->
+  Fehler = string:str(MSG, "Fehlernachricht"),
+  if NNr == NNr2  - 1 or Fehler ->
       pushAllConsecutiveSequenceNumbers(Tail, DLQ, Datei)
   end,
   werkzeug:logging(Datei, lists:concat(["HBQ>>>sent all messages to dlq until NNR: ", NNr, "\n"])),
   {NNr, Tail}
-
 .
+
 
 
 
