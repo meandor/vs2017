@@ -23,9 +23,6 @@ loop(Messages, HBQSize, CurrentNNr, DLQ) ->
       if NNr == CurrentNNr ->
         {CurrentNNr, Messages} = pushAllConsecutiveSequenceNumbers(Messages, DLQ, Datei),
         loop(Messages, HBQSize, CurrentNNr + 1, DLQ);
-        NNr >= CurrentNNr ->
-          %We are still waiting for older messages. Just append the message to the holdback queue
-          loop(lists:append([NNr, Msg, TSclientout, TShbqin], Messages), HBQSize, CurrentNNr, DLQ);
         Size >= HBQSize * (2 / 3) ->
           % TODO: The HBQ is full, insert a placeholder message for the last gap and send all older messages than CurrentNNr
         ok
