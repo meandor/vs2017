@@ -26,6 +26,12 @@ server(Config, CMEM, HBQPID) ->
       NNr = cmem:getClientNNr(CMEM, ClientPID),
       ClientPID ! {nid, NNr},
       server(Config, CMEM, HBQPID);
+    {ClientPID, getmessages} ->
+      NNr = cmem:getClientNNr(CMEM, ClientPID),
+      HBQPID ! {self(), {request, deliverMSG, NNr, ClientPID}},
+      server(Config, CMEM, HBQPID);
+    {dropmessage, [INNr, Msg, TSclientout]} ->
+      HBQPID ! {self(), {request, pushHBQ, [INNr, Msg, TSclientout]}};
     terminate ->
       ok
   end.
