@@ -1,4 +1,4 @@
--module(reader_client).
+-module(reader).
 -export([read/3, calculateNewInterval/1, setup/1]).
 
 loop(Server, Interval, 5) -> io:format("Lese Nachricht...\n"), loop(Server, Interval, 0);
