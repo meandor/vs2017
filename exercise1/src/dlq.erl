@@ -53,6 +53,11 @@ remainingMessagesExist(MsgNr, [[[NNr, _Msg, _TSclientout, _TShbqin, _TSdlqin] | 
 sendMessage(ClientPID, Message, Terminated) ->
   ClientPID ! {reply, Message, Terminated}.
 
+% TODO: Ein Leser-Client bekommt auf Anfrage gemäß Nachrichtennummerierung eine noch nicht an ihn ausgelieferte und beim
+% TODO: Server bekannte Textzeile geliefert. In einem Flag wird ihm mitgeteilt, ob es noch weitere, für ihn unbekante
+% TODO: Nachrichten gibt. Zudem wird ihm explizit die Nummer dieser Nachricht übermittelt. Wenn der Leser-Client nach
+% TODO: neuen Nachrichten beim Server anfragt, dort jedoch keine neuen bzw. überhaupt noch keine Nachrichten vorhanden
+% TODO: sind, sendet der Server eine nicht leere dummy-Nachricht.
 % Ausliefern einer Nachricht an einen Leser-Client
 deliverMSG(MSGNr, ClientPID, Queue, Datei) -> deliverMSG(MSGNr, ClientPID, Queue, Datei, Queue).
 
