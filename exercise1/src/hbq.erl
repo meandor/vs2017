@@ -6,7 +6,7 @@
 %Wenn die HBQ mehr elemente als 2/3 von Size enthält, wird eine nachricht "aufgefüllt"
 initHBQ(Size, Datei) ->
   werkzeug:logging(Datei, lists:concat(["HBQ>>> initialized with capacity: ", Size, "\n"])),
-  [[], Size], loop([], Size, 0, dlq:initDLQ(100, "logging")).
+  loop([], Size, 0, dlq:initDLQ(100, "logging")).
 
 
 loop(Messages, HBQSize, CurrentNNr, DLQ) ->
@@ -15,7 +15,8 @@ loop(Messages, HBQSize, CurrentNNr, DLQ) ->
       dlq:deliverMSG(NNr, ToClient, [Messages, HBQSize], Datei);
     {dellHBQ} ->
       exit("dellHBQ was called"), ok;
-    {pushHBQ, {[NNr, Msg, TSclientout, TShbqin], [DLQ, Size], Datei}}  ->
+    {pushHBQ, {[NNr, Msg, TSclientout, TShbqin], Datei}}  ->
+      werkzeug:logging(Datei, lists:concat(["HBQ>>> pushing message: ", NNr, "\n"])),
       Messages = lists:append(Messages, [[NNr, Msg, TSclientout, TShbqin]]),
       Messages = lists:keysort(1, Messages),
       Size = length(Messages),
@@ -40,7 +41,9 @@ pushAllConsecutiveSequenceNumbers([[NNr, _, _, _] | Tail], DLQ, Datei) ->
   if NNr == NNr2  - 1 ->
       pushAllConsecutiveSequenceNumbers(Tail, DLQ, Datei)
   end,
+  werkzeug:logging(Datei, lists:concat(["HBQ>>>sent all messages to dlq until NNR: ", NNr, "\n"])),
   {NNr, Tail}
+
 .
 
 
