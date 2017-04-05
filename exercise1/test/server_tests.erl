@@ -16,3 +16,8 @@ getmsgid_no_messages_yet_test() ->
   timer:sleep(1000),
   undefined = erlang:process_info(ClientPID),
   wk ! terminate.
+
+terminate_server_after_timeoutseconds_test() ->
+  server:start(),
+  timer:sleep(3000),
+  undefined = erlang:process_info(wk).
