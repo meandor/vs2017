@@ -27,6 +27,7 @@
     \item DLQ (DS)
     \item CMEM (DS)
 	\item HBQ (FW)
+	\item Server (DS)
 \end{itemize}
 
 \textbf{Quellenangaben:}\\
@@ -36,6 +37,7 @@
 	\item 26.03.2017 (FW,DS)
 	\item 03.04.2017 (DS)
 	\item 04.04.2017 (DS)
+	\item 05.04.2017 (DS)
 \end{itemize}
 
 \textbf{Aktueller Stand:}
@@ -43,7 +45,7 @@
 	\item DLQ fertig und getestet
 	\item CMEM fertig und getestet
 	\item HBQ angefangen
-	\item Server
+	\item Server angefangen
 	\item Client
 \end{itemize}
 
@@ -51,7 +53,7 @@
 \begin{itemize}
     \item Formatierung angepasst
 	\item Komponentendiagramm erweitert
-	\item Detailbeschreibungen für jedes Modul und Pakete
+	\item Detailbeschreibungen für jedes Modul und Paket
 \end{itemize}
 
 \newpage
@@ -274,11 +276,11 @@ Neue Nachrichten werden am Anfang der Liste angefügt. Das vereinfacht die Nachf
 
 Nachrichten werden der DLQ entnommen, wenn die Größe der Liste gleich ihrer Kapazität ist und eine neue Nachricht hinzugefügt werden soll.\\
 
-Beim senden einer Nachricht durch Angabe der Nachrichtennummer wird in der DLQ nach der Nachricht mit der Nachrichtennummer gesucht. Wenn diese gefunden wird, wird die Nachricht an den Client (mit der ClientPID) gesendet und die Nachrichtennummer zurück gegeben.
+Beim Senden einer Nachricht durch Angabe der Nachrichtennummer wird in der DLQ nach der Nachricht mit der Nachrichtennummer gesucht. Wenn diese gefunden wird, wird die Nachricht an den Client (mit der ClientPID) gesendet und die Nachrichtennummer zurück gegeben.
 
 Falls die Nachricht nicht gefunden werden konnte, wird die nächste Nachricht mit der nächst größeren Nachrichtennummer an den Client gesendet. Diese wird mit einer Hilfsfunktion ermittelt (via reduce/foldl).
 
-Beim senden einer Nachricht wird die Nachricht zusammen mit einem boolean Flag an den Client gesendet. Dieser boolean Flag signalisiert, ob noch weitere Nachrichten folgen.
+Beim Senden einer Nachricht wird die Nachricht zusammen mit einem boolean Flag an den Client gesendet. Dieser boolean Flag signalisiert, ob noch weitere Nachrichten folgen.
 
 Das wird mit einer weiteren Hilfsfunktion \texttt{remainingMessagesExist(MsgNr,DLQ)}) ermittelt.
 
