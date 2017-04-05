@@ -208,15 +208,14 @@ Jede Nachricht, die der aktuellen erwarteten NNr entspricht, wird direkt weiterg
 Wenn noch auf alte Nachrichten gewartet wird, wird die nachricht in die HBQ eingefügt.
 Wenn die Nachrichtennummer größer als der erwarteten Nachrichtennummer ist,
 müssen alle bereits empfangenennachrichten ab der erwarteten Nachrichtennummer durchgegangen werden.
-Die Nachrichten, die aufeinanderfolgende Sequenznummern haben werden an die
-DLQ ausgeliefert.
-				
-if currentNNr == NNr
-	currentNNr +=1
-	pushToDLQ(NNr)
-else
-	insert(NNr)
-	currentNNr = pushAllConsecutiveFrom(currentNNr) 
+Die Nachrichten, die aufeinanderfolgende Sequenznummern haben oder eine Dummy Nachricht sind werden an die
+DLQ ausgeliefert. Eine Dummy Nachricht erhält NNR -1 und kann so identifiziert werden.
+
+Die Liste wird nach jedem Einfügen Sortiert, um die Reihenfolge zu erhalten. Wenn die Liste überfüllt ist,
+wird rekursiv die erste Lücke zwischen Sequenznummern gesucht. Dann wird eine entsprechende 
+Dummy - Nachricht für diese Lücke eingefügt, und die Funktion zum Senden aller aufeinanderfolgenden Sequenznummern wird erneut aufgerufen.
+So werden mindestens alle Nachrichten bis zum Abschluss der Lücke aus der HBQ entfernt.
+
 				
 \subsubsection{Außensicht}
 
