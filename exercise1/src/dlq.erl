@@ -59,6 +59,7 @@ sendMessage(ClientPID, Message, Terminated) ->
 % TODO: neuen Nachrichten beim Server anfragt, dort jedoch keine neuen bzw. überhaupt noch keine Nachrichten vorhanden
 % TODO: sind, sendet der Server eine nicht leere dummy-Nachricht.
 % Ausliefern einer Nachricht an einen Leser-Client
+%deliverMSG(_,_,_,_) -> 1;
 deliverMSG(MSGNr, ClientPID, Queue, Datei) -> deliverMSG(MSGNr, ClientPID, Queue, Datei, Queue).
 
 % Sollte die Nachrichtennummer nicht mehr vorhanden sein, wird die nächst größere in der DLQ vorhandene Nachricht gesendet

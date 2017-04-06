@@ -5,19 +5,27 @@
 
 testReplyOKServer() ->
   receive
-    {reply, ok} -> ok
+    {reply, ok} -> ok;
+    {reply, 1} -> ok
   end.
 
-%initHBQ_test() ->
-%  ServerPID = spawn(?MODULE, testReplyOKServer, []),
-%  HBQPID = hbq:start(),
-%  HBQPID ! {ServerPID, {request, initHBQ}},
-%  timer:sleep(2000),
-%  undefined = erlang:process_info(ServerPID).
+initHBQ_test() ->
+  ServerPID = spawn(?MODULE, testReplyOKServer, []),
+  HBQPID = hbq:start(),
+  HBQPID ! {ServerPID, {request, initHBQ}},
+  timer:sleep(2000),
+  undefined = erlang:process_info(ServerPID).
+
+deliverMSG_test() ->
+  ServerPID = spawn(?MODULE, testReplyOKServer, []),
+  HBQPID = hbq:start(),
+  HBQPID ! {ServerPID, {request, deliverMSG, 1, ServerPID}},
+  timer:sleep(2000),
+  undefined = erlang:process_info(ServerPID).
 
 msglistToTuple_test() ->
-  [{3, "Bla", 0 , 0}, {1, "Bla", 0 , 0}, {2, "Bla", 0, 0}] = hbq:apply_on_list([[3, "Bla", 0 , 0], [1, "Bla", 0 , 0], [2, "Bla", 0, 0]], [], fun list_to_tuple/1).
+  [{3, "Bla", 0 , 0}, {1, "Bla", 0 , 0}, {2, "Bla", 0, 0}] =
+    hbq:apply_on_list([[3, "Bla", 0 , 0], [1, "Bla", 0 , 0], [2, "Bla", 0, 0]], [], fun list_to_tuple/1).
 
 sort_hbq_test() ->
- % io:format(hbq:sort([[3, "Bla", 0 , 0], [1, "Bla", 0 , 0], [2, "Bla", 0, 0]])).
   [[1,"Bla",0,0],[2,"Bla",0,0],[3,"Bla",0,0]] = hbq:sort([[3, "Bla", 0 , 0], [1, "Bla", 0 , 0], [2, "Bla", 0, 0]]).

@@ -12,30 +12,52 @@ log(Config, Message) ->
   werkzeug:logging(LogAtom, lists:concat(Message)),
   LogAtom.
 
-hbq(HBQ, CurrentNNr, DLQ, Config) ->
+hbq(HBQ, ExpectedNNr, DLQ, Config) ->
   receive
+
+    % Initializes the HBQ with empty value and sends reply to server
     {ServerPID, {request, initHBQ}} ->
       Logfile = log(Config, ["HBQ>>> initialized by ", pid_to_list(ServerPID), "\n"]),
       {ok, DlqLimit} = werkzeug:get_config_value(dlqlimit, Config),
       ServerPID ! {reply, ok},
-      hbq([], 0, dlq:initDLQ(DlqLimit, Logfile), Config)
-%%    {deliverMSG, NNr, ToClient, Datei} ->
-%%      dlq:deliverMSG(NNr, ToClient, [DLQ, HBQSize], Datei);
-%%    {dellHBQ} ->
-%%      exit("dellHBQ was called"), ok;
-%%    {pushHBQ, {[NNr, Msg, TSclientout, TShbqin], Datei}} ->
-%%      werkzeug:logging(Datei, lists:concat(["HBQ>>> pushing message: ", NNr, "\n"])),
-%%      Messages = lists:append(Messages, [[NNr, Msg, TSclientout, TShbqin]]),
-%%      Messages = lists:keysort(1, Messages),
-%%      Size = length(Messages),
-%%      if NNr == CurrentNNr ->
-%%        {CurrentNNr, Messages} = pushAllConsecutiveSequenceNumbers(Messages, DLQ, Datei),
-%%        loop(Messages, HBQSize, CurrentNNr + 1, DLQ);
-%%        Size >= HBQSize * (2 / 3) ->
-%%          ok
-%%      end
+      hbq([], 0, dlq:initDLQ(DlqLimit, Logfile), Config);
+
+    %Forwards the command to deliver a message to the PID "ToClient" to the dlq
+    %TODO: Still test code in here, because deliverMSG doesnt return the number of the message sent. Please fix
+    {ServerPID, {request, deliverMSG, NNr, ToClient}} ->
+        DLQ2 = dlq:initDLQ(3, ""),
+        dlq:push2DLQ([1, "", erlang:now(), erlang:now()], DLQ2, "Test"),
+        Number = dlq:deliverMSG(NNr, ToClient, DLQ, ""),
+
+        log(Config, ["HBQ>>> delivered", 1, "\n"]),
+        ServerPID ! {reply, Number};
+
+    % Terminates the process and sends an ok to the server.
+    {ServerPID, {request,dellHBQ}} ->
+          ServerPID ! {reply, ok},
+          exit("dellHBQ was called");
+
+    %Pushes a message to the HBQ, if its not the expected one.
+    %After each push the hbq gets sorted and inspected for the expected message number at the beginning.
+    {ServerPID, {pushHBQ, [NNr,Msg,TSclientout]}} ->
+      Logfile = log(Config, ["HBQ>>> pushing message: ", NNr, "\n"]),
+      [_, DLQSize] = DLQ,
+      if NNr == ExpectedNNr ->
+          HBQ = lists:append(HBQ, [[NNr, Msg, TSclientout, erlang:now()]]),
+          HBQ = sort(HBQ),
+          {ExpectedNNr, HBQ} = pushAllConsecutiveSequenceNumbers(HBQ, DLQ, Logfile, ExpectedNNr),
+          hbq(HBQ, ExpectedNNr, DLQ, Config);
+        length(HBQ) >= DLQSize * (2 / 3) ->
+          HBQ = lists:append(HBQ, [[NNr, Msg, TSclientout, erlang:now()]]),
+          %TODO
+          ok
+      end
+
+
   end
 .
+
+
 
 
 apply_on_list([H | T], X, Func) ->
@@ -44,17 +66,15 @@ apply_on_list([], X, _) -> X.
 
 sort(Messages) -> apply_on_list(lists:keysort(1, apply_on_list(Messages, [], fun list_to_tuple/1)), [], fun tuple_to_list/1).
 
-%%%deliverMSG(MSGNr, ClientPID, Queue, Datei)
-%%pushAllConsecutiveSequenceNumbers([[NNr, MSG, _, _] | Tail], DLQ, Datei) ->
-%%  dlq:push2DLQ(NNr, DLQ, Datei),
-%%  [NNr2, _, _, _] = Tail,
-%%  Fehler = string:str(MSG, "Fehlernachricht"),
-%%  if NNr == NNr2 - 1 or Fehler ->
-%%    pushAllConsecutiverSequenceNumbers(Tail, DLQ, Datei)
-%%  end,
-%%  werkzeug:logging(Datei, lists:concat(["HBQ>>>sent all messages to dlq until NNR: ", NNr, "\n"])),
-%%  {NNr, Tail}
-%%.
+pushAllConsecutiveSequenceNumbers([[NNr, MSG, TS1, TS2] | Tail], DLQ, Datei, ExpectedNNr) ->
+  Fehler = string:str(MSG, "Fehlernachricht"),
+  if NNr == ExpectedNNr or Fehler  ->
+    dlq:push2DLQ(NNr, DLQ, Datei),
+    pushAllConsecutiveSequenceNumbers(Tail, DLQ, Datei, ExpectedNNr + 1)
+  end,
+  werkzeug:logging(Datei, lists:concat(["HBQ>>>sent all messages to dlq until NNR: ", NNr, "\n"])),
+  {ExpectedNNr, [[NNr, MSG, TS1, TS2] | Tail]}
+.
 
 
 
