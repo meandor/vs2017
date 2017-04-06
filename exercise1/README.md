@@ -23,7 +23,7 @@ To load everything in the erl shell:
 ````erlang
 make:all([load]).
 ````
-[make:all([load]).
+
 ## Test
 To test a $MODULENAME in the erl shell:
 ````erlang
