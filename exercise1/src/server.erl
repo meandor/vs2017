@@ -31,23 +31,29 @@ server(Config, CMEM, HBQPID, NextNNr, Timer, Latency) ->
       NewTimer = werkzeug:reset_timer(Timer, Latency, terminate),
       NNr = cmem:getClientNNr(CMEM, ClientPID),
       HBQPID ! {self(), {request, deliverMSG, NNr, ClientPID}},
+      werkzeug:logging(serverLog(), lists:concat(["Server: deliver message ", NNr, " to ", erlang:pid_to_list(ClientPID), "\n"])),
       receive
         {reply, SendNNr} ->
           NewCMEM = cmem:updateClient(CMEM, ClientPID, SendNNr, serverLog()),
+          werkzeug:logging(serverLog(), lists:concat(["Server: client ", erlang:pid_to_list(ClientPID), " got message ", SendNNr, "\n"])),
           server(Config, NewCMEM, HBQPID, NextNNr, NewTimer, Latency)
       end;
     {dropmessage, [INNr, Msg, TSclientout]} ->
       NewTimer = werkzeug:reset_timer(Timer, Latency, terminate),
       HBQPID ! {self(), {request, pushHBQ, [INNr, Msg, TSclientout]}},
+      werkzeug:logging(serverLog(), lists:concat(["Server: message ", INNr, " was added into the HBQ\n"])),
       server(Config, CMEM, HBQPID, NextNNr, NewTimer, Latency);
     test ->
       NewTimer = werkzeug:reset_timer(Timer, Latency, terminate),
       werkzeug:logging(serverLog(), lists:concat(["test\n"])),
       server(Config, CMEM, HBQPID, NextNNr, NewTimer, Latency);
     terminate ->
+      werkzeug:logging(serverLog(), lists:concat(["Server: starting shutdown sequence ", werkzeug:timeMilliSecond(), "\n"])),
       HBQPID ! {self(), {request, dellHBQ}},
       server(Config, CMEM, HBQPID, NextNNr, Timer, Latency);
-    {reply, ok} -> ok
+    {reply, ok} ->
+      werkzeug:logging(serverLog(), lists:concat(["Server: shutting down ", werkzeug:timeMilliSecond(), "\n"])),
+      ok
   end.
 
 start() ->
