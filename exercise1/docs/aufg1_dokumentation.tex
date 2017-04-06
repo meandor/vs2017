@@ -57,8 +57,6 @@
 \end{itemize}
 
 \newpage
-\tableofcontents 
-\newpage
 
 \section{Einführung und Ziele}
 Es soll eine Message of the Day Anwendung erstellt werden. Dabei werden von verschiedenen Clients an einen Server verschiedene Nachrichten des Tages gesendet. Die Clients rufen vom Server alle Nachrichten ab, so dass jeder Client alle Nachrichten in einer festen Reihenfolge hat.
@@ -111,6 +109,9 @@ Das Client-Paket beinhaltet die Client-Module. Diese sind zum einen der Lese Cli
 \newpage
 
 \section{Subsysteme und Komponenten}
+Das Server Modul und das Client Modul sind über Konfigurationsdateien konfigurierbar. Der Server, der Client und die HBQ
+stellen Prozesse dar, die nebenläufig laufen. Dabei schreiben sie Log-Dateien, in denen ihre jeweiligen Aktionen
+protokolliert werden.
 
 \subsection{Server-Modul}
 \subsubsection{Aufgabe und Verantwortung}
@@ -148,19 +149,40 @@ Mit der Variablen Terminated signailiert der Server, ob noch für ihn aktuelle N
 
 \textbf{getmsgid}: Fragt beim Server die aktuelle Nachrichtenummer ab. self() stellt die Rückrufadresse des Redakteur-Clients dar. Als Rückgabewert erhält er die aktuelle und eindeutige Nachrichtennummer (Number).\\
 
-\textbf{terminate}: Nur von interne Prozesse zu verwenden. Startet den Terminierungsprozess.\\
+\textbf{terminate}: Nur von internen Prozessen zu verwenden. Startet den Terminierungsprozess.\\
 
-\textbf{{reply, ok}}: Nur von interne Prozesse zu verwenden. Signalisiert, dass alle Submodule und Prozesse des Servers
+\textbf{{reply, ok}}: Nur von internen Prozessen zu verwenden. Signalisiert, dass alle Submodule und Prozesse des Servers
 heruntergefahren wurden und der Server nun selber herunterfahren kann.\\
 
 \subsubsection{Entwurfsentscheidungen}
-Der Server bearbeitet Anfragen per message passing. Die NNr ist ein Zählerwert, der nach jedem Herausgeben an einen Client inkrementiert wird.
+Der Server wird mit einer Start Funktion hochgefahren. Diese Funktion startet den Server-Prozess und konfiguriert ihn
+mit den Werten, die in der Config stehen.
+
+Der Server ist mit der HBQ verbunden. Diese läuft als extra Prozess.
+
+Der Server-Prozess hat einen State. In diesem State wird die CMEM, die Config, eine Verbindung zur HBQ (ProzessID),
+die nächste Nachrichtennummer für einen Client zum Senden, ein Timer und die Latenz gespeichert.
+
+Der Timer ist so eingestellt, dass er nach dem Ablaufen der Latenzzeit dem Server benachrichtigt sich herunterzufahren
+(terminate).
+
+Jedes mal, wenn ein Client den Server über seine Schnittstelle anspricht, wird der Timer abgebrochen und zurück auf die
+initiale Latenzzeit gestellt.
+
+Bevor Clients dem Server eine Nachricht schicken können, müssen sie vom Server eine aktuelle Nachritennummer abfragen,
+die sie für die neue Nachricht verwenden können. Diese Nummer ist im State des Server gespeichert und wird dann an den
+anfragenden Client übermittelt. Danach wird diese Nummer im State inkrementiert.
+
+Eingehende Nachrichtenzeilen von Clients werden vom Server an die HBQ weitergeleitet.
+
+Wenn ein Client nach Nachrichten am Server anfragt, wird im CMEM nachgeschaut welche Nachrichtennummer für den Client
+als nächstes vorgesehen wird und die HBQ beauftragt, diese dem Client zu schicken.
 			
 \subsubsection{Konfigurationsparameter}
 \begin{enumerate}
     \item{Latenzzeit bestimmt die maximale Zeit die der Server ungenutzt läuft}
     \item{Lebenszeit des Clients bestimmt die Zeit, für die sich der Server einen Client merkt}
-    \item{Name definiert den Namen des Servers}
+    \item{Namen für den Server Prozess}
     \item{Größe der Deliveryqueue}
 \end{enumerate}
 
