@@ -2,22 +2,26 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
--export([testClientGetMSGID1/0]).
+-export([testClientGetMSGID/1]).
 
-testClientGetMSGID1() ->
+serverPID() -> wk.
+
+testClientGetMSGID(NNr) ->
   receive
-    {nid, 1} -> ok
+    {nid, NNr} -> ok
   end.
 
-getmsgid_no_messages_yet_test() ->
-  server:start(),
-  ClientPID = spawn(?MODULE, testClientGetMSGID1, []),
-  wk ! {ClientPID, getmsgid},
-  timer:sleep(1000),
-  undefined = erlang:process_info(ClientPID),
-  wk ! terminate.
-
 terminate_server_after_timeoutseconds_test() ->
-  server:start(),
-  timer:sleep(3000),
-  undefined = erlang:process_info(wk).
+  server:startMe("./test-config/server.cfg"),
+  timer:sleep(2000),
+  ?assert(undefined =:= whereis(serverPID())).
+
+getmsgid_no_messages_yet_and_dont_terminate_with_client_requests_test() ->
+  ClientPID = spawn(?MODULE, testClientGetMSGID, [1]),
+  server:startMe("./test-config/server.cfg"),
+  serverPID() ! {ClientPID, getmsgid},
+  timer:sleep(1000),
+  ?assert(undefined =:= erlang:process_info(ClientPID)),
+  ?assert(undefined =/= whereis(serverPID())),
+  timer:sleep(2000),
+  ?assert(undefined =:= whereis(serverPID())).

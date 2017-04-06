@@ -1,17 +1,17 @@
 -module(server).
--export([start/0, server/6]).
+-export([startMe/0, startMe/1, server/6]).
 
-loadConfig() ->
-  {ok, Config} = file:consult("./config/server.cfg"),
+loadConfig(ConfigFile) ->
+  {ok, Config} = file:consult(ConfigFile),
   Config.
 
 serverLog() ->
   erlang:list_to_atom(lists:concat(["Server@", node(), ".log"])).
 
 % Lädt die Config Datei, CMEM und startet den HBQ Prozess
-init() ->
+init(ConfigFile) ->
   % Lade configs
-  Config = loadConfig(),
+  Config = loadConfig(ConfigFile),
   werkzeug:logging(serverLog(), lists:concat(["Server: server.cfg opened\n"])),
   % Starte CMEM
   {ok, RemTime} = werkzeug:get_config_value(clientlifetime, Config),
@@ -56,11 +56,14 @@ server(Config, CMEM, HBQPID, NextNNr, Timer, Latency) ->
       ok
   end.
 
-start() ->
-  {Config, CMEM, HBQPID} = init(),
+startMe() ->
+  startMe("./config/server.cfg").
+
+startMe(ConfigFile) ->
+  {Config, CMEM, HBQPID} = init(ConfigFile),
   {ok, ServerName} = werkzeug:get_config_value(servername, Config),
   {ok, Latency} = werkzeug:get_config_value(latency, Config),
-  {ok, Timer} = timer:send_after(Latency * 1000, ServerName, terminate),
+  {ok, Timer} = timer:send_after(round(Latency * 1000), ServerName, terminate),
   ServerPID = spawn(?MODULE, server, [Config, CMEM, HBQPID, 1, Timer, Latency]),
   register(ServerName, ServerPID),
   werkzeug:logging(serverLog(), lists:concat(["Server: Starttime: ", werkzeug:timeMilliSecond(), " with PID", pid_to_list(ServerPID), "\n"])).
