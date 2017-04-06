@@ -1,5 +1,5 @@
 -module(hbq).
--export([start/0, hbq/4]).
+-export([start/0, hbq/4, apply_on_list/3, sort/1]).
 
 loadConfig() ->
   {ok, Config} = file:consult("./config/server.cfg"),
@@ -38,17 +38,26 @@ hbq(HBQ, CurrentNNr, DLQ, Config) ->
 .
 
 
+apply_on_list([H | T], X, Func) ->
+  apply_on_list(T, lists:append(X, [Func(H)]), Func);
+apply_on_list([], X, _) -> X.
+
+sort(Messages) -> apply_on_list(lists:keysort(1, apply_on_list(Messages, [], fun list_to_tuple/1)), [], fun tuple_to_list/1).
+
 %%%deliverMSG(MSGNr, ClientPID, Queue, Datei)
 %%pushAllConsecutiveSequenceNumbers([[NNr, MSG, _, _] | Tail], DLQ, Datei) ->
 %%  dlq:push2DLQ(NNr, DLQ, Datei),
 %%  [NNr2, _, _, _] = Tail,
 %%  Fehler = string:str(MSG, "Fehlernachricht"),
 %%  if NNr == NNr2 - 1 or Fehler ->
-%%    pushAllConsecutiveSequenceNumbers(Tail, DLQ, Datei)
+%%    pushAllConsecutiverSequenceNumbers(Tail, DLQ, Datei)
 %%  end,
 %%  werkzeug:logging(Datei, lists:concat(["HBQ>>>sent all messages to dlq until NNR: ", NNr, "\n"])),
 %%  {NNr, Tail}
 %%.
+
+
+
 
 start() ->
   Config = loadConfig(),
