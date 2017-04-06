@@ -1,38 +1,40 @@
 -module(reader).
--export([read/3, calculateNewInterval/1, setup/1]).
 
-loop(Server, Interval, 5) -> io:format("Lese Nachricht...\n"), loop(Server, Interval, 0);
-loop(Server, Interval, NNr) -> ct:sleep(1000),  io:format("Sende nachricht...\n"), loop(Server, Interval, NNr + 1). % Send messages here
+-export([start_reading/4]).
 
-% Read messages
-
-setup(ServerAddress) -> ok.
-
-read(Server, Interval, 5) ->
-  Server ! {getmessages, self()},
-  logger ! {debug, "Getting a message."},
-  receive
-    {Msg, false} ->
-      logger ! {debug, lists:concat(["Got message: ", Msg])},
-      read(Server, Interval, 5);
-    {Msg, true} ->
-      logger ! {debug, lists:concat(["Got message: ", Msg])},
-      read(Server, Interval, 0);
-    _X ->
-      logger ! {debug, "Unknown error."}
-  end.
-
-calculateNewInterval(Interval) ->
-  Increase = werkzeug:bool_rand(),
-  Value = trunc(max(Interval * 0.5, 1000)),
+mark_my_reader_message(NNr, Msg, ReaderNNrs) ->
+  ReaderMessage = lists:member(NNr, ReaderNNrs),
   if
-    Increase ->
-      Total = Interval + Value,
-      logger ! {debug, lists:concat(["Setting ", integer_to_list(Total), " as new interval."])},
-      Total;
-    true ->
-      Total = max(Interval - Value, 1000),
-      logger ! {debug, lists:concat(["Setting ", integer_to_list(Total), " as new interval."])},
-      Total
+    ReaderMessage -> Msg ++ "*******";
+    true -> Msg
   end.
 
+write_message([NNr, Msg, _TSclientout, _TShbqin, TSdlqin, TSdlqout], Logfile, ReaderNNrs) ->
+  Now = erlang:timestamp(),
+  ValidTSdlqin = werkzeug:validTS(TSdlqin),
+  ValidTSdlqout = werkzeug:validTS(TSdlqout),
+  TSdlqinFromFuture = werkzeug:lessTS(Now, TSdlqin),
+  TSdlqoutFromFuture = werkzeug:lessTS(Now, TSdlqout),
+  MarkedMessage = mark_my_reader_message(NNr, Msg, ReaderNNrs),
+  if
+    ValidTSdlqin and TSdlqinFromFuture ->
+      Diff = werkzeug:now2stringD(werkzeug:diffTS(TSdlqin, Now)),
+      NewMsg = MarkedMessage ++ " time difference: " ++ Diff,
+      werkzeug:logging(Logfile, NewMsg);
+    ValidTSdlqout and TSdlqoutFromFuture ->
+      Diff = werkzeug:now2stringD(werkzeug:diffTS(TSdlqout, Now)),
+      NewMsg = MarkedMessage ++ " time difference: " ++ Diff,
+      werkzeug:logging(Logfile, NewMsg);
+    true ->
+      werkzeug:logging(Logfile, MarkedMessage)
+  end.
+
+start_reading(true, _Logfile, _ReaderNNrs, _ServerPID) -> ok;
+
+start_reading(false, Logfile, ReaderNNrs, ServerPID) ->
+  ServerPID ! {self(), getmessages},
+  receive
+    {reply, Message, Terminated} ->
+      write_message(Message, Logfile, ReaderNNrs),
+      start_reading(Terminated, Logfile, ReaderNNrs, ServerPID)
+  end.
