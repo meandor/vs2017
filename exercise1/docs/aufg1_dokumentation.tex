@@ -191,9 +191,9 @@ als nächstes vorgesehen wird und die HBQ beauftragt, diese dem Client zu schick
 \subsection{CMEM-Modul}
 \subsubsection{Aufgabe und Verantwortung}
 Dieses Modul hat die Aufgabe sich anfragende Clients, ihre letzte bekommene Nachrichtennummer und den letzten Zeitpunkt ihrer Anfrage zu merken.
-Clients, die sich seit einiger Zeit (Konfigurationsparameter) nicht gemeldet haben, sollen aus dem CMEM-Modul gelöscht werden können.
+Clients, die sich seit einiger Zeit (Konfigurationsparameter) nicht gemeldet haben, werden vom CMEM als neue Clients behandelt (vergessen).
 
-Die gespeicherten Daten sollen über die Schnittstelle des Moduls vom Server aus abrufbar sein.
+Die gespeicherten Daten sind über die Schnittstelle des Moduls vom Server aus abrufbar.
 
 \subsubsection{Schnittstelle}
 \begin{lstlisting}[language=erlang]
@@ -279,7 +279,12 @@ So werden mindestens alle Nachrichten bis zum Abschluss der Lücke aus der HBQ e
 
 \subsection{DLQ-Modul}
 \subsubsection{Aufgabe und Verantwortung}
-Die Deliveryqueue hat die Aufgabe Nachrichten an Clients zuzustellen und stellt eine Datenstruktur dar, die eine maximale Menge (Kapazität) an Nachrichten hält. Sie verhält sich dabei wie von einer Warteschlange zu erwarten beim Einfügen und Herausholen von Nachrichten (FIFO). Nur das HBQ-Modul darf auf das DLQ-Modul zugreifen. Das DLQ-Modul sendet über eine Schnittstelle der Clients die Nachrichten an die Clients.
+Die Deliveryqueue hat die Aufgabe Nachrichten an Clients zuzustellen und stellt eine Datenstruktur dar, die eine
+maximale Menge (Kapazität) an Nachrichten hält. Sie verhält sich dabei wie von einer Warteschlange zu erwarten beim
+Einfügen und Herausholen von Nachrichten (FIFO). Nur das HBQ-Modul darf auf das DLQ-Modul zugreifen. Das DLQ-Modul
+sendet über eine Schnittstelle der Clients die Nachrichten an die Clients.
+
+In der DLQ sind die Nachrichten absteigend von vorne nach hinten sortiert.
 
 \subsubsection{Schnittstelle}
 \begin{lstlisting}[language=erlang]
@@ -298,16 +303,25 @@ deliverMSG(MSGNr,ClientPID,Queue,Datei):
     Integer X PID X DQueue X Atom -> Integer
 \end{lstlisting}
 
-\textbf{initDLQ(Size,Datei)}: initialisiert die DLQ mit Kapazität Size. Bei Erfolg wird eine leere DLQ zurück geliefert. Datei kann für ein logging genutzt werden.\\
+\textbf{initDLQ(Size,Datei)}: initialisiert die DLQ mit Kapazität Size. Bei Erfolg wird eine leere DLQ zurück geliefert.
+Datei kann für ein logging genutzt werden.\\
 
-\textbf{expectedNr(Queue)}: liefert die Nachrichtennummer, die als nächstes in der DLQ gespeichert werden kann. Bei leerer DLQ ist dies 1.\\
+\textbf{expectedNr(Queue)}: liefert die Nachrichtennummer, die als nächstes in der DLQ gespeichert werden kann.
+Bei leerer DLQ ist dies 1.\\
 
-\textbf{push2DLQ([NNr,Msg,TSclientout,TShbqin],Queue,Datei)}: speichert die Nachricht [NNr,Msg,TSclientout,TShbqin] in der DLQ Queue und fügt ihr einen Eingangszeitstempel an (einmal an die Nachricht Msg und als expliziten Zeitstempel TSdlqin mit erlang:now() an die Liste an. Bei Erfolg wird die modifizierte DLQ zurück geliefert. Datei kann für ein logging genutzt werden.\\
+\textbf{push2DLQ([NNr,Msg,TSclientout,TShbqin],Queue,Datei)}: speichert die Nachricht [NNr,Msg,TSclientout,TShbqin] in
+der DLQ Queue und fügt ihr einen Eingangszeitstempel an (einmal an die Nachricht Msg und als expliziten Zeitstempel
+TSdlqin mit erlang:now() an die Liste an. Bei Erfolg wird die modifizierte DLQ zurück geliefert. Datei kann für ein
+logging genutzt werden.\\
 
-\textbf{deliverMSG(MSGNr,ClientPID,Queue,Datei)}: sendet die Nachricht MSGNr an den Leser-Client ClientPID. Dabei wird ein Ausgangszeitstempel TSdlqout mit erlang:now() an das Ende der Nachrichtenliste angefügt. Sollte die Nachrichtennummer nicht mehr vorhanden sein, wird die nächst größere in der DLQ vorhandene Nachricht gesendet. Bei Erfolg wird die tatsächlich gesendete Nachrichtennummer zurück geliefert. Datei kann für ein logging genutzt werden.\\
+\textbf{deliverMSG(MSGNr,ClientPID,Queue,Datei)}: sendet die Nachricht MSGNr an den Leser-Client ClientPID. Dabei wird
+ein Ausgangszeitstempel TSdlqout mit erlang:now() an das Ende der Nachrichtenliste angefügt. Sollte die Nachrichtennummer
+nicht mehr vorhanden sein, wird die nächst größere in der DLQ vorhandene Nachricht gesendet. Bei Erfolg wird die
+tatsächlich gesendete Nachrichtennummer zurück geliefert. Datei kann für ein logging genutzt werden.\\
 
 \subsubsection{Entwurfsentscheidungen}
-Die Deliveryqueue wird als Liste realisiert. Das erste Element der Liste ist dabei eine Liste der Nachrichten und das zweite Element der Liste gibt die Kapazität der DLQ an.
+Die Deliveryqueue wird als Liste realisiert. Das erste Element der Liste ist dabei eine Liste der Nachrichten und das
+zweite Element der Liste gibt die Kapazität der DLQ an.
 \begin{lstlisting}[language=erlang]
 /* Nachrichten Format */
 /* minimal 3 Elemente, pro Station kommt eins hinzu; maximal 6 Elemente */
@@ -320,19 +334,27 @@ MSG_List := [NNr,Msg,TSclientout,TShbqin,TSdlqin]:
 DLQ := [Nachrichtenliste, Kapazitaet]: [List X Integer]
 \end{lstlisting}
 
-Neue Nachrichten werden am Anfang der Liste angefügt. Das vereinfacht die Nachfrage nach der nächsten zu speichernden Nachrichtennummer in der DLQ. Demnach werden Nachrichten am Ende der Liste entnommen. Wenn eine Nachricht in die DLQ eingetragen wird, wird ans Ende der Nachricht der aktuelle Zeitstempel zum Zeitpunkt des Einfügens hinzugefügt.
+Neue Nachrichten werden am Anfang der Liste angefügt. Das vereinfacht die Nachfrage nach der nächsten zu speichernden
+Nachrichtennummer in der DLQ. Demnach werden Nachrichten am Ende der Liste entnommen. Wenn eine Nachricht in die DLQ
+eingetragen wird, wird ans Ende der Nachricht der aktuelle Zeitstempel zum Zeitpunkt des Einfügens hinzugefügt.
 
-Nachrichten werden der DLQ entnommen, wenn die Größe der Liste gleich ihrer Kapazität ist und eine neue Nachricht hinzugefügt werden soll.\\
+Nachrichten werden aus der DLQ gelöscht, wenn die Größe der Liste gleich ihrer Kapazität ist und eine neue Nachricht
+hinzugefügt werden soll. Dabei wird nach dem FIFO Prinzip gelöscht.\\
 
-Beim Senden einer Nachricht durch Angabe der Nachrichtennummer wird in der DLQ nach der Nachricht mit der Nachrichtennummer gesucht. Wenn diese gefunden wird, wird die Nachricht an den Client (mit der ClientPID) gesendet und die Nachrichtennummer zurück gegeben.
+Beim Senden einer Nachricht durch Angabe der Nachrichtennummer wird in der DLQ nach der Nachricht mit der
+Nachrichtennummer gesucht. Wenn diese gefunden wird, wird die Nachricht an den Client (mit der ClientPID) gesendet und
+die Nachrichtennummer zurück gegeben.
 
-Falls die Nachricht nicht gefunden werden konnte, wird die nächste Nachricht mit der nächst größeren Nachrichtennummer an den Client gesendet. Diese wird mit einer Hilfsfunktion ermittelt (via reduce/foldl).
+Falls die Nachricht nicht gefunden werden konnte, wird die nächste Nachricht mit der nächst größeren Nachrichtennummer
+an den Client gesendet. Diese wird mit einer Hilfsfunktion ermittelt (via reduce/foldl).
 
-Beim Senden einer Nachricht wird die Nachricht zusammen mit einem boolean Flag an den Client gesendet. Dieser boolean Flag signalisiert, ob noch weitere Nachrichten folgen.
+Beim Senden einer Nachricht wird die Nachricht zusammen mit einem boolean Flag an den Client gesendet. Dieser boolean
+Flag signalisiert, ob noch weitere Nachrichten folgen.
 
 Das wird mit einer weiteren Hilfsfunktion \texttt{remainingMessagesExist(MsgNr,DLQ)}) ermittelt.
 
-Diese Hilfsfunktion holt sich den Kopf der DLQ Nachrichtenliste (aktuellste Nachricht mit höchster Nachrichtennummer) und vergleicht, ob diese Nachrichtennummer größer ist als die übergebene \texttt{MsgNr}.
+Diese Hilfsfunktion holt sich den Kopf der DLQ Nachrichtenliste (aktuellste Nachricht mit höchster Nachrichtennummer)
+und vergleicht, ob diese Nachrichtennummer größer ist als die übergebene \texttt{MsgNr}.
 
 \subsubsection{Konfigurationsparameter}
 \begin{itemize}
