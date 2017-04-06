@@ -173,10 +173,13 @@ Bevor Clients dem Server eine Nachricht schicken können, müssen sie vom Server
 die sie für die neue Nachricht verwenden können. Diese Nummer ist im State des Server gespeichert und wird dann an den
 anfragenden Client übermittelt. Danach wird diese Nummer im State inkrementiert.
 
-Eingehende Nachrichtenzeilen von Clients werden vom Server an die HBQ weitergeleitet.
+Eingehende Nachrichtenzeilen von Clients werden vom Server an die HBQ weitergeleitet. Dabei wird dem Nachrichtentext der
+aktuelle Zeitstempel hinzugefügt.
 
 Wenn ein Client nach Nachrichten am Server anfragt, wird im CMEM nachgeschaut welche Nachrichtennummer für den Client
-als nächstes vorgesehen wird und die HBQ beauftragt, diese dem Client zu schicken.
+als nächstes vorgesehen wird und die HBQ beauftragt, diese dem Client zu schicken. Die dabei zurück gegeben verschickte
+Nachrichtennummer wird dann im CMEM für den Client geupdated. Falls jedoch eine dummy Nachricht zurück kommt
+(Nachrichtennummer: -1) findet dieses Update nicht statt.
 			
 \subsubsection{Konfigurationsparameter}
 \begin{enumerate}

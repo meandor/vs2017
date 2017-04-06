@@ -34,13 +34,18 @@ server(Config, CMEM, HBQPID, NextNNr, Timer, Latency) ->
       werkzeug:logging(serverLog(), lists:concat(["Server: deliver message ", NNr, " to ", erlang:pid_to_list(ClientPID), "\n"])),
       receive
         {reply, SendNNr} ->
-          NewCMEM = cmem:updateClient(CMEM, ClientPID, SendNNr, serverLog()),
+          if
+            SendNNr == -1 ->
+              NewCMEM = CMEM;
+            true ->
+              NewCMEM = cmem:updateClient(CMEM, ClientPID, SendNNr, serverLog())
+          end,
           werkzeug:logging(serverLog(), lists:concat(["Server: client ", erlang:pid_to_list(ClientPID), " got message ", SendNNr, "\n"])),
           server(Config, NewCMEM, HBQPID, NextNNr, NewTimer, Latency)
       end;
     {dropmessage, [INNr, Msg, TSclientout]} ->
       NewTimer = werkzeug:reset_timer(Timer, Latency, terminate),
-      HBQPID ! {self(), {request, pushHBQ, [INNr, Msg, TSclientout]}},
+      HBQPID ! {self(), {request, pushHBQ, [INNr, Msg ++ " " ++ werkzeug:timeMilliSecond(), TSclientout]}},
       werkzeug:logging(serverLog(), lists:concat(["Server: message ", INNr, " was added into the HBQ\n"])),
       server(Config, CMEM, HBQPID, NextNNr, NewTimer, Latency);
     test ->
