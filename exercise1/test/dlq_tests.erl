@@ -44,13 +44,13 @@ deliverMSG_existent_message_not_terminated_test() ->
   ClientPID = spawn(?MODULE, testClientExpectingMessage, [[1, "foobar1", 22, 14, 134], false]),
   dlq:deliverMSG(1, ClientPID, twoElementsDLQSize2(), 'test.log'),
   timer:sleep(1000),
-  undefined = erlang:process_info(ClientPID).
+  ?assert(undefined =:= erlang:process_info(ClientPID)).
 
 deliverMSG_non_existent_message_terminated_test() ->
   ClientPID = spawn(?MODULE, testClientExpectingMessage, [[-1, "No new messages", -1, -1, -1], true]),
   dlq:deliverMSG(3, ClientPID, twoElementsDLQSize2(), 'test.log'),
   timer:sleep(1000),
-  undefined = erlang:process_info(ClientPID).
+  ?assert(undefined =:= erlang:process_info(ClientPID)).
 
 deliverMSG_empty_DLQ_terminated_test() ->
   ClientPID = spawn(?MODULE, testClientExpectingMessage, [[-1, "No new messages", -1, -1, -1], true]),
@@ -62,10 +62,10 @@ deliverMSG_most_up_to_date_message_terminated_test() ->
   ClientPID = spawn(?MODULE, testClientExpectingMessage, [[2, "foobar42", 42, 13, 123], true]),
   dlq:deliverMSG(2, ClientPID, twoElementsDLQSize2(), 'test.log'),
   timer:sleep(1000),
-  undefined = erlang:process_info(ClientPID).
+  ?assert(undefined =:= erlang:process_info(ClientPID)).
 
 deliverMSG_message_inbetween_not_terminated_test() ->
   ClientPID = spawn(?MODULE, testClientExpectingMessage, [[2, "foobar42", 42, 13, 123], false]),
   dlq:deliverMSG(2, ClientPID, [[[3, "foobar41", 4, 113, 1423], [2, "foobar42", 42, 13, 123], [1, "foobar1", 22, 14, 134]], 4], 'test.log'),
   timer:sleep(1000),
-  undefined = erlang:process_info(ClientPID).
+  ?assert(undefined =:= erlang:process_info(ClientPID)).
