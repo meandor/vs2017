@@ -116,8 +116,9 @@ protokolliert werden.
 \subsection{Server-Modul}
 \subsubsection{Aufgabe und Verantwortung}
 Der Server hat die Aufgabe Nachrichten von Clients entgegen zu nehmen, diese zu verarbeiten und an seine Subprozesse
-bzw. an seine an ihn verbundenen Module weiter zu schicken. Der Server ist außerdem die Zentrale Stelle für die
+bzw. an seine an ihn verbundenen Module weiter zu schicken. Der Server ist außerdem die zentrale Stelle für die
 Koordinierung der nächst höchsten freien Nachrichtennummer, die von den Clients zum Senden verwendet werden soll.
+Clients holen sich über den Server Nachrichten. Der Server reicht diese Anfragen an die relevanten Subprozesse weiter.
 
 Wenn der Server für eine bestimmte Zeit von keinem Client mehr angesprochen wird, soll er sich und seine Subprozesse
 herunterfahren.
@@ -156,15 +157,14 @@ heruntergefahren wurden und der Server nun selber herunterfahren kann.\\
 
 \subsubsection{Entwurfsentscheidungen}
 Der Server wird mit einer Start Funktion hochgefahren. Diese Funktion startet den Server-Prozess und konfiguriert ihn
-mit den Werten, die in der Config stehen.
-
-Der Server ist mit der HBQ verbunden. Diese läuft als extra Prozess.
+mit den Werten, die in der Config stehen. Außerdem initialisiert der Server dabei eine CMEM (interne ADT) und startet
+den Prozess der HBQ (externe ADT als Prozess) und initalisiert diese.
 
 Der Server-Prozess hat einen State. In diesem State wird die CMEM, die Config, eine Verbindung zur HBQ (ProzessID),
 die nächste Nachrichtennummer für einen Client zum Senden, ein Timer und die Latenz gespeichert.
 
 Der Timer ist so eingestellt, dass er nach dem Ablaufen der Latenzzeit dem Server benachrichtigt sich herunterzufahren
-(terminate).
+(terminate). Dabei werden die Subprozesse heruntergefahren bevor der Server herunterfährt.
 
 Jedes mal, wenn ein Client den Server über seine Schnittstelle anspricht, wird der Timer abgebrochen und zurück auf die
 initiale Latenzzeit gestellt.
