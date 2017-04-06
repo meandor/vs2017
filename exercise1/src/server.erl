@@ -48,10 +48,6 @@ server(Config, CMEM, HBQPID, NextNNr, Timer, Latency) ->
       HBQPID ! {self(), {request, pushHBQ, [INNr, Msg ++ " " ++ werkzeug:timeMilliSecond(), TSclientout]}},
       werkzeug:logging(serverLog(), lists:concat(["Server: message ", INNr, " was added into the HBQ\n"])),
       server(Config, CMEM, HBQPID, NextNNr, NewTimer, Latency);
-    test ->
-      NewTimer = werkzeug:reset_timer(Timer, Latency, terminate),
-      werkzeug:logging(serverLog(), lists:concat(["test\n"])),
-      server(Config, CMEM, HBQPID, NextNNr, NewTimer, Latency);
     terminate ->
       werkzeug:logging(serverLog(), lists:concat(["Server: starting shutdown sequence ", werkzeug:timeMilliSecond(), "\n"])),
       HBQPID ! {self(), {request, dellHBQ}},
