@@ -37,7 +37,7 @@
 	\item 26.03.2017 (FW,DS)
 	\item 03.04.2017 (DS)
 	\item 04.04.2017 (DS)
-	\item 05.04.2017 (DS)
+	\item 05.04.2017 (FW,DS)
 \end{itemize}
 
 \textbf{Aktueller Stand:}
@@ -45,7 +45,7 @@
 	\item DLQ fertig und getestet
 	\item CMEM fertig und getestet
 	\item HBQ angefangen
-	\item Server angefangen
+	\item Server fertig
 	\item Client
 \end{itemize}
 
@@ -112,36 +112,58 @@ Das Client-Paket beinhaltet die Client-Module. Diese sind zum einen der Lese Cli
 
 \section{Subsysteme und Komponenten}
 
-\subsection{Server}
+\subsection{Server-Modul}
 \subsubsection{Aufgabe und Verantwortung}
-Der Server hat die Aufgaben  
-\begin{enumerate}
-	\item{Sich anfragende Clients mit ProzessID und Zeitstempel zu merken}
-    \item{Clients die ihnen zugehörigen Nachrichten zurückzugeben}
-\end{enumerate}
-Für die erste Aufgabe wird das Modul CMEM verwendet. 
-Zum Senden an die Clients leitet der Server die Nachrichten zunächst an die HBQ weiter. 
-Erscheint eine Anfrage vom Client, erfolgt über die HBQ der Aufruf an die DLQ, die Nachricht zu übermitteln.
+Der Server hat die Aufgabe Nachrichten von Clients entgegen zu nehmen, diese zu verarbeiten und an seine Subprozesse
+bzw. an seine an ihn verbundenen Module weiter zu schicken. Der Server ist außerdem die Zentrale Stelle für die
+Koordinierung der nächst höchsten freien Nachrichtennummer, die von den Clients zum Senden verwendet werden soll.
+
+Wenn der Server für eine bestimmte Zeit von keinem Client mehr angesprochen wird, soll er sich und seine Subprozesse
+herunterfahren.
+
+\subsubsection{Schnittstelle}
+\begin{lstlisting}[language=erlang]
+/* Abfragen einer Nachricht */
+Server ! {self(), getmessages},
+receive {reply,[NNr,Msg,TSclientout,TShbqin,TSdlqin,TSdlqout],Terminated}
+
+/* Senden einer Nachricht */
+Server ! {dropmessage,[INNr,Msg,TSclientout]},
+
+/* Abfragen der eindeutigen Nachrichtennummer */
+Server ! {self(),getmsgid}
+
+/* Nur fuer interne Prozesse: Einleiten des Herunterfahrens */
+Server ! terminate
+
+/* Nur fuer interne Prozesse: Terminierungsprozess erfolgreich, fahre runter*/
+Server ! {reply,ok}
+\end{lstlisting}
+
+\textbf{getmessages}: Fragt beim Server eine aktuelle Textzeile ab. self() stellt die Rückrufadresse des Leser-Clients dar. Als Rückgabewert erhält er eine für ihn aktuelle Textzeile (Zeichenkette) zugestellt (Msg) und deren eindeutige Nummer (NNr).
+Zudem erhält er die Zeitstempel explizit (erstellt durch erlang:now(), TSclientout, TShbqin, TSdlqin, TSdlqout).
+Mit der Variablen Terminated signailiert der Server, ob noch für ihn aktuelle Nachrichten vorhanden sind. Terminated == false bedeutet, es gibt noch weitere aktuelle Nachrichten, Terminated == true bedeutet, dass es keine aktuellen Nachrichten mehr gibt, d.h. weitere Aufrufe von getmessages sind nicht notwendig.\\
+
+\textbf{dropmessage}: Sendet dem Server eine Textzeile (Msg), die den  Namen des aufrufenden Clients und seine aktuelle Systemzeit sowie ggf. irgendeinen Text beinhaltet, zudem die zugeordnete (globale) Nummer der Textzeile (INNr) und seine Sendezeit (erstellt mit erlang:now(), TSclientout).\\
+
+\textbf{getmsgid}: Fragt beim Server die aktuelle Nachrichtenummer ab. self() stellt die Rückrufadresse des Redakteur-Clients dar. Als Rückgabewert erhält er die aktuelle und eindeutige Nachrichtennummer (Number).\\
+
+\textbf{terminate}: Nur von interne Prozesse zu verwenden. Startet den Terminierungsprozess.\\
+
+\textbf{{reply, ok}}: Nur von interne Prozesse zu verwenden. Signalisiert, dass alle Submodule und Prozesse des Servers
+heruntergefahren wurden und der Server nun selber herunterfahren kann.\\
 
 \subsubsection{Entwurfsentscheidungen}
 Der Server bearbeitet Anfragen per message passing. Die NNr ist ein Zählerwert, der nach jedem Herausgeben an einen Client inkrementiert wird.
-
-\subsubsection{Außensicht}
-Es werden Schnittstellen zur Abfage der aktuellen NNr, zum Holen \& Speichern von Nachrichten bereitgestellt. Nach einer bestimmten, aber nach Außen unbekannten Zeit werden auch bereits abgeholte Nachrichten ausgeliefert.
-
-\subsubsection{Innensicht}
-Anfragen werden in einer Endlosschleife abgefragt und nur an die jeweiligen Komponenten weitergeleitet. Fehlerbehandlung erfolgt in den jeweiligen Komponenten. Bei jeder Anfrage erfolgt die Abfrage \& Aktualisierung der CMEM, um sich den anfragenden Client zu merken und Anfragen an die HBQ korrekt zu stellen.
 			
 \subsubsection{Konfigurationsparameter}
 \begin{enumerate}
-    \item{Latenzzeit bestimmt die maximale Zeit die der Server ungenutzt läuft.}
-    \item{Lebenszeit des Clients bestimmt die Zeit, für die sich der Server einen Client merkt.}
-    \item{Name definiert den Namen der Server - Node}
-    \item{HBQ - Name \& Node definieren die Verknüpfung zur HBQ - Node}
+    \item{Latenzzeit bestimmt die maximale Zeit die der Server ungenutzt läuft}
+    \item{Lebenszeit des Clients bestimmt die Zeit, für die sich der Server einen Client merkt}
+    \item{Name definiert den Namen des Servers}
+    \item{Größe der Deliveryqueue}
 \end{enumerate}
 
-\subsubsection{Benutzungsschnittstelle}
-Der Server wird nur durch seine Schnitstellen vom Client verwendet.
 \newpage
 
 \subsection{CMEM-Modul}
