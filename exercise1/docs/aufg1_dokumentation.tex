@@ -335,26 +335,33 @@ DLQ := [Nachrichtenliste, Kapazitaet]: [List X Integer]
 \end{lstlisting}
 
 Neue Nachrichten werden am Anfang der Liste angefügt. Das vereinfacht die Nachfrage nach der nächsten zu speichernden
-Nachrichtennummer in der DLQ. Demnach werden Nachrichten am Ende der Liste entnommen. Wenn eine Nachricht in die DLQ
-eingetragen wird, wird ans Ende der Nachricht der aktuelle Zeitstempel zum Zeitpunkt des Einfügens hinzugefügt.
+Nachrichtennummer in der DLQ. Das ist die Nachrichtennummer der ersten Nachricht in der DLQ um eins inkrementiert.
 
-Nachrichten werden aus der DLQ gelöscht, wenn die Größe der Liste gleich ihrer Kapazität ist und eine neue Nachricht
-hinzugefügt werden soll. Dabei wird nach dem FIFO Prinzip gelöscht.\\
+Demnach werden Nachrichten am Ende der Liste entnommen. Wenn eine Nachricht in die DLQ eingetragen wird, wird ans Ende
+der Nachricht der aktuelle Zeitstempel zum Zeitpunkt des Einfügens hinzugefügt.
+
+Beim Eintragen wird außerdem überprüft, ob die DLQ schon voll ist. Wenn die DLQ voll ist, wird die Nachricht am Ende der
+DLQ gelöscht und die neue DLQ danach eingefügt (FIFO).\\
 
 Beim Senden einer Nachricht durch Angabe der Nachrichtennummer wird in der DLQ nach der Nachricht mit der
-Nachrichtennummer gesucht. Wenn diese gefunden wird, wird die Nachricht an den Client (mit der ClientPID) gesendet und
-die Nachrichtennummer zurück gegeben.
+Nachrichtennummer oder der nächst höchsten Nachrichtennummer gesucht.\\
 
-Falls die Nachricht nicht gefunden werden konnte, wird die nächste Nachricht mit der nächst größeren Nachrichtennummer
-an den Client gesendet. Diese wird mit einer Hilfsfunktion ermittelt (via reduce/foldl).
+Das finden der richtigen Nachricht übernimmt eine Hilfsfunktion. Diese bekommt die Nachrichtenliste der DLQ in
+umgekehrter Reihenfolge. Dadurch hat diese Hilfsfunktion die Nachrichtenliste der DLQ in aufsteigender Reihenfolge.
 
-Beim Senden einer Nachricht wird die Nachricht zusammen mit einem boolean Flag an den Client gesendet. Dieser boolean
-Flag signalisiert, ob noch weitere Nachrichten folgen.
+Nun sucht die Hilfsfunktion innerhalb dieser Liste das erste vorkommen einer Nachricht mit der Nachrichtennummer größer
+gleich der gewünschten Nachrichtennummer (von links nach rechts). Dadurch wird entweder die Nachricht mit der angefragten Nachrichtennummer
+gefunden oder die Nachricht mit der nächst höchsten Nachrichtennummer.
 
-Das wird mit einer weiteren Hilfsfunktion \texttt{remainingMessagesExist(MsgNr,DLQ)}) ermittelt.
+Falls überhaupt keine passende Nachricht gefunden wird (DLQ leer / Nachrichtennummer zu groß), wird eine dummy Nachricht
+zurückgegeben, die eine -1 als Nachrichtennummer hat. Dadurch kann sie als dummy Nachricht identifiert werden.\\
 
-Diese Hilfsfunktion holt sich den Kopf der DLQ Nachrichtenliste (aktuellste Nachricht mit höchster Nachrichtennummer)
-und vergleicht, ob diese Nachrichtennummer größer ist als die übergebene \texttt{MsgNr}.
+Die aus der Hilfsfunktion resultierende Nachricht wird mit einem Zeitstempel versehen. Beim Senden dieser Nachricht wird
+die Nachricht zusammen mit einem boolean Flag an den Client gesendet. Dieses boolean Flag signalisiert, ob keine
+weiteren Nachrichten folgen.
+
+Dieses Flag ist wahr, wenn entweder eine Fehlernachricht vorliegt oder die Nachricht mit der Nachrichtennumer des ersten
+Elementes der DLQ.
 
 \subsubsection{Konfigurationsparameter}
 \begin{itemize}
