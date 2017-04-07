@@ -7,6 +7,8 @@
 is_empty_list([]) -> true;
 is_empty_list(_) -> false.
 
+date_from_future() -> {1537, 536071, 0}.
+
 test_server_with_one_reply(Message, Terminated) ->
   receive
     {ClientPID, getmessages} ->
@@ -31,6 +33,15 @@ getmessages_with_dummy_message_reply_test() ->
 
 getmessages_with_two_messages_reply_test() ->
   ServerPID = spawn(?MODULE, test_server_with_multiple_replies, [[[1, "foobar1", 22, 14, 134, 1], [2, "foobar42", 42, 13, 123, 1]]]),
+  ClientPID = spawn(reader, start_reading, [false, 'test.log', [1, 3, 4], ServerPID]),
+  ?assert(undefined =/= erlang:process_info(ServerPID)),
+  ?assert(undefined =/= erlang:process_info(ClientPID)),
+  timer:sleep(100),
+  ?assert(undefined =:= erlang:process_info(ServerPID)),
+  ?assert(undefined =:= erlang:process_info(ClientPID)).
+
+getmessages_from_the_future_with_two_messages_reply_test() ->
+  ServerPID = spawn(?MODULE, test_server_with_multiple_replies, [[[1, "foobar1", 22, 14, date_from_future(), 1], [2, "foobar42", 42, 13, 123, date_from_future()]]]),
   ClientPID = spawn(reader, start_reading, [false, 'test.log', [1, 3, 4], ServerPID]),
   ?assert(undefined =/= erlang:process_info(ServerPID)),
   ?assert(undefined =/= erlang:process_info(ClientPID)),
