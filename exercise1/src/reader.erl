@@ -2,7 +2,7 @@
 
 -export([start_reading/4]).
 
-mark_my_reader_message(NNr, Msg, ReaderNNrs) ->
+formatMessage(NNr, Msg, ReaderNNrs) ->
   ReaderMessage = lists:member(NNr, ReaderNNrs),
   if
     ReaderMessage -> Msg ++ "*******";
@@ -15,18 +15,18 @@ write_message([NNr, Msg, _TSclientout, _TShbqin, TSdlqin, TSdlqout], Logfile, Re
   ValidTSdlqout = werkzeug:validTS(TSdlqout),
   TSdlqinFromFuture = werkzeug:lessTS(Now, TSdlqin),
   TSdlqoutFromFuture = werkzeug:lessTS(Now, TSdlqout),
-  MarkedMessage = mark_my_reader_message(NNr, Msg, ReaderNNrs),
+  FormattedMessage = formatMessage(NNr, Msg, ReaderNNrs),
   if
     ValidTSdlqin and TSdlqinFromFuture ->
       Diff = werkzeug:now2stringD(werkzeug:diffTS(TSdlqin, Now)),
-      NewMsg = MarkedMessage ++ " time difference: " ++ Diff,
-      werkzeug:logging(Logfile, NewMsg);
+      NewMsg = FormattedMessage ++ " time difference: " ++ Diff,
+      werkzeug:logging(Logfile, NewMsg ++ "\n");
     ValidTSdlqout and TSdlqoutFromFuture ->
       Diff = werkzeug:now2stringD(werkzeug:diffTS(TSdlqout, Now)),
-      NewMsg = MarkedMessage ++ " time difference: " ++ Diff,
-      werkzeug:logging(Logfile, NewMsg);
+      NewMsg = FormattedMessage ++ " time difference: " ++ Diff,
+      werkzeug:logging(Logfile, NewMsg ++ "\n");
     true ->
-      werkzeug:logging(Logfile, MarkedMessage)
+      werkzeug:logging(Logfile, FormattedMessage ++ "\n")
   end.
 
 start_reading(true, _Logfile, _ReaderNNrs, _ServerPID) -> ok;
