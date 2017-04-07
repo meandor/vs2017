@@ -142,6 +142,12 @@ Die Funktion zum Anfragen und Empfangen von Nachrichten arbeitet rekursiv: Sie r
 lange selbst auf, bis getmessages das flag true zurückliefert. Das Reader-Modul ist eine ADT
 und es wird nur vom Client angesprochen.
 
+Der Reader terminiert wenn: 
+\begin{itemize}
+    \item Er im MoreFlag mitgeteilt bekommt, dass keine weiteren Nachrichten vorliegen
+    \item Er von dem Client-Modul terminiert wird 
+\end{itemize}
+
 \subsection{Server-Modul}
 \subsubsection{Aufgabe und Verantwortung}
 Der Server hat die Aufgabe Nachrichten von Clients entgegen zu nehmen, diese zu verarbeiten und an seine Subprozesse
