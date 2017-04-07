@@ -43,6 +43,18 @@ push_one_message_into_empty_hbq_and_dlq_test() ->
   ?assert(undefined =:= erlang:process_info(ServerPID2)),
   ?assert(undefined =:= erlang:process_info(HBQPID)).
 
+push_one_invalid_message_into_empty_hbq_test() ->
+  ServerPID = spawn(?MODULE, testReplyOKServer, []),
+  ServerPID2 = spawn(?MODULE, testReplyOKServer, []),
+  HBQPID = initHBQ(ServerPID),
+  HBQPID ! {ServerPID, {pushHBQ, [3, "Bla2", erlang:now()]}},
+  timer:sleep(100),
+  ?assert(undefined =:= erlang:process_info(ServerPID)),
+  HBQPID ! {ServerPID2, {request, dellHBQ}},
+  timer:sleep(100),
+  ?assert(undefined =:= erlang:process_info(ServerPID2)),
+  ?assert(undefined =:= erlang:process_info(HBQPID)).
+
 %%deliverMSG_test() ->
 %%  ServerPID = spawn(?MODULE, testReplyMSGNumberServer, [0]),
 %%  HBQPID = initHBQ(ServerPID),
