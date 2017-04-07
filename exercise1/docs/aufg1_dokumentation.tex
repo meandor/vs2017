@@ -319,6 +319,13 @@ Die HBQ-Liste wird nach jedem Einfügen anhand der NNr Sortiert, um die Reihenfo
 Dies ist nötig, um die erste Lücke in Sequenznummern zu finden. Außerdem ist so das Senden der
 ältesten Nachricht einfacher.
 
+\begin{figure}[FullHBQSequence]
+\centering
+\includegraphics[width=\textwidth]{FullHBQSequence.png}
+\caption[seq-dia]{Aktivitätendiagramm für pushHBQ}
+\label{fig:sequence-diagram}
+\end{figure}
+
 \subsubsection{Konfigurationsparameter}
 \begin{itemize}
 	\item Die Maximalgröße der DLQ wird verwendet um die HBQ bei kritischer Überfüllung zu leeren
