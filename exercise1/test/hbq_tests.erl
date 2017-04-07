@@ -1,39 +1,39 @@
 -module(hbq_tests).
 -include_lib("eunit/include/eunit.hrl").
 
--export([testReplyOKServer/0, testReplyMSGNumberServer/1, testReplyMSGNumber9Server/0]).
+-export([testReplyOKServer/1, testReplyMSGNumberServer/1]).
 
-testReplyOKServer() ->
+testReplyOKServer(0) -> ok;
+
+testReplyOKServer(Times) ->
   receive
-    {reply, ok} -> ok
+    {reply, ok} ->
+      Less = Times - 1,
+      testReplyOKServer(Less)
   end.
 
 testReplyMSGNumberServer(Number) ->
   receive
-    {reply, ok} -> ok;
     {reply, Number} -> ok
   end.
 
-
-testReplyMSGNumber9Server() ->
-  receive
-    {reply, ok} -> testReplyMSGNumber9Server();
-    {reply, 0} -> ok
-  end.
-
 initHBQ(ServerPID) ->
-  HBQPID = hbq:start(),
-  HBQPID ! {ServerPID, {request, initHBQ}}, HBQPID.
+  initHBQ(ServerPID, "./config/server.cfg").
+
+initHBQ(ServerPID, Configfile) ->
+  HBQPID = hbq:start(Configfile),
+  HBQPID ! {ServerPID, {request, initHBQ}},
+  HBQPID.
 
 initHBQ_test() ->
-  ServerPID = spawn(?MODULE, testReplyOKServer, []),
+  ServerPID = spawn(?MODULE, testReplyOKServer, [1]),
   initHBQ(ServerPID),
   timer:sleep(100),
   ?assert(undefined =:= erlang:process_info(ServerPID)).
 
 push_one_message_into_empty_hbq_and_dlq_test() ->
-  ServerPID = spawn(?MODULE, testReplyOKServer, []),
-  ServerPID2 = spawn(?MODULE, testReplyOKServer, []),
+  ServerPID = spawn(?MODULE, testReplyOKServer, [1]),
+  ServerPID2 = spawn(?MODULE, testReplyOKServer, [1]),
   HBQPID = initHBQ(ServerPID),
   HBQPID ! {ServerPID, {pushHBQ, [1, "Bla", erlang:now()]}},
   timer:sleep(100),
@@ -44,8 +44,8 @@ push_one_message_into_empty_hbq_and_dlq_test() ->
   ?assert(undefined =:= erlang:process_info(HBQPID)).
 
 push_one_invalid_message_into_empty_hbq_test() ->
-  ServerPID = spawn(?MODULE, testReplyOKServer, []),
-  ServerPID2 = spawn(?MODULE, testReplyOKServer, []),
+  ServerPID = spawn(?MODULE, testReplyOKServer, [1]),
+  ServerPID2 = spawn(?MODULE, testReplyOKServer, [1]),
   HBQPID = initHBQ(ServerPID),
   HBQPID ! {ServerPID, {pushHBQ, [3, "Bla2", erlang:now()]}},
   timer:sleep(100),
@@ -54,6 +54,30 @@ push_one_invalid_message_into_empty_hbq_test() ->
   timer:sleep(100),
   ?assert(undefined =:= erlang:process_info(ServerPID2)),
   ?assert(undefined =:= erlang:process_info(HBQPID)).
+
+push_invalid_messages_into_hbq_test() ->
+  ServerPID = spawn(?MODULE, testReplyOKServer, [6]),
+  HBQPID = initHBQ(ServerPID, "./test-config/server.cfg"),
+
+  HBQPID ! {ServerPID, {pushHBQ, [1, "Bla2", erlang:now()]}},
+  timer:sleep(100),
+  ?assert(undefined =/= erlang:process_info(ServerPID)),
+
+  % Insert invalid messages
+  HBQPID ! {ServerPID, {pushHBQ, [3, "Bla2", erlang:now()]}},
+  timer:sleep(100),
+  ?assert(undefined =/= erlang:process_info(ServerPID)),
+  HBQPID ! {ServerPID, {pushHBQ, [4, "Bla2", erlang:now()]}},
+  timer:sleep(100),
+  ?assert(undefined =/= erlang:process_info(ServerPID)),
+  HBQPID ! {ServerPID, {pushHBQ, [5, "Bla2", erlang:now()]}},
+  timer:sleep(100),
+  ?assert(undefined =/= erlang:process_info(ServerPID)),
+
+  HBQPID ! {ServerPID, {request, dellHBQ}},
+  timer:sleep(100),
+  ?assert(undefined =:= erlang:process_info(HBQPID)),
+  ?assert(undefined =:= erlang:process_info(ServerPID)).
 
 %%deliverMSG_test() ->
 %%  ServerPID = spawn(?MODULE, testReplyMSGNumberServer, [0]),
