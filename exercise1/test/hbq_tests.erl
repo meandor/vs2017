@@ -25,24 +25,29 @@ initHBQ(ServerPID) ->
   HBQPID = hbq:start(),
   HBQPID ! {ServerPID, {request, initHBQ}}, HBQPID.
 
-%%initHBQ_test() ->
-%%  ServerPID = spawn(?MODULE, testReplyOKServer, []),
-%%  initHBQ(ServerPID),
-%%  timer:sleep(1000),
-%%  ?assert(undefined =:= erlang:process_info(ServerPID)).
-%%
-%%push_HBQ_test() ->
-%%  ServerPID = spawn(?MODULE, testReplyOKServer, []),
-%%  HBQPID = initHBQ(ServerPID),
-%%  HBQPID ! {ServerPID,  {pushHBQ, [1,"Bla",erlang:now()]}},
-%%  timer:sleep(1000),
-%%  ?assert(undefined =:= erlang:process_info(ServerPID)).
+initHBQ_test() ->
+  ServerPID = spawn(?MODULE, testReplyOKServer, []),
+  initHBQ(ServerPID),
+  timer:sleep(100),
+  ?assert(undefined =:= erlang:process_info(ServerPID)).
 
-deliverMSG_test() ->
-  ServerPID = spawn(?MODULE, testReplyMSGNumberServer, [0]),
+push_one_message_into_empty_hbq_and_dlq_test() ->
+  ServerPID = spawn(?MODULE, testReplyOKServer, []),
+  ServerPID2 = spawn(?MODULE, testReplyOKServer, []),
   HBQPID = initHBQ(ServerPID),
-  ?assert(undefined =/= erlang:process_info(HBQPID)),
-  HBQPID ! {ServerPID,  {pushHBQ, [0,"Bla",123]}}.
+  HBQPID ! {ServerPID, {pushHBQ, [1, "Bla", erlang:now()]}},
+  timer:sleep(100),
+  ?assert(undefined =:= erlang:process_info(ServerPID)),
+  HBQPID ! {ServerPID2, {request, dellHBQ}},
+  timer:sleep(100),
+  ?assert(undefined =:= erlang:process_info(ServerPID2)),
+  ?assert(undefined =:= erlang:process_info(HBQPID)).
+
+%%deliverMSG_test() ->
+%%  ServerPID = spawn(?MODULE, testReplyMSGNumberServer, [0]),
+%%  HBQPID = initHBQ(ServerPID),
+%%  ?assert(undefined =/= erlang:process_info(HBQPID)),
+%%  HBQPID ! {ServerPID,  {pushHBQ, [0,"Bla",123]}}.
 %%  HBQPID ! {ServerPID, {request, deliverMSG, 0, ServerPID}},
 %%  timer:sleep(2000),
 %%  ?assert(undefined =:= erlang:process_info(ServerPID)).
