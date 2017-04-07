@@ -1,8 +1,8 @@
 -module(hbq).
--export([start/0, hbq/3, apply_on_list/3, sort/1]).
+-export([start/0, start/1, hbq/3, apply_on_list/3, sort/1]).
 
-loadConfig() ->
-  {ok, Config} = file:consult("./config/server.cfg"),
+loadConfig(Configfile) ->
+  {ok, Config} = file:consult(Configfile),
   Config.
 
 log(Config, Message) ->
@@ -21,16 +21,18 @@ sort(Messages) ->
 
 % inserts an error message into dlq
 insertErrorMessage(ErrorNNr, DLQ, Config) ->
-  ErrorMessage = [ErrorNNr, "Fehlernachricht fuer Nachrichtennummern x bis x", erlang:now(), erlang:now()],
+  From = dlq:expectedNr(DLQ),
+  ErrorMsg = "Fehlernachricht fuer Nachrichtennummern " ++ integer_to_list(From) ++ " bis " ++ integer_to_list(ErrorNNr),
+  ErrorMessage = [ErrorNNr, ErrorMsg, erlang:now(), erlang:now()],
   dlq:push2DLQ(ErrorMessage, DLQ, Config).
 
 % handles inserting error message or doing nothing if everything is ok!
 handleFaultyHBQ([HBQMessage | HBQRest], [DLQMessages, DLQSize], Config) ->
   HBQLength = length([HBQMessage | HBQRest]),
-  [ErrorNNr, _MSG, _TSclientin, _TShbqin] = HBQMessage,
+  [NNr, _MSG, _TSclientin, _TShbqin] = HBQMessage,
   if
     HBQLength >= (DLQSize * 2 / 3) ->
-      NewDLQ = insertErrorMessage(ErrorNNr, [DLQMessages, DLQSize], Config),
+      NewDLQ = insertErrorMessage(NNr - 1, [DLQMessages, DLQSize], Config),
       startPushing(HBQMessage, HBQRest, NewDLQ, Config);
     true ->
       {[HBQMessage | HBQRest], [DLQMessages, DLQSize]}
@@ -92,6 +94,9 @@ hbq(HBQ, DLQ, Config) ->
   end.
 
 start() ->
-  Config = loadConfig(),
+  start("./config/server.cfg").
+
+start(Configfile) ->
+  Config = loadConfig(Configfile),
   log(Config, ["HBQ>>> server.cfg opened \n"]),
   spawn(?MODULE, hbq, [[], [], Config]).
