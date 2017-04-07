@@ -123,6 +123,25 @@ Das Server Modul und das Client Modul sind über Konfigurationsdateien konfiguri
 stellen Prozesse dar, die nebenläufig laufen. Dabei schreiben sie Log-Dateien, in denen ihre jeweiligen Aktionen
 protokolliert werden.
 
+\subsection{Reader-Modul}
+\subsubsection{Aufgabe und Verantwortung}
+Das Reader-Modul übernimmt das Anfordern und Empfangen von Nachrichten wenn sich der Client
+im lesenden Zustand befindet.
+\subsubsection{Schnittstelle}
+start_reading(MoreFlag, Logfile, ReaderNNrs, ServerPID)\newline
+Der Parameter MoreFlag wird vom Server zurückgeschickt. Er zeigt an, ob es keine weiteren 
+Nachrichten mehr für den Reader gibt. \newline
+ReaderNNrs enthalten die vom Editor gesendeten Nachrichtennummern. Diese Nachrichtennummern
+sollen der Reihe nach vom Reader angefragt werden \newline
+Der Reader-Client sendet seine Anfragen an den Server mit der PID ServerPID.
+
+\subsubsection{Entwurfsentscheidungen}
+Innerhalb des Reader - Moduls gibt es eine Methode zum Formatieren und zum Loggen einer 
+empfangenen Nachricht. 
+Die Funktion zum Anfragen und Empfangen von Nachrichten arbeitet rekursiv: Sie ruft sich so
+lange selbst auf, bis getmessages das flag true zurückliefert. Das Reader-Modul ist eine ADT
+und es wird nur vom Client angesprochen.
+
 \subsection{Server-Modul}
 \subsubsection{Aufgabe und Verantwortung}
 Der Server hat die Aufgabe Nachrichten von Clients entgegen zu nehmen, diese zu verarbeiten und an seine Subprozesse
@@ -132,6 +151,7 @@ Clients holen sich über den Server Nachrichten. Der Server reicht diese Anfrage
 
 Wenn der Server für eine bestimmte Zeit von keinem Client mehr angesprochen wird, soll er sich und seine Subprozesse
 herunterfahren.
+
 
 \subsubsection{Schnittstelle}
 \begin{lstlisting}[language=erlang]
