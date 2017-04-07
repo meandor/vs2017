@@ -36,5 +36,7 @@ start_reading(false, Logfile, ReaderNNrs, ServerPID) ->
   receive
     {reply, Message, Terminated} ->
       write_message(Message, Logfile, ReaderNNrs),
-      start_reading(Terminated, Logfile, ReaderNNrs, ServerPID)
+      start_reading(Terminated, Logfile, ReaderNNrs, ServerPID);
+    terminate ->
+      ok
   end.
