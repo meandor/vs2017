@@ -144,9 +144,9 @@ startClients()
 \textbf{startClient(Lifetime)}: Startet einen Client als Prozess, der zwischen Redakteur und Leser wechselt. Terminiert
 nach ablauf der Lifetime.\\
 
-\textbf{startClients()}: Startet eine feste Anzahl an Clients. Die Anzahl wird aus der Config Datei herausgelesen.
+\textbf{startClients()}: Startet eine feste Anzahl an Clients. Die Anzahl wird aus der Config Datei herausgelesen.\\
 
-\subsubsection{Entwurdsentscheidungen}
+\subsubsection{Entwurfsentscheidungen}
 Beim Starten eines Client-Prozesses wird gleichzeitig ein Timer mit der Lifetime pro Prozess gestartet, der dem Client
 in seiner jeweiligen Rolle eine Terminierungsnachricht schickt. Dadurch wird der Client nach dem Ablaufen der Lebenszeit
 heruntergefahren. Ansonsten wird die jeweilige Rolle des Clients durchgewechselt.
@@ -159,31 +159,39 @@ heruntergefahren. Ansonsten wird die jeweilige Rolle des Clients durchgewechselt
     \item Name des Servers
 \end{itemize}
 
+\newpage
+
 \subsection{Reader-Modul}
 \subsubsection{Aufgabe und Verantwortung}
-Das Reader-Modul übernimmt das Anfordern und Empfangen von Nachrichten wenn sich der Client
-im lesenden Zustand befindet.
+Das Reader-Modul übernimmt das Anfordern und Empfangen von Nachrichten wenn sich der Client im lesenden Zustand
+befindet. Der Reader erkennt welche Nachrichten von seinem Redakteur gesendet wurden und stellt die Nachrichten in
+seiner GUI dar.
 
 \subsubsection{Schnittstelle}
-start\_reading(MoreFlag, Logfile, ReaderNNrs, ServerPID)\newline
-Der Parameter MoreFlag wird vom Server zurückgeschickt. Er zeigt an, ob es keine weiteren
-Nachrichten mehr für den Reader gibt. \newline
-ReaderNNrs enthalten die vom Editor gesendeten Nachrichtennummern. Diese Nachrichtennummern
-sollen der Reihe nach vom Reader angefragt werden \newline
-Der Reader-Client sendet seine Anfragen an den Server mit der PID ServerPID.
+\begin{lstlisting}[language=Erlang]
+/* Startet den Lesevorgang */
+start_reading(Terminated, Logfile, ReaderNNrs, ServerPID):
+    (Boolean X Atom X Liste X PID) -> Atom
+\end{lstlisting}
+
+\textbf{start\_reading(Terminated, Logfile, ReaderNNrs, ServerPID)}: Startet den Lesevorgang. Der Parameter Terminated
+wird vom Server zurückgeschickt. Er zeigt an, ob es keine weiteren Nachrichten mehr für den Reader gibt. Der Reader holt
+sich Eine Nachricht pro Abfrage so lange, bis keine mehr vorliegen.
+
+ReaderNNrs enthalten die vom Editor gesendeten Nachrichtennummern. Das dient zur Markierung der Nachrichten vom Editor
 
 \subsubsection{Entwurfsentscheidungen}
-Innerhalb des Reader - Moduls gibt es eine Methode zum Formatieren und zum Loggen einer
-empfangenen Nachricht.
-Die Funktion zum Anfragen und Empfangen von Nachrichten arbeitet rekursiv: Sie ruft sich so
-lange selbst auf, bis getmessages das flag true zurückliefert. Das Reader-Modul ist eine ADT
-und es wird nur vom Client angesprochen.
+Der Reader hat als State seine Abbruchbedingung (Terminated), die Logfile in die er schreibt, die Nachrichtennummern
+seines Redakteurs und eine Referenz zum Server.
 
-Der Reader terminiert wenn: 
-\begin{itemize}
-    \item Er im MoreFlag mitgeteilt bekommt, dass keine weiteren Nachrichten vorliegen
-    \item Er von dem Client-Modul terminiert wird 
-\end{itemize}
+Innerhalb des Reader-Moduls gibt es eine Funktion zum Formatieren und ausgeben einer empfangenen Nachricht.
+Nachrichten, die vom eigenen Redakteur kommen werden markiert. Außerdem kann der Reader Nachrichten aus der Zukunft
+markieren. Dabei wird die Differenz der Zeitstempel der Nachricht angefügt (Now - TSdlqin oder Now - TSdlqout).
+
+Die Funktion zum Anfragen und Empfangen von Nachrichten wird so lange aufgerufen, bis entweder eine Terminate Nachricht
+ankommt (Timer vom Client-Modul) oder keine neuen Nachrichten mehr vorliegen.
+
+\newpage
 
 \subsection{Server-Modul}
 \subsubsection{Aufgabe und Verantwortung}
