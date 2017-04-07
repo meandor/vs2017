@@ -171,49 +171,82 @@ seiner GUI dar.
 \begin{lstlisting}[language=Erlang]
 /* Startet den Lesevorgang */
 start_reading(Terminated, Logfile, ReaderNNrs, ServerPID):
-    (Boolean X Atom X Liste X PID) -> Atom
+    Boolean X Atom X Liste X PID -> Atom
 \end{lstlisting}
 
 \textbf{start\_reading(Terminated, Logfile, ReaderNNrs, ServerPID)}: Startet den Lesevorgang. Der Parameter Terminated
 wird vom Server zurückgeschickt. Er zeigt an, ob es keine weiteren Nachrichten mehr für den Reader gibt. Der Reader holt
 sich Eine Nachricht pro Abfrage so lange, bis keine mehr vorliegen.
 
-ReaderNNrs enthalten die vom Editor gesendeten Nachrichtennummern. Das dient zur Markierung der Nachrichten vom Editor
+ReaderNNrs enthalten die vom Editor gesendeten Nachrichtennummern. Das dient zur Markierung der Nachrichten vom Editor\\
 
 \subsubsection{Entwurfsentscheidungen}
+Das Reader-Modul ist eine interne ADT, die vom Client verwendet wird.
+
 Der Reader hat als State seine Abbruchbedingung (Terminated), die Logfile in die er schreibt, die Nachrichtennummern
 seines Redakteurs und eine Referenz zum Server.
 
-Innerhalb des Reader-Moduls gibt es eine Funktion zum Formatieren und ausgeben einer empfangenen Nachricht.
+Innerhalb des Reader-Moduls gibt es eine Funktion zum Formatieren und Ausgeben einer empfangenen Nachricht.
 Nachrichten, die vom eigenen Redakteur kommen werden markiert. Außerdem kann der Reader Nachrichten aus der Zukunft
 markieren. Dabei wird die Differenz der Zeitstempel der Nachricht angefügt (Now - TSdlqin oder Now - TSdlqout).
 
 Die Funktion zum Anfragen und Empfangen von Nachrichten wird so lange aufgerufen, bis entweder eine Terminate Nachricht
 ankommt (Timer vom Client-Modul) oder keine neuen Nachrichten mehr vorliegen.
 
+\subsubsection{Konfigurationsparameter}
+\begin{itemize}
+    \item Name des Servers
+\end{itemize}
+
 \newpage
 
 \subsection{Editor-Modul}
 \subsubsection{Aufgabe und Verantwortung}
-Das Editor-Modul übernimmt das Senden von Nachrichten an den Server.
+Das Editor-Modul übernimmt das Senden von Nachrichten an den Server. Dafür baut das Modul Nachrichten zusammen.
 
 \subsubsection{Schnittstelle}
-Der Editor bietet zwei Schnittstellen für den Client: starten und terminieren.
+\begin{lstlisting}[language=Erlang]
+/* Startet den Sendevorgang */
+start_sending(Counter, Logfile, ReaderNNrs, SendWait, ServerPID):
+    Integer X Atom X Liste X Integer X PID -> {Liste X Integer}
+\end{lstlisting}
 
+\textbf{start\_sending(Counter, Logfile, ReaderNNrs, SendWait, ServerPID)}: Startet den Sendevorgang. Der Parameter Counter dient
+als Akkumulator um rekursiv 5 mal ausgeführt zu werden. In ReaderNNrs werden die gesendeten Nachrichtennummern
+gespeichert. SendWait wird verwendet, um nach jedem Senden zu warten.\\
 
 \subsubsection{Entwurfsentscheidungen}
-Beim Start des Moduls wird automatisch mit dem Senden von Nachrichten begonnen: Zunächst wird
-über die Schnittstelle des Servers die nächste Nachrichtennummer geholt, und danach eine Nachricht mit dieser
-Nummer an den Server geschickt. Diese Funktion ruft sich 5 mal rekursiv auf. Bei Terminierung des Vorgangs wird
-einmal eine Nachrichtennummer angefragt, ohne eine entsprechende Nachricht zu senden.
-Beim Senden einer Nachricht wird mit erlang:now/0 ein Zeitstempel in die Nachricht eingefügt.
+Das Editor-Modul ist eine interne ADT, die vom Client verwendet wird.
+Der Editor hat als State einen Counter, eine Logfile, eine ReaderNNrs Liste, eine Wartezeit und eine Referenz zum Server.
+Der Counter dient dazu 5 mal eine Nachricht mit der beim Server erfragten neuen Nummer zu schicken.
 
-Der Reader terminiert wenn: 
+Danach wird eine Nummer beim Server abgefragt, ohne eine Nachricht an den Server mit dieser Nachrichtennummer zu senden
+(im Log vermerkt).
+
+Die gesendeten Nachrichtennummern werden in der ReaderNNrs Liste gespeichert und an den Leser durch den Client gesendet.
+
+Die Wartezeit wird zum Warten zwischen der Anforderung einer eindeutigen Nachrichtennummer beim Server und vor dem
+Senden der Nachricht an den Server ausgeführt.
+
+Die Wartezeit wird nach dem Senden von 5 Textzeilen jeweils um ca. 50\% per Zufall vergrößert oder verkleinert.
+Die Wartezeit darf nicht unter 2 Sekunde rutschen. Das wird durch eine Hilfsfunktion realisiert.
+
+Nachrichten bauen sich aus dem Namen des Clients, die Praktikumsgruppe, der Teamnummer und seiner aktuellen Systemzeit
+(entspricht Sendezeit). Außerdem beinhaltet die Nachricht die Nachrichtennummer.
+
+Der Reader terminiert wenn:
 \begin{itemize}
-    \item Er 5 Nachrichten gesendet hat.
+    \item Er 5 Nachrichten gesendet hat und einmal eine neue Nachrichtennummer vom Server abgefragt hat
     \item Er von dem Client-Modul terminiert wird 
 \end{itemize}
 
+\subsubsection{Konfigurationsparameter}
+\begin{itemize}
+    \item Name des Servers
+    \item Initiales Sendeintervall
+\end{itemize}
+
+\newpage
 
 \subsection{Server-Modul}
 \subsubsection{Aufgabe und Verantwortung}
