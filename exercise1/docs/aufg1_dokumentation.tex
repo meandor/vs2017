@@ -193,6 +193,28 @@ ankommt (Timer vom Client-Modul) oder keine neuen Nachrichten mehr vorliegen.
 
 \newpage
 
+\subsection{Editor-Modul}
+\subsubsection{Aufgabe und Verantwortung}
+Das Editor-Modul übernimmt das Senden von Nachrichten an den Server.
+
+\subsubsection{Schnittstelle}
+Der Editor bietet zwei Schnittstellen für den Client: starten und terminieren.
+
+
+\subsubsection{Entwurfsentscheidungen}
+Beim Start des Moduls wird automatisch mit dem Senden von Nachrichten begonnen: Zunächst wird
+über die Schnittstelle des Servers die nächste Nachrichtennummer geholt, und danach eine Nachricht mit dieser
+Nummer an den Server geschickt. Diese Funktion ruft sich 5 mal rekursiv auf. Bei Terminierung des Vorgangs wird
+einmal eine Nachrichtennummer angefragt, ohne eine entsprechende Nachricht zu senden.
+Beim Senden einer Nachricht wird mit erlang:now/0 ein Zeitstempel in die Nachricht eingefügt.
+
+Der Reader terminiert wenn: 
+\begin{itemize}
+    \item Er 5 Nachrichten gesendet hat.
+    \item Er von dem Client-Modul terminiert wird 
+\end{itemize}
+
+
 \subsection{Server-Modul}
 \subsubsection{Aufgabe und Verantwortung}
 Der Server hat die Aufgabe Nachrichten von Clients entgegen zu nehmen, diese zu verarbeiten und an seine Subprozesse
