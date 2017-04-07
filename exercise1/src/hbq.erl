@@ -23,13 +23,9 @@ hbq(HBQ, ExpectedNNr, DLQ, Config) ->
       hbq([], 0, dlq:initDLQ(DlqLimit, Logfile), Config);
 
     %Forwards the command to deliver a message to the PID "ToClient" to the dlq
-    %TODO: Still test code in here, because deliverMSG doesnt return the number of the message sent. Please fix
     {ServerPID, {request, deliverMSG, NNr, ToClient}} ->
-        DLQ2 = dlq:initDLQ(3, ""),
-        dlq:push2DLQ([1, "", erlang:now(), erlang:now()], DLQ2, "Test"),
-        Number = dlq:deliverMSG(NNr, ToClient, DLQ, ""),
-
-        log(Config, ["HBQ>>> delivered", 1, "\n"]),
+        Logfile = log(Config, ["HBQ>>> delivered", 1, "\n"]),
+        Number = dlq:deliverMSG(NNr, ToClient, DLQ, Logfile),
         ServerPID ! {reply, Number};
 
     % Terminates the process and sends an ok to the server.
@@ -42,23 +38,22 @@ hbq(HBQ, ExpectedNNr, DLQ, Config) ->
     {ServerPID, {pushHBQ, [NNr,Msg,TSclientout]}} ->
       Logfile = log(Config, ["HBQ>>> pushing message: ", NNr, "\n"]),
       [_, DLQSize] = DLQ,
-      if NNr == ExpectedNNr ->
+      if NNr > ExpectedNNr ->
           HBQ = lists:append(HBQ, [[NNr, Msg, TSclientout, erlang:now()]]),
           HBQ = sort(HBQ),
           {ExpectedNNr, HBQ} = pushAllConsecutiveSequenceNumbers(HBQ, DLQ, Logfile, ExpectedNNr),
           hbq(HBQ, ExpectedNNr, DLQ, Config);
+         NNr == ExpectedNNr ->
+          dlq:push2DLQ([NNr, Msg, TSclientout, erlang:now()], DLQ, "Test");
         length(HBQ) >= DLQSize * (2 / 3) ->
           HBQ = lists:append(HBQ, [[NNr, Msg, TSclientout, erlang:now()]]),
-          %TODO
-          ok
-      end
 
+          ok
+      end,
+      ServerPID ! {reply, ok}
 
   end
 .
-
-
-
 
 apply_on_list([H | T], X, Func) ->
   apply_on_list(T, lists:append(X, [Func(H)]), Func);
