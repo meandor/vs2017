@@ -112,7 +112,7 @@ Das Client-Paket beinhaltet die Client-Module. Diese sind zum einen der Lese Cli
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{FullHBQSequence.png}
-\caption[seq-dia]{Aktivitätsdiagramm beim Hinzufügen von Nachrichten in die HBQ}
+\caption[act-dia]{Aktivitätsdiagramm beim Hinzufügen von Nachrichten in die HBQ}
 \label{fig:acivity-diagram}
 \end{figure}
 
@@ -123,21 +123,58 @@ Das Server Modul und das Client Modul sind über Konfigurationsdateien konfiguri
 stellen Prozesse dar, die nebenläufig laufen. Dabei schreiben sie Log-Dateien, in denen ihre jeweiligen Aktionen
 protokolliert werden.
 
+\subsection{Client-Modul}
+\subsubsection{Aufgabe und Verantwortung}
+Das Client-Modul stellt einen Client in einem Prozess dar. Es kann eingestellt werden, wie viele Clients auf einmal
+gestartet werden und wie lange diese Clients existieren.
+
+Clients bestehen aus einem Leser (Reader) und einem Redakteur (Editor). Diese Rollen werden sequentiell im Laufe des
+Lebenszyklus des Clients immer abwechselnd durchgetauscht. Das Client-Modul koordiniert also auch die Rollen des
+Clients.
+
+\subsubsection{Schnittstelle}
+\begin{lstlisting}[language=erlang]
+/* Startet einen Client mit gegebener Lifetime */
+startClient(Lifetime): Integer -> PID
+
+/* Startet eine feste Anzahl an Clients (Config) */
+startClients()
+\end{lstlisting}
+
+\textbf{startClient(Lifetime)}: Startet einen Client als Prozess, der zwischen Redakteur und Leser wechselt. Terminiert
+nach ablauf der Lifetime.\\
+
+\textbf{startClients()}: Startet eine feste Anzahl an Clients. Die Anzahl wird aus der Config Datei herausgelesen.
+
+\subsubsection{Entwurdsentscheidungen}
+Beim Starten eines Client-Prozesses wird gleichzeitig ein Timer mit der Lifetime pro Prozess gestartet, der dem Client
+in seiner jeweiligen Rolle eine Terminierungsnachricht schickt. Dadurch wird der Client nach dem Ablaufen der Lebenszeit
+heruntergefahren. Ansonsten wird die jeweilige Rolle des Clients durchgewechselt.
+
+\subsubsection{Konfigurationsparameter}
+\begin{itemize}
+    \item Anzahl der Clients
+    \item Lebensdauer eines Clients
+    \item Initiales Sendeintervall
+    \item Name des Servers
+\end{itemize}
+
 \subsection{Reader-Modul}
 \subsubsection{Aufgabe und Verantwortung}
 Das Reader-Modul übernimmt das Anfordern und Empfangen von Nachrichten wenn sich der Client
 im lesenden Zustand befindet.
+
 \subsubsection{Schnittstelle}
-start_reading(MoreFlag, Logfile, ReaderNNrs, ServerPID)\newline
-Der Parameter MoreFlag wird vom Server zurückgeschickt. Er zeigt an, ob es keine weiteren 
+start\_reading(MoreFlag, Logfile, ReaderNNrs, ServerPID)\newline
+Der Parameter MoreFlag wird vom Server zurückgeschickt. Er zeigt an, ob es keine weiteren
 Nachrichten mehr für den Reader gibt. \newline
 ReaderNNrs enthalten die vom Editor gesendeten Nachrichtennummern. Diese Nachrichtennummern
 sollen der Reihe nach vom Reader angefragt werden \newline
 Der Reader-Client sendet seine Anfragen an den Server mit der PID ServerPID.
 
 \subsubsection{Entwurfsentscheidungen}
-Innerhalb des Reader - Moduls gibt es eine Methode zum Formatieren und zum Loggen einer 
-empfangenen Nachricht. 
+Innerhalb des Reader - Moduls gibt es eine Methode zum Formatieren und zum Loggen einer
+empfangenen Nachricht.
 Die Funktion zum Anfragen und Empfangen von Nachrichten arbeitet rekursiv: Sie ruft sich so
 lange selbst auf, bis getmessages das flag true zurückliefert. Das Reader-Modul ist eine ADT
 und es wird nur vom Client angesprochen.
@@ -157,7 +194,6 @@ Clients holen sich über den Server Nachrichten. Der Server reicht diese Anfrage
 
 Wenn der Server für eine bestimmte Zeit von keinem Client mehr angesprochen wird, soll er sich und seine Subprozesse
 herunterfahren.
-
 
 \subsubsection{Schnittstelle}
 \begin{lstlisting}[language=erlang]
