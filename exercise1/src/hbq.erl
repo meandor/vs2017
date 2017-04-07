@@ -26,7 +26,7 @@ hbq(HBQ, ExpectedNNr, DLQ, Config) ->
     {ServerPID, {request, deliverMSG, NNr, ToClient}} ->
         Logfile = log(Config, ["HBQ>>> delivered", 1, "\n"]),
         Number = dlq:deliverMSG(NNr, ToClient, DLQ, Logfile),
-        ServerPID ! {reply, Number};
+        ServerPID ! {reply, 0};
 
     % Terminates the process and sends an ok to the server.
     {ServerPID, {request,dellHBQ}} ->
@@ -37,23 +37,32 @@ hbq(HBQ, ExpectedNNr, DLQ, Config) ->
     %After each push the hbq gets sorted and inspected for the expected message number at the beginning.
     {ServerPID, {pushHBQ, [NNr,Msg,TSclientout]}} ->
       Logfile = log(Config, ["HBQ>>> pushing message: ", NNr, "\n"]),
-      [_, DLQSize] = DLQ,
+    %  [_, DLQSize] = DLQ,
+
+      if length(HBQ) >= 6 * (2 / 3) ->
+        insertErrorMessage(HBQ),
+        pushAllConsecutiveSequenceNumbers(HBQ, DLQ, Logfile, ExpectedNNr)
+      end,
+
       if NNr > ExpectedNNr ->
           HBQ = lists:append(HBQ, [[NNr, Msg, TSclientout, erlang:now()]]),
           HBQ = sort(HBQ),
           {ExpectedNNr, HBQ} = pushAllConsecutiveSequenceNumbers(HBQ, DLQ, Logfile, ExpectedNNr),
           hbq(HBQ, ExpectedNNr, DLQ, Config);
          NNr == ExpectedNNr ->
-          dlq:push2DLQ([NNr, Msg, TSclientout, erlang:now()], DLQ, "Test");
-        length(HBQ) >= DLQSize * (2 / 3) ->
-          HBQ = lists:append(HBQ, [[NNr, Msg, TSclientout, erlang:now()]]),
-
-          ok
+          dlq:push2DLQ([NNr, Msg, TSclientout, erlang:now()], DLQ, "Test")
       end,
+
       ServerPID ! {reply, ok}
 
   end
 .
+
+insertErrorMessage([FirstMessage ,  [NNr2, Msg2, TSclientout2, TSHBQIn2] | T]) ->
+  FirstMessage
+    ++ [NNr2 - 1, "Fehlernachricht fuer Nachrichtennummern x bis x", erlang:now(), erlang:now()]
+    ++  [NNr2, Msg2, TSclientout2, TSHBQIn2]
+    ++ T.
 
 apply_on_list([H | T], X, Func) ->
   apply_on_list(T, lists:append(X, [Func(H)]), Func);
@@ -65,7 +74,7 @@ pushAllConsecutiveSequenceNumbers([[NNr, MSG, TS1, TS2] | Tail], DLQ, Datei, Exp
   Fehler = string:str(MSG, "Fehlernachricht"),
   if NNr == ExpectedNNr or Fehler  ->
     dlq:push2DLQ(NNr, DLQ, Datei),
-    pushAllConsecutiveSequenceNumbers(Tail, DLQ, Datei, ExpectedNNr + 1)
+    pushAllConsecutiveSequenceNumbers(Tail, DLQ, Datei, NNr + 1)
   end,
   werkzeug:logging(Datei, lists:concat(["HBQ>>>sent all messages to dlq until NNR: ", NNr, "\n"])),
   {ExpectedNNr, [[NNr, MSG, TS1, TS2] | Tail]}
