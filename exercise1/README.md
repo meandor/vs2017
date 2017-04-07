@@ -29,3 +29,8 @@ To test a $MODULENAME in the erl shell:
 ````erlang
 eunit:test($MODULENAME).
 ````
+
+For all tests:
+````erlang
+eunit:test(cmem), eunit:test(dlq), eunit:test(server), eunit:test(reader), eunit:test(hbq).
+````
