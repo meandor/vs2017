@@ -109,6 +109,13 @@ Das Client-Paket beinhaltet die Client-Module. Diese sind zum einen der Lese Cli
 \label{fig:sequence-diagram}
 \end{figure}
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{FullHBQSequence.png}
+\caption[seq-dia]{Aktivitätsdiagramm beim Hinzufügen von Nachrichten in die HBQ}
+\label{fig:acivity-diagram}
+\end{figure}
+
 \newpage
 
 \section{Subsysteme und Komponenten}
@@ -318,13 +325,6 @@ festgelegt.
 Die HBQ-Liste wird nach jedem Einfügen anhand der NNr Sortiert, um die Reihenfolge zu erhalten.
 Dies ist nötig, um die erste Lücke in Sequenznummern zu finden. Außerdem ist so das Senden der
 ältesten Nachricht einfacher.
-
-\begin{figure}[FullHBQSequence]
-\centering
-\includegraphics[width=\textwidth]{FullHBQSequence.png}
-\caption[seq-dia]{Aktivitätendiagramm für pushHBQ}
-\label{fig:sequence-diagram}
-\end{figure}
 
 \subsubsection{Konfigurationsparameter}
 \begin{itemize}
