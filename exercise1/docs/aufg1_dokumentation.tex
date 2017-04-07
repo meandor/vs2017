@@ -250,58 +250,78 @@ Für bekannte Clients wird die resultierende nächste Nachrichtennummer inkremen
 
 \newpage
 			
-\subsection{Komponente HBQ}
-\subsubsection{Aufgabe und Verantwortung der HBQ}
+\subsection{HBQ-Modul}
+\subsubsection{Aufgabe und Verantwortung}
 
 Von Redakteur-Clients gesendete Nachrichten werden hier zwischengespeichert falls sie noch nicht
-erwartet werden. Erwartete Nachrichten werden weitergeleitet, und es wird Fehlerbehandlung
-bei Überfüllung vorgenommen.
+erwartet werden (nicht in Reihenfolge). Erwartete Nachrichten werden weitergeleitet, und es wird eine Fehlerbehandlung
+bei Überfüllung vorgenommen. Dadurch sollen Lücken zwischen Nachrichten durch eine Nachricht gefüllt werden. Das kann
+passieren, wenn z.B. Nachrichten nicht ankommen oder verloren gehen.
 
 \subsubsection{Schnittstelle}
+\begin{lstlisting}[language=Erlang]
+/* Initialisieren der HBQ */
+HBQ ! {self(), {request,initHBQ}}
+receive {reply,ok}
 
-{request,initHBQ}: \newline 
-Ruft den receive - Loop der HBQ mit leerer Nachrichtenliste und
-					der Initialisierung der DLQ auf. Dieser Aufruf ist zwingend nötig, 
-					bevor weitere RPCs ausgeführt werden.
+/* Speichern einer Nachricht in der HBQ */
+HBQ ! {self(), {request,pushHBQ,[NNr,Msg,TSclientout]}}
+receive {reply,ok}
 
-{request,pushHBQ,[NNr,Msg,TSclientout]}:\newline 
-Nachricht zwischenspeichen, oder an DLQ weiterleiten. Je nach dem,
-ob sie von der DLQ erwartet wird.
+/* Abfrage einer Nachricht */
+HBQ ! {self(), {request,deliverMSG,NNr,ToClient}}
+receive {reply,SendNNr}
 
-{request,deliverMSG,NNr,ToClient}: \newline 
-Auftrag der Zustellung wird an DLQ weitergereicht 
-und die tatsächlich gesendete NNr zurückgeschickt.
+/* Terminierung der HBQ */
+HBQ ! {self(), {request,dellHBQ}}
+receive {reply, ok}
+\end{lstlisting}
 
-{request,dellHBQ}:\newline 
-terminiert die HBQ bedingungslos.
+\textbf{{request,initHBQ}}: initialisiert die HBQ und die DLQ. Bei Erfolg wird ein ok gesendet.\\
 
+\textbf{{request,pushHBQ,[NNr,Msg,TSclientout]}}: fügt eine Nachricht Msg (Textzeile) mit Nummer NNr und dem
+Sende-Zeitstempel TSclientout (mit erlang:now() erstellt) in die HBQ ein. Bei Erfolg wird ein ok gesendet.\\
+
+\textbf{{request,deliverMSG,NNr,ToClient}}: beauftragt die HBQ über die DLQ die Nachricht mit der Nummer NNr
+(falls nicht verfügbar die nächst höhere Nachrichtennummer) an den Client ToClient (als PID) auszuliefern. Bei Erfolg
+wird die tatsächlich gesendete Nachrichtennummer SendNNr gesendet.\\
+
+\textbf{{request,dellHBQ}}: terminiert den Prozess der HBQ. Bei Erfolg wird ein ok gesendet.\\
 
 \subsubsection{Entwurfsentscheidungen}
-pushHBQ \newline
+Die HBQ interne Datenstrukur zur Speicherung der Nachrichten ist eine Liste, die von vorne nach hinten aufsteigend
+sortiert ist. Sie stellt eine Queue dar. Die HBQ hat als State die tatsächliche HBQ, die DLQ und die Config
+Einstellungen. Die HBQ wird als externe ADT mit einem eigenen Prozess abgebildet.\\
+\\
+Beim push in die HBQ wird folgende Fallunterscheidung vorgenommen.
+
 Im Fall dass die an die HBQ gepushte Nachricht der erwarteten NNr der DLQ entspricht wird:
 	\begin{enumerate}
 		\item{Die Nachricht an die DLQ direkt weitergeleitet, und nicht gespeichert.}
 		\item{Die HBQ wird auf Nachrichten geprüft die nun gesendet werden können.}
 	\end{enumerate}
+
 Im anderen Fall wird die Nachricht nur in der HBQ gespeichert, und nichts weiter getan.
 So werden alle von der DLQ erwarteten Nachrichten direkt zugestellt. 
 
-Fehlerfall: HBQGröße >= (2/3) * Maximale DLQ Größe  \newline
+Wenn Nachrichten der HBQ zugefügt werden, wird danach eine Fehlerbehandlung eingeleitet. Der Fehlerfall wird durch den
+HBQ State: \texttt{HBQGröße >= (2/3) * Maximale DLQ Größe} beschrieben.\\
 
 Nach jedem Einfügen wird die Größe der HBQ geprüft. Im Falle einer Überfüllung
 wird eine Dummynachricht zum Schließen einer Lücke in den Sequenznummern direkt in 
-die DLQ gepusht. Danach wird die HBQ wird auf weitere Nachrichten geprüft die nun gesendet werden können.
-Die Dummynachrichten schließen Lücken bestehend aus einer oder mehrerer Sequenznummern.
-Eine Dummynachricht wird durch den String "Fehlernachricht" im Inhalt identifiziert.
-Ihre NNr wird auf das Ende des Intervalls, welches Sie abdeckt festgelegt.
+die DLQ gepusht. Danach wird die HBQ auf weitere Nachrichten, die nun gesendet werden können geprüft.
 
-Die Liste wird nach jedem Einfügen anhand der NNr Sortiert, um die Reihenfolge zu erhalten. 
+Die Dummynachrichten schließen Lücken bestehend aus einer oder mehrerer Sequenznummern. Eine Dummynachricht wird durch
+den String "Fehlernachricht" im Inhalt identifiziert. Ihre NNr wird auf das Ende des Intervalls, welches Sie abdeckt
+festgelegt.
+
+Die HBQ-Liste wird nach jedem Einfügen anhand der NNr Sortiert, um die Reihenfolge zu erhalten.
 Dies ist nötig, um die erste Lücke in Sequenznummern zu finden. Außerdem ist so das Senden der
-ältesten Nachricht performant, O(1).
+ältesten Nachricht einfacher.
 
 \subsubsection{Konfigurationsparameter}
 \begin{itemize}
-	\item Die Maximalgröße der DLQ wird verwendet um die HBQ bei kritischer Überfüllung zu leeren.
+	\item Die Maximalgröße der DLQ wird verwendet um die HBQ bei kritischer Überfüllung zu leeren
 \end{itemize}
 \newpage
 

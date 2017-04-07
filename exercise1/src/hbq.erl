@@ -77,9 +77,11 @@ hbq(HBQ, DLQ, Config) ->
 
   %Forwards the command to deliver a message to the PID "ToClient" to the dlq
     {ServerPID, {request, deliverMSG, NNr, ToClient}} ->
-      Logfile = log(Config, ["HBQ>>> delivered", 1, "\n"]),
-      Number = dlq:deliverMSG(NNr, ToClient, DLQ, Logfile),
-      ServerPID ! {reply, Number};
+      {ok, NodeName} = werkzeug:get_config_value(hbqnode, Config),
+      LogfileName = lists:concat(["HB-DLQ@", NodeName, ".log"]),
+      Logfile = erlang:list_to_atom(LogfileName),
+      SendNNr = dlq:deliverMSG(NNr, ToClient, DLQ, Logfile),
+      ServerPID ! {reply, SendNNr};
 
   % Terminates the process and sends an ok to the server.
     {ServerPID, {request, dellHBQ}} ->
