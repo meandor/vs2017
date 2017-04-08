@@ -17,7 +17,8 @@ simple_test() ->
   server:startMe("./test-config/server.cfg"),
   editor:start("Juergen", [], 500, ServerName),
   timer:sleep(2001),
-  ClientPID = spawn(?MODULE, testClientExpectingMessage, [1]),
+  ClientPID = spawn(?MODULE, testClientExpectingMessage, []),
+  server:startMe("./test-config/server.cfg"),
   ServerName ! {ClientPID, getmessages},
   ?assert(undefined =:= erlang:process_info(ClientPID))
 
