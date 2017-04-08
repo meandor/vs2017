@@ -4,7 +4,7 @@
 receiveNNr(ServerPID, ReaderNNrs) ->
   receive
     {nid, NextNNr} ->
-      ReaderNNrs = lists:append(ReaderNNrs, [NextNNr]),
+     % ReaderNNrs = lists:append(ReaderNNrs, [NextNNr]),
       %TODO
       ServerPID ! {dropmessage, [NextNNr, "Nachricht vom Editor", erlang:now()]}
   end,
@@ -17,7 +17,7 @@ receiveLastNNr(Logfile) ->
   end.
 
 start(Logfile, ReaderNNrs, SendWait, ServerPID) ->
-  ReceiveServer = spawn(?MODULE, receiveNNr, [ServerPID]),
+  ReceiveServer = spawn(?MODULE, receiveNNr, [ServerPID, ReaderNNrs]),
   start_sending(0, Logfile, ReaderNNrs, SendWait, ServerPID, ReceiveServer).
 
 start_sending(Counter, Logfile, ReaderNNrs, SendWait, ServerPID, ReceiveServer) ->
