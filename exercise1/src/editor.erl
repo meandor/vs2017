@@ -4,14 +4,13 @@
 receiveNNr(ServerPID, ReaderNNrs, Logging) ->
   receive
     {nid, NextNNr} ->
-      werkzeug:logging(Logging, lists:concat(["EDITOR>>>", "Received NNr\n", NextNNr])),
-      ReaderNNrs = lists:append(ReaderNNrs, [NextNNr]),
+      werkzeug:logging(Logging, lists:concat(["EDITOR>>>", "Received NNr", NextNNr, "\n"])),
+      NewReaderNNrs = ReaderNNrs ++ [NextNNr],
       %TODO Message format
-      ServerPID ! {dropmessage, [NextNNr, "Nachricht vom Editor", erlang:now()]};
+      wk ! {dropmessage, [NextNNr, "Nachricht vom Editor", erlang:now()]},
+      receiveNNr(ServerPID, NewReaderNNrs, Logging);
     {terminate, ClientPID} -> ClientPID ! {doneSending, ReaderNNrs}
-  end,
-  receiveNNr(ServerPID, ReaderNNrs, Logging)
-.
+  end.
 
 receiveLastNNr(Logfile) ->
   receive
@@ -29,7 +28,7 @@ start_sending(5, Logfile, _SendWait, ServerPID, ClientPID, ReceiveServer) ->
   ReceiveServer ! {terminate, ClientPID};
 
 start_sending(Counter, Logfile, SendWait, ServerPID, ClientPID, ReceiveServer) ->
-  ServerPID ! {ReceiveServer, getmsgid},
+  wk ! {ReceiveServer, getmsgid},
   timer:sleep(SendWait),
   werkzeug:logging(Logfile, lists:concat(["EDITOR>>>", Counter, " ID reqeusted\n"])),
   start_sending(Counter + 1, Logfile, SendWait, ServerPID, ClientPID, ReceiveServer)

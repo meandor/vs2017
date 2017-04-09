@@ -15,8 +15,10 @@ simple_test() ->
   {ok, Config} = file:consult("./config/server.cfg"),
   {ok, ServerName} = werkzeug:get_config_value(servername, Config),
   server:startMe(),
-  editor:start("Juergen", [], 500, ServerName),
-  timer:sleep(500),
+  editor:start("Juergen", 100, wk, self()),
+  receive
+    {doneSending, ReaderNNrs} -> ok %?assert(ReaderNNrs =:= [1, 2, 3, 4, 5])
+  end,
   ClientPID = spawn(?MODULE, testClientExpectingMessage, []),
   %server:startMe("./test-config/server.cfg"),
   ServerName ! {ClientPID, getmessages},

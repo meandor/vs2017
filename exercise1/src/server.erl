@@ -66,5 +66,6 @@ startMe(ConfigFile) ->
   {ok, Latency} = werkzeug:get_config_value(latency, Config),
   {ok, Timer} = timer:send_after(round(Latency * 1000), ServerName, terminate),
   ServerPID = spawn(?MODULE, server, [Config, CMEM, HBQPID, 1, Timer, Latency]),
-  register(ServerName, ServerPID),
+  register(wk, ServerPID),
+  HBQPID ! {ServerPID, {request, initHBQ}},
   werkzeug:logging(serverLog(), lists:concat(["Server: Starttime: ", werkzeug:timeMilliSecond(), " with PID", pid_to_list(ServerPID), "\n"])).
