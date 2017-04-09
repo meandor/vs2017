@@ -14,14 +14,15 @@ simple_test() ->
 
   {ok, Config} = file:consult("./config/server.cfg"),
   {ok, ServerName} = werkzeug:get_config_value(servername, Config),
-  server:startMe("./test-config/server.cfg"),
+  server:startMe(),
   editor:start("Juergen", [], 500, ServerName),
-  timer:sleep(2001),
+  timer:sleep(500),
   ClientPID = spawn(?MODULE, testClientExpectingMessage, []),
-  server:startMe("./test-config/server.cfg"),
+  %server:startMe("./test-config/server.cfg"),
   ServerName ! {ClientPID, getmessages},
-  ?assert(undefined =:= erlang:process_info(ClientPID))
-
+  timer:sleep(500),
+  ?assert(undefined =:= erlang:process_info(ClientPID)),
+  ServerName ! terminate
 .
 
 
