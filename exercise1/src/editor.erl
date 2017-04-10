@@ -1,14 +1,16 @@
 -module(editor).
--export([start_sending/5, receiveNNr/3, receiveLastNNr/1, createMessage/1]).
+-export([start_sending/5, createMessage/1, calculateNewInterval/1]).
+
+minInterval() -> 2000.
 
 calculateNewInterval(Interval) ->
   Increase = werkzeug:bool_rand(),
-  Value = trunc(max(Interval * 0.5, 1000)),
+  Value = trunc(max(Interval * 0.5, minInterval())),
   if
     Increase ->
       Interval + Value;
     true ->
-      max(Interval - Value, 1000)
+      max(Interval - Value, minInterval())
   end.
 
 % 0-client@lab18-<0.1313.0>-C-1-03: 22te_Nachricht. Sendezeit: 16.05 18:01:30,769|
@@ -27,15 +29,14 @@ getLogFile([], NextNNr) ->
 
 getLogFile(Logfile, _NextNNr) -> Logfile.
 
-start_sending(0, Logfile, ReaderNNRs, SendWait, ServerPID) ->
-  timer:sleep(SendWait),
+start_sending(0, Logfile, ReaderNNRs, _SendWait, ServerPID) ->
   ServerPID ! {self, getmsgid},
   receive
-    {nid, NextNNr} -> werkzeug:logging(Logfile, lists:concat(["EDITOR>>> message number ", NextNNr, " forgotten\n"]))
+    {nid, NextNNr} ->
+      werkzeug:logging(Logfile, lists:concat(["EDITOR>>> message number ", NextNNr, " forgotten to send\n"]))
   end,
-  ReaderNNRs
-;
-
+  NewSendWait = 13, % TODO Calculate new interval
+  {ReaderNNRs, NewSendWait, Logfile};
 
 start_sending(Counter, Logfile, ReaderNNrs, SendWait, ServerPID) ->
   ServerPID ! {self(), getmsgid},
