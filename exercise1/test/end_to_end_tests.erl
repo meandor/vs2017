@@ -12,3 +12,6 @@ getmessages_with_empty_dlq_and_dont_update_cmem_test() ->
   ?assert(undefined =:= erlang:process_info(ClientPID)).
 
 % Add test for sending message and get request for test client
+
+send_receive_test() ->
+  client:start().

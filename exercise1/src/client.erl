@@ -1,6 +1,6 @@
 -module(client).
 
--export([startClients/0, startClient/1]).
+-export([startClients/0, startClient/2]).
 
 loadConfig() ->
   {ok, Config} = file:consult("./config/client.cfg"),

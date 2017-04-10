@@ -30,6 +30,7 @@ server(Config, CMEM, HBQPID, NextNNr, Timer, Latency) ->
     {ClientPID, getmessages} ->
       NewTimer = werkzeug:reset_timer(Timer, Latency, terminate),
       NNr = cmem:getClientNNr(CMEM, ClientPID),
+
       HBQPID ! {self(), {request, deliverMSG, NNr, ClientPID}},
       werkzeug:logging(serverLog(), lists:concat(["Server: deliver message ", NNr, " to ", erlang:pid_to_list(ClientPID), "\n"])),
       receive
@@ -67,5 +68,4 @@ startMe(ConfigFile) ->
   {ok, Timer} = timer:send_after(round(Latency * 1000), ServerName, terminate),
   ServerPID = spawn(?MODULE, server, [Config, CMEM, HBQPID, 1, Timer, Latency]),
   register(wk, ServerPID),
-  HBQPID ! {ServerPID, {request, initHBQ}},
-  werkzeug:logging(serverLog(), lists:concat(["Server: Starttime: ", werkzeug:timeMilliSecond(), " with PID", pid_to_list(ServerPID), "\n"])).
+  werkzeug:logging(serverLog(), lists:concat(["Server: Starttime: ", werkzeug:timeMilliSecond(), " with PID", pid_to_list(ServerPID), "\n"])), ServerPID.
