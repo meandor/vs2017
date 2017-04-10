@@ -7,5 +7,5 @@
 
 send_receive_test() ->
   ServerPID = server:startMe(),
-  client:startClient(1000 * 60, ServerPID),
+  client:startClient( ServerPID),
   ServerPID ! terminate.
