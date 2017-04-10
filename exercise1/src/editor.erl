@@ -27,27 +27,15 @@ getLogFile([], NextNNr) ->
 
 getLogFile(Logfile, _NextNNr) -> Logfile.
 
-receiveNNr(ServerPID, ReaderNNrs, Logging) ->
-  receive
-    {nid, NextNNr} ->
-      werkzeug:logging(Logging, lists:concat(["EDITOR>>>", "Received NNr", NextNNr, "\n"])),
-      NewReaderNNrs = ReaderNNrs ++ [NextNNr],
-      %TODO Message format
-      wk ! {dropmessage, [NextNNr, "Nachricht vom Editor", erlang:now()]},
-      receiveNNr(ServerPID, NewReaderNNrs, Logging);
-    {terminate, ClientPID} -> werkzeug:logging(Logging, lists:concat(["EDITOR>>>", "Terminating, sending done", "\n"])),
-      ClientPID ! {doneSending, ReaderNNrs}, exit("Terminated"), ok
-  end.
-
-receiveLastNNr(Logfile) ->
+start_sending(0, Logfile, ReaderNNRs, SendWait, ServerPID) ->
+  timer:sleep(SendWait),
+  ServerPID ! {self, getmsgid},
   receive
     {nid, NextNNr} -> werkzeug:logging(Logfile, lists:concat(["EDITOR>>> message number ", NextNNr, " forgotten\n"]))
-  end.
+  end,
+  ReaderNNRs
+;
 
-start_sending(0, Logfile, ReaderNNRs, SendWait, ServerPID) ->
-  ReceiveLastServer = spawn(?MODULE, receiveLastNNr, [Logfile]),
-  werkzeug:logging(Logfile, lists:concat(["EDITOR>> > ", " Receive last\n"])),
-  ServerPID ! {ReceiveLastServer, getmsgid};
 
 start_sending(Counter, Logfile, ReaderNNrs, SendWait, ServerPID) ->
   ServerPID ! {self(), getmsgid},
