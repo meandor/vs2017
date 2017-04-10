@@ -13,7 +13,7 @@ delCMEM(_CMEM) -> ok.
 % Speichern/Aktualisieren eines Clients in dem CMEM
 updateClient([CMEMList, RemTime], ClientID, NNr, Datei) ->
   ClientTS = werkzeug:getUTC(),
-  werkzeug:logging(Datei, lists:concat(["CMEM>>> Client ", ClientID, " updated (", NNr, "/", ClientTS, ")\n"])),
+  werkzeug:logging(Datei, lists:concat(["CMEM>>> Client ", pid_to_list(ClientID), " updated (", NNr, "/", ClientTS, ")\n"])),
   [lists:keystore(ClientID, 1, CMEMList, {ClientID, NNr, ClientTS}), RemTime].
 
 % Abfrage welche Nachrichtennummer der Client als nächstes erhalten darf
