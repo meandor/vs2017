@@ -44,8 +44,8 @@ start_sending(Counter, Logfile, ReaderNNrs, SendWait, ServerPID) ->
     {nid, NextNNr} ->
       NewLogFile = getLogFile(Logfile, NextNNr),
       NewReaderNNrs = ReaderNNrs ++ [NextNNr],
-      timer:sleep(SendWait),
       Message = createMessage(NextNNr),
+      timer:sleep(SendWait),
       ServerPID ! {dropmessage, [NextNNr, Message, erlang:now()]},
       werkzeug:logging(Logfile, lists:concat([Message, " was sent\n"])),
       NewCounter = Counter - 1,
