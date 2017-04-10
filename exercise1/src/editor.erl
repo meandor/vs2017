@@ -19,6 +19,14 @@ createMessage(NNr) ->
   {ok, Teamnr} = werkzeug:get_config_value(teamnummer, Config),
   lists:concat([Rechnername, "-", Prgroup, "-", Teamnr, ": message_number_", integer_to_list(NNr), ". Sent time: ", werkzeug:timeMilliSecond()]).
 
+% client_<Nummer><Node>.log
+getLogFile([], NextNNr) ->
+  Logfile = erlang:list_to_atom(lists:concat(["client_", NextNNr, node(), ".log"])),
+  werkzeug:logging(Logfile, lists:concat(["client_", NextNNr, node(), "-", pid_to_list(self()), "- Start: ", werkzeug:timeMilliSecond()])),
+  Logfile;
+
+getLogFile(Logfile, _NextNNr) -> Logfile.
+
 receiveNNr(ServerPID, ReaderNNrs, Logging) ->
   receive
     {nid, NextNNr} ->
@@ -35,14 +43,6 @@ receiveLastNNr(Logfile) ->
   receive
     {nid, NextNNr} -> werkzeug:logging(Logfile, lists:concat(["EDITOR>>> message number ", NextNNr, " forgotten\n"]))
   end.
-
-% client_<Nummer><Node>.log
-getLogFile([], NextNNr) ->
-  Logfile = erlang:list_to_atom(lists:concat(["client_", NextNNr, node(), ".log"])),
-  werkzeug:logging(Logfile, lists:concat(["client_", NextNNr, node(), "-", pid_to_list(self()), "- Start: ", werkzeug:timeMilliSecond()])),
-  Logfile;
-
-getLogFile(Logfile, _NextNNr) -> Logfile.
 
 start_sending(0, Logfile, ReaderNNRs, SendWait, ServerPID) ->
   ReceiveLastServer = spawn(?MODULE, receiveLastNNr, [Logfile]),
