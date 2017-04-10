@@ -90,7 +90,7 @@ hbq(HBQ, DLQ, Config) ->
       exit("dell HBQ called"), ok;
 
   % start the push process
-    {ServerPID, {pushHBQ, Message}} ->
+    {ServerPID, {request, pushHBQ, Message}} ->
       {HBQNew, DLQNew} = startPushing(Message ++ [erlang:now()], HBQ, DLQ, Config),
       ServerPID ! {reply, ok},
       hbq(HBQNew, DLQNew, Config)
