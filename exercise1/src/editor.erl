@@ -24,7 +24,7 @@ createMessage(NNr) ->
 % client_<Nummer><Node>.log
 getLogFile([], NextNNr) ->
   Logfile = erlang:list_to_atom(lists:concat(["client_", NextNNr, node(), ".log"])),
-  werkzeug:logging(Logfile, lists:concat(["client_", NextNNr, node(), "-", pid_to_list(self()), "- Start: ", werkzeug:timeMilliSecond()])),
+  werkzeug:logging(Logfile, lists:concat(["client_", NextNNr, node(), "-", pid_to_list(self()), "- Start: ", werkzeug:timeMilliSecond(), "\n"])),
   Logfile;
 
 getLogFile(Logfile, _NextNNr) -> Logfile.
@@ -44,9 +44,10 @@ start_sending(Counter, Logfile, ReaderNNrs, SendWait, ServerPID) ->
     {nid, NextNNr} ->
       NewLogFile = getLogFile(Logfile, NextNNr),
       NewReaderNNrs = ReaderNNrs ++ [NextNNr],
-      %TODO Message format
-      wk ! {dropmessage, [NextNNr, "Nachricht vom Editor", erlang:now()]},
-      start_sending(Counter - 1, Logfile, NewReaderNNrs, SendWait, ServerPID)
-  end,
-  timer:sleep(SendWait),
-  werkzeug:logging(Logfile, lists:concat(["EDITOR>> > ", Counter, " ID reqeusted\n"])).
+      timer:sleep(SendWait),
+      Message = createMessage(NextNNr),
+      ServerPID ! {dropmessage, [NextNNr, Message, erlang:now()]},
+      werkzeug:logging(Logfile, lists:concat([Message, " was sent\n"])),
+      NewCounter = Counter - 1,
+      start_sending(NewCounter, NewLogFile, NewReaderNNrs, SendWait, ServerPID)
+  end.
