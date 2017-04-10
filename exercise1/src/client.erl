@@ -1,18 +1,24 @@
 -module(client).
 
--export([startClients/0, startClient/1]).
+-export([startClients/0, spawnClient/1, startClient/4]).
 
 loadConfig() ->
   {ok, Config} = file:consult("./config/client.cfg"),
   Config.
 
-startClient(ServerPID) ->
+startClient(ServerPID, Logfile, ReaderNNrs, SendWait) ->
+  % Start editor
+  {NewReaderNNrs, NewSendWait, NewLogFile} = editor:start_sending(5, Logfile, ReaderNNrs, SendWait, ServerPID),
+  % Start reader
+  reader:start_reading(false, NewLogFile, NewReaderNNrs, ServerPID),
+  % Do everything again
+  startClient(ServerPID, NewLogFile, NewReaderNNrs, NewSendWait).
+
+spawnClient(ServerPID) ->
   Config = loadConfig(),
   {ok, Lifetime} = werkzeug:get_config_value(lifetime, Config),
-  {ok, SendeIntervall} = werkzeug:get_config_value(sendeintervall, Config),
-  % Start editor
-  ClientPID = erlang:spawn(editor, start_sending, [5, [], [], SendeIntervall, ServerPID]),
-  % Start timeout handler
+  {ok, SendIntervall} = werkzeug:get_config_value(sendeintervall, Config),
+  ClientPID = erlang:spawn(?MODULE, startClient, [ServerPID, [], [], SendIntervall]),
   timer:kill_after(Lifetime, ClientPID),
   ClientPID.
 
@@ -27,4 +33,4 @@ startClients() ->
   Config = loadConfig(),
   {ok, Clients} = werkzeug:get_config_value(clients, Config),
   {ok, ServerName} = werkzeug:get_config_value(servername, Config),
-  do_times(Clients, fun client:startClient/1, ServerName).
+  do_times(Clients, fun client:spawnClient/1, ServerName).
