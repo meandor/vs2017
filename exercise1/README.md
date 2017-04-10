@@ -32,5 +32,5 @@ eunit:test($MODULENAME).
 
 For all tests:
 ````erlang
-eunit:test(cmem), eunit:test(dlq), eunit:test(server), eunit:test(reader), eunit:test(hbq).
+eunit:test(cmem), eunit:test(dlq), eunit:test(server), eunit:test(reader), eunit:test(hbq), eunit:test(client), eunit:test(editor).
 ````
