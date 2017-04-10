@@ -6,15 +6,12 @@ loadConfig() ->
   {ok, Config} = file:consult("./config/client.cfg"),
   Config.
 
-clientLog() ->
-  erlang:list_to_atom(lists:concat(["client_nummer@", node(), ".log"])).
-
 startClient(ServerPID) ->
   Config = loadConfig(),
   {ok, Lifetime} = werkzeug:get_config_value(lifetime, Config),
   {ok, SendeIntervall} = werkzeug:get_config_value(sendeintervall, Config),
   % Start editor
-  ClientPID = erlang:spawn(editor, start_sending, [5, clientLog(), [], SendeIntervall, ServerPID]),
+  ClientPID = erlang:spawn(editor, start_sending, [5, [], [], SendeIntervall, ServerPID]),
   % Start timeout handler
   timer:kill_after(Lifetime, ClientPID),
   ClientPID.

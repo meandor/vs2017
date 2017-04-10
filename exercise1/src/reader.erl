@@ -29,7 +29,7 @@ write_message([NNr, Msg, _TSclientout, _TShbqin, TSdlqin, TSdlqout], Logfile, Re
       werkzeug:logging(Logfile, FormattedMessage ++ "\n")
   end.
 
-start_reading(true, _Logfile, _ReaderNNrs, _ServerPID) -> ok;
+start_reading(true, Logfile, ReaderNNrs, _ServerPID) -> {ReaderNNrs, Logfile};
 
 start_reading(false, Logfile, ReaderNNrs, ServerPID) ->
   ServerPID ! {self(), getmessages},

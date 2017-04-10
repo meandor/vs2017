@@ -173,7 +173,7 @@ seiner GUI dar.
 \begin{lstlisting}[language=Erlang]
 /* Startet den Lesevorgang */
 start_reading(Terminated, Logfile, ReaderNNrs, ServerPID):
-    Boolean X Atom X Liste X PID -> Atom
+    Boolean X Atom X Liste X PID -> {Liste X Atom}
 \end{lstlisting}
 
 \textbf{start\_reading(Terminated, Logfile, ReaderNNrs, ServerPID)}: Startet den Lesevorgang. Der Parameter Terminated
@@ -210,7 +210,7 @@ Das Editor-Modul übernimmt das Senden von Nachrichten an den Server. Dafür bau
 \begin{lstlisting}[language=Erlang]
 /* Startet den Sendevorgang */
 start_sending(Counter, Logfile, ReaderNNrs, SendWait, ServerPID):
-    Integer X Atom X Liste X Integer X PID -> {Liste X Integer}
+    Integer X Atom X Liste X Integer X PID -> {Liste X Integer X Atom}
 \end{lstlisting}
 
 \textbf{start\_sending(Counter, Logfile, ReaderNNrs, SendWait, ServerPID)}: Startet den Sendevorgang. Der Parameter Counter dient
@@ -220,6 +220,9 @@ gespeichert. SendWait wird verwendet, um nach jedem Senden zu warten.\\
 \subsubsection{Entwurfsentscheidungen}
 Das Editor-Modul ist eine interne ADT, die vom Client verwendet wird.
 Der Editor hat als State einen Counter, eine Logfile, eine ReaderNNrs Liste, eine Wartezeit und eine Referenz zum Server.
+
+Falls die Logfile eine leere Liste ist, wird sie mit der vom Server erhaltenen MessageID und dem Node initialisiert.
+
 Der Counter dient dazu 5 mal eine Nachricht mit der beim Server erfragten neuen Nummer zu schicken.
 
 Danach wird eine Nummer beim Server abgefragt, ohne eine Nachricht an den Server mit dieser Nachrichtennummer zu senden
@@ -236,7 +239,7 @@ Die Wartezeit darf nicht unter 2 Sekunde rutschen. Das wird durch eine Hilfsfunk
 Nachrichten bauen sich aus dem Namen des Clients, die Praktikumsgruppe, der Teamnummer und seiner aktuellen Systemzeit
 (entspricht Sendezeit). Außerdem beinhaltet die Nachricht die Nachrichtennummer.
 
-Der Reader terminiert wenn:
+Der Editor terminiert wenn:
 \begin{itemize}
     \item Er 5 Nachrichten gesendet hat und einmal eine neue Nachrichtennummer vom Server abgefragt hat
     \item Er von dem Client-Modul terminiert wird 
