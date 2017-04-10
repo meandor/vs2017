@@ -30,7 +30,7 @@ getLogFile([], NextNNr) ->
 getLogFile(Logfile, _NextNNr) -> Logfile.
 
 start_sending(0, Logfile, ReaderNNRs, SendWait, ServerPID) ->
-  ServerPID ! {self, getmsgid},
+  ServerPID ! {self(), getmsgid},
   receive
     {nid, NextNNr} ->
       werkzeug:logging(Logfile, lists:concat(["EDITOR>>> message number ", NextNNr, " forgotten to send\n"]))
