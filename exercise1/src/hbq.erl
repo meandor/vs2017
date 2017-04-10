@@ -82,12 +82,13 @@ hbq(HBQ, DLQ, Config) ->
       Logfile = erlang:list_to_atom(LogfileName),
       log(Config, ["HBQ>>> dlq:delivermsg", NNr, pid_to_list(ToClient), "\n"]),
       SendNNr = dlq:deliverMSG(NNr, ToClient, DLQ, Logfile),
-      ServerPID ! {reply, SendNNr};
+      ServerPID ! {reply, SendNNr},
+      hbq(HBQ, DLQ, Config);
 
   % Terminates the process and sends an ok to the server.
     {ServerPID, {request, dellHBQ}} ->
       ServerPID ! {reply, ok},
-      exit("dell HBQ called"), ok;
+      ok;
 
   % start the push process
     {ServerPID, {request, pushHBQ, Message}} ->
