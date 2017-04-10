@@ -46,9 +46,17 @@ server(Config, CMEM, HBQPID, NextNNr, Timer, Latency) ->
       end;
     {dropmessage, [INNr, Msg, TSclientout]} ->
       NewTimer = werkzeug:reset_timer(Timer, Latency, terminate),
-      HBQPID ! {self(), {request, pushHBQ, [INNr, Msg ++ " " ++ werkzeug:timeMilliSecond(), TSclientout]}},
-      werkzeug:logging(serverLog(), lists:concat(["Server: message ", INNr, " was added into the HBQ\n"])),
-      server(Config, CMEM, HBQPID, NextNNr, NewTimer, Latency);
+      NewMessage = Msg ++ " " ++ werkzeug:timeMilliSecond(),
+      werkzeug:logging(serverLog(), lists:concat(["Server: try pushing ", NewMessage, " into hbq\n"])),
+      HBQPID ! {self(), {request, pushHBQ, [INNr, NewMessage, TSclientout]}},
+      receive
+        {reply, ok} ->
+          werkzeug:logging(serverLog(), lists:concat(["Server: message ", INNr, " was added into the HBQ\n"])),
+          server(Config, CMEM, HBQPID, NextNNr, NewTimer, Latency)
+      end;
+    {reply, ok} ->
+      werkzeug:logging(serverLog(), lists:concat(["Server: Starttime: ", werkzeug:timeMilliSecond(), " with PID", pid_to_list(self()), "\n"])),
+      server(Config, CMEM, HBQPID, NextNNr, Timer, Latency);
     terminate ->
       werkzeug:logging(serverLog(), lists:concat(["Server: starting shutdown sequence ", werkzeug:timeMilliSecond(), "\n"])),
       HBQPID ! {self(), {request, dellHBQ}},
@@ -68,7 +76,6 @@ startMe(ConfigFile) ->
   {ok, Latency} = werkzeug:get_config_value(latency, Config),
   {ok, Timer} = timer:send_after(round(Latency * 1000), ServerName, terminate),
   ServerPID = spawn(?MODULE, server, [Config, CMEM, HBQPID, 1, Timer, Latency]),
-  HBQPID ! {ServerPID, {request, initHBQ}},
-  register(ServerName, ServerPID), % init hbq
-  werkzeug:logging(serverLog(), lists:concat(["Server: Starttime: ", werkzeug:timeMilliSecond(), " with PID", pid_to_list(ServerPID), "\n"])),
+  register(ServerName, ServerPID),
+  HBQPID ! {ServerPID, {request, initHBQ}}, % init hbq
   ServerPID.
