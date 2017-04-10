@@ -1,6 +1,24 @@
 -module(editor).
 -export([start/4, receiveNNr/3, receiveLastNNr/1]).
 
+calculateNewInterval(Interval) ->
+  Increase = werkzeug:bool_rand(),
+  Value = trunc(max(Interval * 0.5, 1000)),
+  if
+    Increase ->
+      Interval + Value;
+    true ->
+      max(Interval - Value, 1000)
+  end.
+
+startLoop(ServerPID, Intervall) ->
+  editor:start(clientLog(), Intervall, ServerPID, self()),
+  receive
+    {doneSending, ReaderNNrs} -> reader:start_reading(false, clientLog(), ReaderNNrs, ServerPID)
+  end,
+  startLoop(ServerPID, calculateNewInterval(Intervall)).
+
+
 receiveNNr(ServerPID, ReaderNNrs, Logging) ->
   receive
     {nid, NextNNr} ->
