@@ -1,5 +1,5 @@
 -module(editor).
--export([start/4, receiveNNr/3, receiveLastNNr/1]).
+-export([start_sending/5, receiveNNr/3, receiveLastNNr/1]).
 
 calculateNewInterval(Interval) ->
   Increase = werkzeug:bool_rand(),
@@ -36,20 +36,20 @@ receiveLastNNr(Logfile) ->
     {nid, NextNNr} -> werkzeug:logging(Logfile, lists:concat(["EDITOR>>> message number ", NextNNr, " forgotten\n"]))
   end.
 
-start(Logfile, SendWait, ServerPID, ClientPID) ->
+start_sending(Counter, Logfile, SendWait, ServerPID, ClientPID) ->
   werkzeug:logging(Logfile, lists:concat(["EDITOR>>>", " Receiving requested NNrs\n"])),
   ReceiveServer = spawn(?MODULE, receiveNNr, [ServerPID, [], Logfile]),
-  start_sending(0, Logfile, SendWait, ServerPID, ClientPID, ReceiveServer).
+  start(Counter, Logfile, SendWait, ServerPID, ClientPID, ReceiveServer).
 
-start_sending(5, Logfile, _SendWait, ServerPID, ClientPID, ReceiveServer) ->
+start(0, Logfile, _SendWait, ServerPID, ClientPID, ReceiveServer) ->
   ReceiveLastServer = spawn(?MODULE, receiveLastNNr, [Logfile]),
   werkzeug:logging(Logfile, lists:concat(["EDITOR>>>", " Receive last\n"])),
   ServerPID ! {ReceiveLastServer, getmsgid},
   ReceiveServer ! {terminate, ClientPID};
 
-start_sending(Counter, Logfile, SendWait, ServerPID, ClientPID, ReceiveServer) ->
+start(Counter, Logfile, SendWait, ServerPID, ClientPID, ReceiveServer) ->
   ServerPID ! {ReceiveServer, getmsgid},
   timer:sleep(SendWait),
   werkzeug:logging(Logfile, lists:concat(["EDITOR>>>", Counter, " ID reqeusted\n"])),
-  start_sending(Counter + 1, Logfile, SendWait, ServerPID, ClientPID, ReceiveServer)
+  start(Counter - 1, Logfile, SendWait, ServerPID, ClientPID, ReceiveServer)
 .
