@@ -17,7 +17,7 @@ init(ConfigFile) ->
   {ok, RemTime} = werkzeug:get_config_value(clientlifetime, Config),
   CMEM = cmem:initCMEM(RemTime, serverLog()),
 % Starte HBQ
-  HBQPID = hbq:start(),
+  HBQPID = hbq:start(ConfigFile),
   {Config, CMEM, HBQPID}.
 
 server(Config, CMEM, HBQPID, NextNNr, Timer, Latency) ->
