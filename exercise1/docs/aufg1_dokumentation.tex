@@ -136,8 +136,9 @@ Clients.
 
 \subsubsection{Schnittstelle}
 \begin{lstlisting}[language=erlang]
-/* Startet einen Client mit gegebener Lifetime */
-startClient(Lifetime): Integer -> PID
+/* Startet einen Client mit der PID des Servers, der zu lesenden NNrs und der Wartezeit zwischen Sendevorgängen, 
+ */
+startClient(ServerPID, Logfile, ReaderNNrs, SendWait): Integer -> PID
 
 /* Startet eine feste Anzahl an Clients (Config) */
 startClients()
