@@ -61,3 +61,5 @@ eunit:test(cmem), eunit:test(dlq), eunit:test(server), eunit:test(reader), eunit
 ## Configuration
 All configurable variables are located in `./config`.
 The server and the client can both be configured. Each configuration is found in the respective `*.cfg` file.
+
+The test configurations for the modules are located in the `./test-config` folder.
