@@ -4,33 +4,29 @@
 
 serverPID() -> wk.
 
+fakeClient() ->
+  receive
+    {reply, Message, Terminated} -> ok
+  end
+.
+
 getmessages_with_empty_dlq_and_dont_update_cmem_test() ->
-  ClientPID = dlq_tests:testClientExpectingMessage([-1, "No new messages", -1, -1, -1], true),
   server:startMe("./test-config/server.cfg"),
-  serverPID() ! {ClientPID, getmessages},
-  timer:sleep(100),
-  ?assert(undefined =:= erlang:process_info(ClientPID)).
+  %client:startClient(serverPID(), "Test", [], 2000),
+  editor:start_sending(1, "Test", [], 2000, wk),
+  serverPID() ! {self(), getmessages},
+  receive
+    {reply, Message, Terminated} -> ok
+  end
 
-% Add test for sending message and get request for test client
+ .
 
-send_receive_test() ->
-  client:start().
+%%receive
+%%{reply, [NNr, Msg | _T], Terminated} ->
+%%if NNr =:= -1 ->
+%%ok
+%%end
+%%end,
+%%wk ! terminate,
+%%timer:sleep(3000)
 
-%%
-%%simple_test() ->
-%%
-%%  {ok, Config} = file:consult("./config/server.cfg"),
-%%  {ok, ServerName} = werkzeug:get_config_value(servername, Config),
-%%  ServerPID = server:startMe(),
-%%  timer:sleep(1000),
-%%  editor:start("Editor", 100, ServerPID, self()),
-%%  receive
-%%    {doneSending, ReaderNNrs} -> io:format("reveiced done"), ok %?assert(ReaderNNrs =:= [1, 2, 3, 4, 5])
-%%  end,
-%%  ClientPID = spawn(?MODULE, testClientExpectingMessage, []),
-%%  ?assert(undefined =/= ClientPID),
-%%  ServerPID ! {ClientPID, getmessages},
-%%  timer:sleep(2000),
-%%  ?assert(undefined =:= erlang:process_info(ClientPID)),
-%%  ServerPID ! terminate
-%%.
