@@ -136,16 +136,15 @@ Clients.
 
 \subsubsection{Schnittstelle}
 \begin{lstlisting}[language=erlang]
-/* Startet einen Client mit der PID des Servers, der zu lesenden NNrs und der Wartezeit zwischen Sendevorgängen, 
- */
-startClient(ServerPID, Logfile, ReaderNNrs, SendWait): Integer -> PID
+/* Startet einen Client mit der PID des Servers */
+spawnClient(ServerPID): PID -> PID
 
 /* Startet eine feste Anzahl an Clients (Config) */
 startClients()
 \end{lstlisting}
 
-\textbf{startClient(Lifetime)}: Startet einen Client als Prozess, der zwischen Redakteur und Leser wechselt. Terminiert
-nach ablauf der Lifetime.\\
+\textbf{spawnClient(ServerPID)}: Startet einen Client als Prozess, der zwischen Redakteur und Leser wechselt. Terminiert
+nach ablauf der Lifetime (Config).\\
 
 \textbf{startClients()}: Startet eine feste Anzahl an Clients. Die Anzahl wird aus der Config Datei herausgelesen.\\
 
