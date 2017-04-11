@@ -14,23 +14,50 @@ To compile everything:
 erl -make
 ````
 
+## Run
 To start with compiled files:
 ````bash
 erl -pa ebin/
 ````
 
-To load everything in the erl shell:
+To start with compiled files and given name@host:
+````bash
+erl -pa ebin/ -sname name@host
+````
+
+## Usage
+To reload everything in the erlang shell:
 ````erlang
 make:all([load]).
 ````
 
-## Test
-To test a $MODULENAME in the erl shell:
+To start the server:
 ````erlang
-eunit:test($MODULENAME).
+server:startMe().
+````
+
+To start multiple clients:
+````erlang
+client:startClients().
+````
+This will start a scenario which will launch multiple clients (configured in configs) that send messages to the server
+
+To start one client:
+````erlang
+client:spawnClient(ServerPID).
+````
+
+## Test
+To test a <MODULENAME> in the erl shell:
+````erlang
+eunit:test(<MODULENAME>).
 ````
 
 For all tests:
 ````erlang
 eunit:test(cmem), eunit:test(dlq), eunit:test(server), eunit:test(reader), eunit:test(hbq), eunit:test(client), eunit:test(editor).
 ````
+
+## Configuration
+All configurable variables are located in `./config`.
+The server and the client can both be configured. Each configuration is found in the respective `*.cfg` file.
