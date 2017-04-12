@@ -6,6 +6,5 @@ _*
 *.swp
 *.swo
 .erlang.cookie
-*.log
 erl_crash.dump
 .idea
