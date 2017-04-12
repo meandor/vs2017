@@ -1,3 +1,11 @@
+%%%-------------------------------------------------------------------
+%%% @doc
+%%% Detailed Documentation: See section 3.3 of docs/aufgabe1_dokumentation.pdf
+%%%
+%%% This module sends 5 messages to the server, then requests a NNr without sending a message.
+%%% Gets called from client in a loop.
+%%% @end
+%%%-------------------------------------------------------------------
 -module(editor).
 -export([start_sending/5, createMessage/1, calculateNewInterval/1]).
 

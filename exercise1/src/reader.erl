@@ -6,7 +6,6 @@
 %%% Every message received is written to a log. After the reading process,
 %%% all read NNrs are returned from the startReading function.
 %%% @end
-%%% Created : 12. Apr 2017 14:28
 %%%-------------------------------------------------------------------
 -module(reader).
 

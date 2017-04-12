@@ -4,7 +4,6 @@
 %%% Interface consists of spawnClient/1 and startClients/0 (see 3.1.2)
 %%% This module switches between editor and reader modes in an endless loop until termination
 %%% @end
-%%% Created : 12. Apr 2017 14:28
 %%%-------------------------------------------------------------------
 -module(client).
 
