@@ -29,6 +29,8 @@ spawnClient(ServerPID) ->
   timer:kill_after(Lifetime, ClientPID),
   ClientPID.
 
+% Applies Fn with Args 'Times' times. Returns the results of each function call as a list
+% Used to call the spawnClient function n times
 do_times(Times, Fn, Arg) -> do_times(Times, Fn, Arg, []).
 do_times(0, _Fn, _Arg, Results) -> Results;
 do_times(Times, Fn, Arg, Results) ->
