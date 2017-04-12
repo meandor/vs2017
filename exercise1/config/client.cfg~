@@ -1,7 +1,7 @@
 {clients, 20}.
 {lifetime, 120000}.
 {servername, wk}.
-{servernode, 'server@lab22.cpt.haw-hamburg.de'}.
+{servernode, 'server@lab29.cpt.haw-hamburg.de'}.
 {cookie, vsp}.
 {sendeintervall, 2000}.
 {rechnername, 'lab29'}.

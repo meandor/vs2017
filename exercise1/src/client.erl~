@@ -42,4 +42,4 @@ startClients() ->
   {ok, ServerName} = werkzeug:get_config_value(servername, Config),
   {ok, ServerNode} = werkzeug:get_config_value(servernode, Config),
   ServerPID = {ServerName,ServerNode},
-  do_times(Clients, fun client:spawnClient/1, ServerPID).
+  do_times(Clients, fun client:spawnClient/1, ServerName).
