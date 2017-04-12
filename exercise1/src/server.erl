@@ -50,7 +50,7 @@ server(Config, CMEM, HBQPID, NextNNr, Timer, Latency) ->
     {dropmessage, [INNr, Msg, TSclientout]} ->
       NewTimer = werkzeug:reset_timer(Timer, Latency, terminate),
       NewMessage = Msg ++ " " ++ werkzeug:timeMilliSecond(),
-      werkzeug:logging(serverLog(), lists:concat(["Server: try pushing ", NewMessage, " into hbq", pid_to_list(HBQPID), "\n"])),
+      werkzeug:logging(serverLog(), lists:concat(["Server: try pushing ", NewMessage, " into hbq ",tuple_to_list(HBQPID),"\n"])),
       HBQPID ! {self(), {request, pushHBQ, [INNr, NewMessage, TSclientout]}},
       receive
         {reply, ok} ->
