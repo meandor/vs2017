@@ -1,3 +1,13 @@
+%%%-------------------------------------------------------------------
+%%% @doc
+%%% Detailed Documentation: See section 3.2 of docs/aufgabe1_dokumentation.pdf
+%%%
+%%% This module polls messages from the server until a terminated flag is true in the response.
+%%% Every message received is written to a log. After the reading process,
+%%% all read NNrs are returned from the startReading function.
+%%% @end
+%%% Created : 12. Apr 2017 14:28
+%%%-------------------------------------------------------------------
 -module(reader).
 
 -export([start_reading/4]).
@@ -8,7 +18,7 @@ formatMessage(NNr, Msg, ReaderNNrs) ->
     ReaderMessage -> Msg ++ "*******";
     true -> Msg
   end.
-
+%% prints formatted message to logs. Adds time difference, in case messages from the future are received
 write_message([NNr, Msg, _TSclientout, _TShbqin, TSdlqin, TSdlqout], Logfile, ReaderNNrs) ->
   Now = erlang:timestamp(),
   ValidTSdlqin = werkzeug:validTS(TSdlqin),
@@ -28,7 +38,7 @@ write_message([NNr, Msg, _TSclientout, _TShbqin, TSdlqin, TSdlqout], Logfile, Re
     true ->
       werkzeug:logging(Logfile, FormattedMessage ++ "\n")
   end.
-
+%% starts reading process, see 3.2.2 in documentation.pdf
 start_reading(true, Logfile, ReaderNNrs, _ServerPID) -> {ReaderNNrs, Logfile};
 
 start_reading(false, Logfile, ReaderNNrs, ServerPID) ->
