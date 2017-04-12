@@ -1,3 +1,11 @@
+%%%-------------------------------------------------------------------
+%%% @doc
+%%% Detailed Documentation: See section 3.4 of docs/aufgabe1_dokumentation.pdf
+%%%
+%%% Accepts requests from clients and communicates with the hbq. Uses the cmem module to remember clients.
+%%% @end
+%%%-------------------------------------------------------------------
+
 -module(server).
 -export([startMe/0, startMe/1, server/6]).
 
@@ -23,6 +31,7 @@ init(ConfigFile) ->
   HBQPID = {HBQName,HBQNode},
   {Config, CMEM, HBQPID}.
 
+%% Interface of the server, detailed description in section 3.4.2
 server(Config, CMEM, HBQPID, NextNNr, Timer, Latency) ->
   receive
     {ClientPID, getmsgid} ->
@@ -33,7 +42,6 @@ server(Config, CMEM, HBQPID, NextNNr, Timer, Latency) ->
     {ClientPID, getmessages} ->
       NewTimer = werkzeug:reset_timer(Timer, Latency, terminate),
       NNr = cmem:getClientNNr(CMEM, ClientPID),
-
       HBQPID ! {self(), {request, deliverMSG, NNr, ClientPID}},
       werkzeug:logging(serverLog(), lists:concat(["Server: deliver message ", NNr, " to ", erlang:pid_to_list(ClientPID), "\n"])),
       receive
@@ -67,6 +75,7 @@ server(Config, CMEM, HBQPID, NextNNr, Timer, Latency) ->
       receive
         {reply, ok} ->
           werkzeug:logging(serverLog(), lists:concat(["Server: shutting down ", werkzeug:timeMilliSecond(), "\n"])),
+          % returning ok terminates the process
           ok
       end
   end.
@@ -74,6 +83,7 @@ server(Config, CMEM, HBQPID, NextNNr, Timer, Latency) ->
 startMe() ->
   startMe("./config/server.cfg").
 
+%% Spawns a server process and initializes the HBQ remotely
 startMe(ConfigFile) ->
   {Config, CMEM, HBQPID} = init(ConfigFile),
   {ok, ServerName} = werkzeug:get_config_value(servername, Config),
