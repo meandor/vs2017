@@ -1,3 +1,14 @@
+%%%-------------------------------------------------------------------
+%%% @doc
+%%% Detailed Documentation: See section 3.6 of docs/aufgabe1_dokumentation.pdf
+%%%
+%%% This module receives incoming messages and validates them before it puts them
+%%% into the DLQ. Invalid messages are hold back. A valid message is a message,
+%%%  that is expected by the DLQ.Any other message is invalid.
+%%% For Details about the error handling process see docs/aufgabe1_dokumentation.pdf
+%%% section 3.6.3.
+%%% @end
+%%%-------------------------------------------------------------------
 -module(hbq).
 -export([start/0, start/1, hbq/3, apply_on_list/3, sort/1]).
 
@@ -12,21 +23,23 @@ log(Config, Message) ->
   werkzeug:logging(LogAtom, lists:concat(Message)),
   LogAtom.
 
+%% Used to apply a function on a list. Helper function for sorting.
 apply_on_list([H | T], X, Func) ->
   apply_on_list(T, lists:append(X, [Func(H)]), Func);
 apply_on_list([], X, _) -> X.
 
+%% Sorts messages in the HBQ
 sort(Messages) ->
   apply_on_list(lists:keysort(1, apply_on_list(Messages, [], fun list_to_tuple/1)), [], fun tuple_to_list/1).
 
-% inserts an error message into dlq
+%% Inserts an error message into dlq
 insertErrorMessage(ErrorNNr, DLQ, Config) ->
   From = dlq:expectedNr(DLQ),
   ErrorMsg = "Fehlernachricht fuer Nachrichtennummern " ++ integer_to_list(From) ++ " bis " ++ integer_to_list(ErrorNNr),
   ErrorMessage = [ErrorNNr, ErrorMsg, erlang:now(), erlang:now()],
   dlq:push2DLQ(ErrorMessage, DLQ, Config).
 
-% handles inserting error message or doing nothing if everything is ok!
+%% Handles inserting error message or doing nothing if everything is ok!
 handleFaultyHBQ([HBQMessage | HBQRest], [DLQMessages, DLQSize], Config) ->
   HBQLength = length([HBQMessage | HBQRest]),
   [NNr, _MSG, _TSclientin, _TShbqin] = HBQMessage,
@@ -38,7 +51,7 @@ handleFaultyHBQ([HBQMessage | HBQRest], [DLQMessages, DLQSize], Config) ->
       {[HBQMessage | HBQRest], [DLQMessages, DLQSize]}
   end.
 
-% push only valid messages into dlq, message is valid if it is expected
+%% push only valid messages into dlq, message is valid if it is expected
 pushToDLQ([NNr, Msg, TSclientout, TShbqin], DLQ, Logfile) ->
   ExpectedNNr = dlq:expectedNr(DLQ),
   if
@@ -48,7 +61,7 @@ pushToDLQ([NNr, Msg, TSclientout, TShbqin], DLQ, Logfile) ->
       DLQ
   end.
 
-% Push valid Message into dlq directly
+%% Push valid message into dlq directly
 startPushing([NNr, Msg, TSclientout, TShbqin], HBQ, DLQ, Config) ->
   Logfile = log(Config, ["HBQ>>> pushing message: ", NNr, "\n"]),
   MSGInsertedDLQ = pushToDLQ([NNr, Msg, TSclientout, TShbqin], DLQ, Logfile),
@@ -66,6 +79,7 @@ startPushing([NNr, Msg, TSclientout, TShbqin], HBQ, DLQ, Config) ->
       end
   end.
 
+%% HBQ interface. For detailed description see section 3.6.2 in docs/aufgabe1_dokumentation.pdf
 hbq(HBQ, DLQ, Config) ->
   receive
   % Initializes the HBQ with empty value and sends reply to server
@@ -97,9 +111,11 @@ hbq(HBQ, DLQ, Config) ->
       hbq(HBQNew, DLQNew, Config)
   end.
 
+%% Used to start the HBQ with default config file
 start() ->
   start("./config/server.cfg").
 
+%% Used for starting the HBQ with a custom config file
 start(Configfile) ->
   Config = loadConfig(Configfile),
   {ok, HBQName} = werkzeug:get_config_value(hbqname, Config),
