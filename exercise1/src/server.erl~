@@ -19,7 +19,7 @@ init(ConfigFile) ->
   {ok, HBQNode} = werkzeug:get_config_value(hbqnode, Config),
   CMEM = cmem:initCMEM(RemTime, serverLog()),
 % Starte HBQ
-  %hbq:start(ConfigFile),
+  hbq:start(ConfigFile),
   HBQPID = {HBQName,HBQNode},
   {Config, CMEM, HBQPID}.
 

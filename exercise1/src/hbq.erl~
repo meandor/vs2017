@@ -105,4 +105,4 @@ start(Configfile) ->
   {ok, HBQName} = werkzeug:get_config_value(hbqname, Config),
   log(Config, ["HBQ>>> server.cfg opened \n"]),
   HBQPID = spawn(?MODULE, hbq, [[], [], Config]),
-  register(HBQName, HBQPID).
+  register(HBQName, HBQPID),.
