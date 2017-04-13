@@ -15,20 +15,20 @@ erl -make
 ````
 
 ## Run
-To start with compiled files:
+To start with compiled files, the <nodename> and a <cookie>:
 ````bash
-erl -pa ebin/
-````
-
-To start with compiled files and given name@host:
-````bash
-erl -pa ebin/ -sname name@host
+erl -pa ebin/ -name <nodename> -setcookie <cookie>
 ````
 
 ## Usage
 To reload everything in the erlang shell:
 ````erlang
 make:all([load]).
+````
+
+The HBQ needs to be started before the server:
+````erlang
+hbq:start().
 ````
 
 To start the server:
