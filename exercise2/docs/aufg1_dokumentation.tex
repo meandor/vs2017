@@ -66,10 +66,21 @@ Das System soll in Erlang umgesetzt werden. Es muss auf Computern mit Linux Betr
 
 \section{Subsysteme und Komponenten}
 
-\subsection{Konfigurator-Modul}
+\subsection{Starter-Modul}
 \subsubsection{Aufgabe und Verantwortung}
 
+Der Starter steht zwischen Koordinator und ggT Prozess. Er übernimmt das starten mehrerer ggT-Prozesse.
+Hierfür benötigt er Initialisierungsdaten für die ggT Prozesse, diese werden für ihn durch das Koordinator - Modul
+bereitgestellt.
+
+
 \subsubsection{Schnittstelle}
+{steeringval,ArbeitsZeit,TermZeit,Quota,GGTProzessnummer}
+Dies ist eine Schnittstelle für den Koordinator. Nach der Anfrage getsteeringval des Starters sendet der Koordinator alle
+benötigten Informationen für den Start der Prozesse. Ansprechen dieser Schnitstelle bewirkt das starten von <GGTProzessnummer>
+GGT-Prozessen mit gegebenen Werten.
+Hierfür zählt eine Rekursive Funktion von GGTProzessnummer bis 0, und startet in jedem Aufruf einen GGT Prozess,
+dessen namen sich nach Vorgabe aus den config - Parametern und der Prozessnummer zusammensetzt.
 
 \subsubsection{Entwurfsentscheidungen}
 
