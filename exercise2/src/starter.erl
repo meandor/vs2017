@@ -12,16 +12,13 @@ loggingAtom(Config) ->
   LogfileName = lists:concat(["Koordinator@", Name, ".log"]),
   erlang:list_to_atom(LogfileName).
 
-loadConfig(Configfile) ->
-  {ok, Config} = file:consult(Configfile),
-  Config.
 
 % Starter hat eindeutige Nummer, Beim starten des Starters wird ihm seine Starternummer mitgegeben.
 start(StarterNumber) -> start(StarterNumber, "./config/ggt.cfg").
 
 start(StarterNumber, ConfigPath) ->
 
-  Config = loadConfig(ConfigPath),
+  Config = werkzeug:loadConfig(ConfigPath),
   Logging = loggingAtom(Config),
   werkzeug:logging(Logging, lists:concat(["starter>>" , ConfigPath, " opened \n"])),
 

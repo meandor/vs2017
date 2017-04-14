@@ -4,10 +4,12 @@
 %%% @end
 %%%-------------------------------------------------------------------
 -module(koordinator).
--export([start/1]).
+-export([start/1, start/0, receive_loop/1]).
 
 
-start(Config) -> ok.
+start() -> start("./config/koordinator.cfg").
+
+start(Config) -> register(chef,self()),  spawn(?MODULE, receive_loop, [Config]).
 
 receive_loop(Config) ->
   receive
@@ -22,6 +24,7 @@ receive_loop(Config) ->
     toggle -> ok;
     {calc,WggT} -> ok;
     kill -> ok
-  end
+  end,
+  receive_loop(Config)
 .
 
