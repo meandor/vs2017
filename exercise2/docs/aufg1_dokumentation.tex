@@ -31,7 +31,7 @@
 \\
 \textbf{Bearbeitungszeitraum:}
 \begin{itemize}
-	\item 13.04.2017 40m (FW)
+	\item 13.04.2017 3h (FW)
 \end{itemize}
 
 \textbf{Aktueller Stand:}
@@ -81,8 +81,13 @@ benötigten Informationen für den Start der Prozesse. Ansprechen dieser Schnits
 GGT-Prozessen mit gegebenen Werten.
 Hierfür zählt eine Rekursive Funktion von GGTProzessnummer bis 0, und startet in jedem Aufruf einen GGT Prozess,
 dessen namen sich nach Vorgabe aus den config - Parametern und der Prozessnummer zusammensetzt.
+Beim Starten eines GGT Prozesses werden ihm alle benötigten Daten inkl. Starternummer und Adressen von Namensservice und
+Koordinator übergeben. Das ringförmige Verketten der Prozesse übernimmt der Koordinator.
 
 \subsubsection{Entwurfsentscheidungen}
+Absolute Abstimmungsquote und die Nummer des zu startenden Prozesses werden im Koordinator berechnet und nur übergeben.
+Der Starter hat nur die Aufgabe, die Parameter an die gesetzte Anzahl von Clients weiterzureichen.
+
 
 \subsubsection{Konfigurationsparameter}
 

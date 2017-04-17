@@ -4,33 +4,29 @@
 %%% @end
 %%%-------------------------------------------------------------------
 -module(ggt).
--export([start/6]).
+-export([start/6, receive_loop/5]).
 
 
 loggingAtom(GGTName) ->
   LogfileName = lists:concat(["GGT@", GGTName, ".log"]),
   erlang:list_to_atom(LogfileName).
-start(WorkingTime,TerminationTime,Quota, GGTName, Koordinator) ->
-  start(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, "./config/ggt.cfg").
 
-start(WorkingTime,TerminationTime,Quota, GGTName, Koordinator, ConfigPath) ->
-
-  % Der ggT-Prozess meldet sich beim Koordinator mit seinem Namen an (hello) und beim Namensdienst (rebind).
+start(WorkingTime,TerminationTime,Quota, GGTName, Koordinator, Nameservice) ->
+  Koordinator ! {hello,GGTName},
   % Er registriert sich ebenfalls lokal auf der Erlang-Node mit seinem Namen (register).
   % Der ggT-Prozess erwartet dann vom Koordinator die Informationen über seine Nachbarn (setneighbors).
+  spawn(?MODULE, receive_loop, [WorkingTime, TerminationTime, Quota, GGTName, Nameservice]).
 
-  Config = werkzeug:loadConfig(ConfigPath),
-  {ok, NSNode} = werkzeug:get_config_value(nameservicenode, Config),
-  {ok, NSName} = werkzeug:get_config_value(nameservicename, Config),
-  %net_adm:ping(NSNode),
-  Nameservice = global:whereis_name(nameservice),
- % register(GGTName, self())
+receive_loop(WorkingTime,TerminationTime,Quota, GGTName, Nameservice) ->
   Nameservice ! {self(),{rebind,GGTName,node()}},
-  Koordinator ! {hello,GGTName}
-.
- % receive_loop(WorkingTime, TerminationTime, Quota, GGTName).
+  Registered = erlang:whereis(GGTName) ,
+  if
+    Registered == undefined -> register(GGTName ,self())
+  end,
+  receive_loop(WorkingTime, TerminationTime, Quota, GGTName).
 
 receive_loop(WorkingTime,TerminationTime,Quota, GGTName) ->
+  werkzeug:logging(lists:concat([GGTName, "@vsp"]), "GGT in receive loop\n"),
   receive
     {setneighbors,LeftN,RightN} -> ok;
     {setpm,MiNeu} -> ok;
@@ -39,7 +35,7 @@ receive_loop(WorkingTime,TerminationTime,Quota, GGTName) ->
     {voteYes,Name} -> ok;
     {From,tellmi} -> ok;
     {From,pingGGT} -> From ! {pongGGT,GGTName};
-    kill -> exit("Kill command received"), ok
+    kill -> werkzeug:logging(lists:concat([GGTName, "@vsp"]), "Kill received"), exit(self(), normal), ok
   end,
   receive_loop(WorkingTime, TerminationTime, Quota, GGTName)
 .

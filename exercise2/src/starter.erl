@@ -31,26 +31,34 @@ start(StarterNumber, ConfigPath) ->
 
   %TODO check if correct?
   NameService = {NSName, NSNode},
-  net_adm:ping(NSNode),
+  pong = net_adm:ping(NSNode),
   NameService  ! {self(), {rebind, StarterNumber, node()}},
 
   {ok, CoordinatorName} = werkzeug:get_config_value(koordinatorname, Config),
   {ok, GroupNumber} = werkzeug:get_config_value(praktikumsgruppe, Config),
   {ok, TeamNumber} = werkzeug:get_config_value(teamnummer, Config),
   GroupTeam = erlang:list_to_atom([GroupNumber, TeamNumber]),
-  request_steering_values(Config, CoordinatorName, GroupTeam, StarterNumber).
+  request_steering_values(ConfigPath, CoordinatorName, GroupTeam, StarterNumber).
 
-request_steering_values(Config, CoordinatorName, GroupTeam, StarterNumber) ->
+request_steering_values(ConfigPath, CoordinatorName, GroupTeam, StarterNumber) ->
   CoordinatorName ! {self(), getsteeringval},
   receive
-    {steeringval,ArbeitsZeit,TermZeit,Quota,GGTProzessnummer} -> startGGT(ArbeitsZeit, TermZeit, Quota, GGTProzessnummer, GroupTeam, StarterNumber)
+    {steeringval,WorkingTime,TerminationTime,Quota,GGTProcessNumber} -> startGGT(WorkingTime, TerminationTime, Quota, GGTProcessNumber, GroupTeam, StarterNumber, CoordinatorName, ConfigPath)
   end
 .
 
-startGGT(ArbeitsZeit,TermZeit,Quota,0, GroupTeam, StartNumber) -> ok;
+startGGT(WorkingTime,TerminationTime,Quota,0, GroupTeam, StartNumber, CoordinatorName, Config) -> ok;
 
-startGGT(ArbeitsZeit,TermZeit,Quota,GGTProzessnummer, GroupTeam, StartNumber) ->
+startGGT(WorkingTime,TerminationTime,Quota,GGTProcessNumber, GroupTeam, StartNumber,CoordinatorName, ConfigPath) ->
   %<PraktikumsgruppenID><TeamID><Nummer des ggT-Prozess><Nummer des Starters>
-  GGTProcessName = erlang:list_to_atom([GroupTeam, GGTProzessnummer, StartNumber]),
-  %TODO: StartGGT Process with GGTProccessName and given values
-  startGGT(ArbeitsZeit, TermZeit, Quota, GGTProzessnummer - 1, GroupTeam, StartNumber).
+  GGTProcessName = erlang:list_to_atom([GroupTeam, GGTProcessNumber, StartNumber]),
+  ggt:start(WorkingTime,TerminationTime,Quota, GGTProcessName, CoordinatorName, ConfigPath),
+  
+  % Der Starter startet die ggT-Prozesse mit den zugehörigen Werten:
+  % der Verzögerungszeit, die Terminierungszeit,
+  % der Startnummer dieses Prozesses (also der wievielte gestartete ggT-Prozess er ist),
+  % seine eindeutige Starternummer, die Praktikumsgruppennummer,
+  % die Teamnummer sowie die benötigten Kontaktdaten für den Namensdienst
+  % und den Koordinator und die Abstimmungsquote als konkrete Anzahl.
+
+  startGGT(WorkingTime, TerminationTime, Quota, GGTProcessNumber - 1, GroupTeam, StartNumber,CoordinatorName, ConfigPath).
