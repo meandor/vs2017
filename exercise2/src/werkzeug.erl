@@ -1,8 +1,8 @@
 -module(werkzeug).
--export([get_config_value/2,logging/2,logstop/0,openSe/2,openSeA/2,openRec/3,openRecA/3,createBinaryS/1,createBinaryD/1,createBinaryT/1,createBinaryNS/1,concatBinary/4,concatBinary/3,message_to_string/1,
-		 shuffle/1,generiereRZOD/2,timeMilliSecond/0,reset_timer/3,compareNow/2,getUTC/0,compareUTC/2,now2UTC/1,
-		 type_is/1,to_String/1,validTS/1,lessTS/2,lessoeqTS/2,equalTS/2,diffTS/2,now2string/1,now2stringD/1,
-		 bestimme_mis/2,testeMI/2, loadConfig/1, ensureNameserviceStarted/0]).
+-export([get_config_value/2, logging/2, logstop/0, openSe/2, openSeA/2, openRec/3, openRecA/3, createBinaryS/1, createBinaryD/1, createBinaryT/1, createBinaryNS/1, concatBinary/4, concatBinary/3, message_to_string/1,
+	shuffle/1, generiereRZOD/2, timeMilliSecond/0, reset_timer/3, compareNow/2, getUTC/0, compareUTC/2, now2UTC/1,
+	type_is/1, to_String/1, validTS/1, lessTS/2, lessoeqTS/2, equalTS/2, diffTS/2, now2string/1, now2stringD/1,
+	bestimme_mis/2, testeMI/2, loadConfig/1, ensureNameserviceStarted/0, register_safe/2]).
 -define(ZERO, integer_to_list(0)).
 -define(TAUS, 1000).
 -define(MILL, 1000000).
@@ -363,3 +363,10 @@ ensureNameserviceStarted() ->   try
 																catch
 																	Exception:Reason -> {caught, Exception, Reason}, io:format("Nameservice already started")
 																end.
+
+register_safe(Name, PID) ->
+	NotRegistered = erlang:whereis(Name) == undefined,
+	if
+		NotRegistered  -> register(Name, PID)
+	end
+.
