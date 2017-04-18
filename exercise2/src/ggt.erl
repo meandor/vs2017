@@ -33,13 +33,17 @@ receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R,
     {setpm, MiNeu} -> receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R, MiNeu);
 
   % The heart of the recursive algorithm
-    {sendy, Y} -> if
-                    Y < Mi ->
-                      NewMi = ((Mi - 1) rem Y) + 1,
-                      L ! {sendy, NewMi},
-                      R ! {sendy, NewMi},
-                      receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R, NewMi)
-                  end;
+    {sendy, Y} ->
+
+      if Y < Mi ->
+        NewMi = ((Mi - 1) rem Y) + 1,
+        werkzeug:logging(lists:concat([GGTName, "@vsp"]), lists:concat(["mi: ", Y, ", Old mi:", Mi, " NEW MI:", NewMi, "\n"])),
+        L ! {sendy, NewMi},
+        R ! {sendy, NewMi},
+        receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R, NewMi)
+
+        ;true -> werkzeug:logging(lists:concat([GGTName, "@vsp"]), lists:concat(["else zweig \n"]))
+      end;
 
   % TODO Wahlnachricht für die Terminierung der aktuellen Berechnung;
   % TODO Initiator ist der Initiator dieser Wahl (Name des ggT-Prozesses, keine PID!) und From (ist PID) ist sein Absender.
@@ -52,11 +56,11 @@ receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R,
         V >= Quota -> Koordinator ! kill;
         true -> receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V + 1, L, R, Mi)
       end;
-    % Just a getter for current Mi Value
+  % Just a getter for current Mi Value
     {From, tellmi} -> From ! {mi, Mi};
 
     {From, pingGGT} -> From ! {pongGGT, GGTName};
-    kill -> werkzeug:logging(lists:concat([GGTName, "@vsp"]), "Kill received"), exit(self(), normal), ok
+    kill -> exit(self(), normal), ok
   end,
   receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R, Mi)
 .
