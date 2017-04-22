@@ -40,8 +40,8 @@ receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R,
         werkzeug:logging(lists:concat([GGTName, "@vsp"]), lists:concat(["mi: ", Y, ", Old mi:", Mi, " NEW MI:", NewMi, "\n"])),
         L ! {sendy, NewMi},
         R ! {sendy, NewMi},
+        Koordinator ! {briefmi, {GGTName,NewMi, erlang:now()}},
         receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R, NewMi)
-
         ;true -> werkzeug:logging(lists:concat([GGTName, "@vsp"]), lists:concat(["else zweig \n"]))
       end;
 
