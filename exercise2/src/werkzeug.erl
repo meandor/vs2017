@@ -365,9 +365,9 @@ ensureNameserviceStarted() ->   try
 																end.
 
 register_safe(Name, PID) ->
-	NotRegistered = erlang:whereis(Name) == undefined,
-	if
-		NotRegistered -> register(Name, PID);
-		true -> logging("Test", "Already registered \n")
+	WhereIsName = erlang:whereis(Name),
+	case WhereIsName of
+		undefined -> register(Name, PID);
+		_Else -> logging("Test", "Already registered \n")
 	end
 .
