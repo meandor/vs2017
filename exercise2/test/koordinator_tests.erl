@@ -13,35 +13,40 @@ simple_test() ->
 ringbuild_test() ->
   werkzeug:ensureNameserviceStarted(),
   koordinator:start("./test-config/koordinator.cfg"),
-  ggt:start(2000, 20000, 6, one, chef, nameservice),
-  ggt:start(2000, 20000, 6, two, chef, nameservice),
-  ggt:start(2000, 20000, 6, three, chef, nameservice),
-  ggt:start(2000, 20000, 6, four, chef, nameservice),
-  ggt:start(2000, 20000, 6, five, chef, nameservice),
-  ggt:start(2000, 20000, 6, six, chef, nameservice),
+  Nodes = [one, two, three, four, five, six],
+  start_nodes(Nodes),
+
   timer:sleep(1000),
   chef ! step,
   timer:sleep(1000),
-
-  one ! {setpm, 6},
-  two ! {setpm, 6},
-  three ! {setpm, 6},
-  four ! {setpm, 6},
-  five ! {setpm, 6},
-  six ! {setpm, 6},
+  send_node_command(Nodes, {setpm, 6}),
   three ! {sendy, 3},
-  four ! {self(), tellmi},
+  % Without this sleep not working
+  timer:sleep(100),
+  assert_three(Nodes),
 
-  one ! kill,
-  two ! kill,
-  three ! kill,
-  four ! kill,
-  five ! kill,
-  six ! kill,
-  chef! kill,
-receive
-{mi, Mi} -> ?assert(Mi =:= 6)
-end.
+  send_node_command(Nodes, kill),
+  chef ! kill
 
-  %,
 
+.
+
+start_nodes([]) -> ok;
+start_nodes([H | T]) ->
+  ggt:start(2000, 20000, 6, H, chef, nameservice),
+  start_nodes(T).
+
+send_node_command([], _Command) -> ok;
+send_node_command([H | T], Command) ->
+  H ! Command,
+  send_node_command(T, Command).
+
+
+
+assert_three([]) -> ok;
+assert_three([H | T]) ->
+  H ! {self(), tellmi},
+  receive
+    {mi, Mi} -> ?assert(Mi =:= 3)
+  end,
+  assert_three(T).
