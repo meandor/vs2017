@@ -98,8 +98,15 @@ Der Starter hat nur die Aufgabe, die Parameter an die gesetzte Anzahl von Client
 
 Der Koordinator verwaltet alle ggT Prozesse. Er kommuniziert mit Starter-Prozessen um diesen die benötigten
 Werte zum Starten der ggT-Prozesse zu übergeben. Alle ggT-Prozesse müssen sich außerdem bei ihm anmelden,
-und er übernimmt die Anordnung dieser in einem Ring, darüber hinaus die Terminierung des gesamten systems auf Befehl eines
+und er übernimmt die Anordnung dieser in einem Ring, darüber hinaus die Terminierung des gesamten Systems auf Befehl eines
 ggt-Prozesses.
+
+Im Koordinator - Modul werden die drei Zustände durch drei receive - Schleifen realisiert. Alle Referenzen auf GGT
+Prozesse werden in einer Erlang - Liste persistiert. Meldet sich ein GGT - Prozess beim Koordinator,
+wird er entweder am Anfang oder am Ende dieser Liste angefügt. So entsteht die entsprechende Zufälligkeit.
+
+Im Zustandsübergang zu "bereit" wird durch diese Liste iteriert, und die Knoten bekommen ihre entsprechenden Nachbarn
+zugewiesen.
 
 
 \subsubsection{Schnittstelle}

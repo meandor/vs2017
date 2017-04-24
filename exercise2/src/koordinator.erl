@@ -16,19 +16,10 @@ start(Config) ->
 
 receive_loop(Config, RegisterName) ->
   werkzeug:register_safe(RegisterName, self()),
-  receive_loop(Config, [], initial, false).
+  initial(Config, []).
 
-%%{arbeitszeit, 2}.
-%%{termzeit, 42}.
-%%{ggtprozessnummer, 9}.
-%%{nameservicenode, 'ns@Brummpa'}.
-%%{nameservicename, nameservice}.
-%%{koordinatorname, chef}.
-%%{quote, 80}.
-%%{korrigieren, 1}.
+initial(Config, Clients) ->
 
-
-receive_loop(Config, Clients, State, Toggled) ->
   receive
     {From, getsteeringval} ->
       {ok, WorkingTime} = werkzeug:get_config_value(arbeitszeit, Config),
@@ -36,17 +27,54 @@ receive_loop(Config, Clients, State, Toggled) ->
       {ok, Quota} = werkzeug:get_config_value(quote, Config),
       {ok, GGTProcessNumber} = werkzeug:get_config_value(ggtprozessnummer, Config),
       From ! {steeringval,WorkingTime,TerminationTime,Quota,GGTProcessNumber} ;
-    {hello,Clientname} -> ok;
-    {briefmi,{Clientname,CMi,CZeit}} -> ok;
-    {From,briefterm,{Clientname,CMi,CZeit}} -> ok;
-    reset -> receive_loop(Config, [], initial, false);
-    step -> receive_loop(Config, Clients, ready, Toggled);
-    prompt -> ok;
-    nudge -> ok;
-    toggle -> receive_loop(Config, Clients, State, not(Toggled));
-    {calc,WggT} -> ok;
-    kill -> ok
+
+    {hello,Clientname} ->
+      % Generate some randomness in the ring
+      werkzeug:logging("Koordinator", lists:concat(["Koordinator@chef.log>>" , Clientname, " added \n"])),
+      LeftOrRight = bool_rand(),
+      case LeftOrRight of
+        _Any -> initial(Config, Clients ++ [Clientname]);
+        true -> initial(Config, Clients ++ [Clientname]);
+        false -> initial(Config, [Clientname] ++ Clients)
+      end;
+
+    reset -> initial(Config, []);
+    kill -> exit(self(), normal), ok;
+    step -> build_ring(Config, Clients)
   end,
-  receive_loop(Config, Clients, State, Toggled)
+  initial(Config, Clients)
 .
 
+build_ring(Config, Clients) ->
+  set_neighbors(Clients, Clients),
+  step(Config, Clients, false).
+
+set_neighbors([Middle, Last], [First, Second | _Tail]) ->
+  werkzeug:logging("Koordinator", lists:concat(["Koordinator@chef.log>>" , Middle, " <- ",  Last,  " -> ", First, " neighbours set \n"])),
+  werkzeug:logging("Koordinator", lists:concat(["Koordinator@chef.log>>" , Last, " <- ",  First,  " -> ", Second, " neighbours set \n"])),
+
+  Last ! {setneighbors, Middle, First},
+  First! {setneighbors, Last, Second};
+
+
+set_neighbors([Left, Middle, Right | Tail], Clients) ->
+  werkzeug:logging("Koordinator", lists:concat(["Koordinator@chef.log>>" , Left, " <- ",  Middle,  " -> ", Right, " neighbours set \n"])),
+  Middle ! {setneighbors, Left, Right},
+  set_neighbors([Middle, Right] ++ Tail, Clients).
+
+step(Config, Clients, Toggled) ->
+  receive
+    toggle -> step(Config, Clients, not(Toggled));
+    prompt -> ok;
+    nudge -> ok;
+    {calc,WggT} -> ok;
+    kill -> exit(self(), normal), ok;
+    {briefmi,{Clientname,CMi,CZeit}} -> ok;
+    {From,briefterm,{Clientname,CMi,CZeit}} -> ok
+  end
+.
+
+
+
+bool_rand() ->
+  random:uniform(2) == 1.

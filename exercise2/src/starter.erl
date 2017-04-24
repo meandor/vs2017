@@ -7,7 +7,8 @@
 
 -export([start/1]).
 
-loggingAtom(Config) ->
+loggingAtom(ConfigPath) ->
+  Config = werkzeug:loadConfig(ConfigPath),
   {ok, Name} = werkzeug:get_config_value(koordinatorname, Config),
   LogfileName = lists:concat(["Koordinator@", Name, ".log"]),
   erlang:list_to_atom(LogfileName).
@@ -18,14 +19,14 @@ start(StarterNumber) -> start(StarterNumber, "./config/ggt.cfg").
 
 start(StarterNumber, ConfigPath) ->
 
-  Config = werkzeug:loadConfig(ConfigPath),
-  Logging = loggingAtom(Config),
+  Logging = loggingAtom(ConfigPath),
   werkzeug:logging(Logging, lists:concat(["starter>>" , ConfigPath, " opened \n"])),
 
   %Der Starter liest aus der Datei ggt.cfg die weiteren Werte aus:
   % die Erlang-Node des Namensdienstes, der Name des Koordinators,
   % die Nummer der Praktikumsgruppe und die Nummer des Teams.
 
+  Config = werkzeug:loadConfig(ConfigPath),
   {ok, NSNode} = werkzeug:get_config_value(nameservicenode, Config),
   {ok, NSName} = werkzeug:get_config_value(nameservicename, Config),
 
@@ -37,7 +38,7 @@ start(StarterNumber, ConfigPath) ->
   {ok, CoordinatorName} = werkzeug:get_config_value(koordinatorname, Config),
   {ok, GroupNumber} = werkzeug:get_config_value(praktikumsgruppe, Config),
   {ok, TeamNumber} = werkzeug:get_config_value(teamnummer, Config),
-  GroupTeam = erlang:list_to_atom([GroupNumber, TeamNumber]),
+  GroupTeam = erlang:list_to_atom(lists:concat([integer_to_list(GroupNumber), integer_to_list(TeamNumber)])),
   request_steering_values(ConfigPath, CoordinatorName, GroupTeam, StarterNumber, NameService).
 
 request_steering_values(ConfigPath, CoordinatorName, GroupTeam, StarterNumber, NameService) ->
@@ -52,8 +53,9 @@ startGGT(WorkingTime,TerminationTime,Quota,0, GroupTeam, StartNumber, Coordinato
 
 startGGT(WorkingTime,TerminationTime,Quota,GGTProcessNumber, GroupTeam, StartNumber,CoordinatorName, ConfigPath, Nameservice) ->
   %<PraktikumsgruppenID><TeamID><Nummer des ggT-Prozess><Nummer des Starters>
-  %GGTProcessName = erlang:list_to_atom([atom_to_list(GroupTeam), GGTProcessNumber, atom_to_list(StartNumber)]),
-  GGTProcessName =  list_to_atom("c1234"),
+  GGTProcessName = erlang:list_to_atom(lists:concat([atom_to_list(GroupTeam), integer_to_list(GGTProcessNumber), atom_to_list(StartNumber)])),
+  Logging = loggingAtom(ConfigPath),
+  werkzeug:logging(Logging, lists:concat(["starter>>" , GGTProcessName, " started \n"])),
   ggt:start(WorkingTime, TerminationTime, Quota, GGTProcessName, CoordinatorName, Nameservice),
 
   % Der Starter startet die ggT-Prozesse mit den zugehörigen Werten:
