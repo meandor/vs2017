@@ -8,7 +8,7 @@
 %%%-------------------------------------------------------------------
 -module(starter).
 
--export([start/1, log/2, bind_nameservice/1]).
+-export([start/1, log/2, bind_nameservice/1, discover_coordinator/2]).
 
 log(Config, Message) ->
   {ok, StarterID} = werkzeug:get_config_value(starterid, Config),
@@ -25,31 +25,43 @@ bind_nameservice(Config) ->
   log(Config, ["Nameservice '", pid_to_list(NameService), "' bound..."]),
   NameService.
 
-request_steering_values(ConfigPath, CoordinatorName, GroupTeam, StarterNumber, NameService) ->
-  CoordinatorName ! {self(), getsteeringval},
+discover_coordinator(NameService, Config) ->
+  {ok, CoordinatorName} = werkzeug:get_config_value(koordinatorname, Config),
+  NameService ! {self(), {lookup, CoordinatorName}},
   receive
-    {steeringval, WorkingTime, TerminationTime, Quota, GGTProcessNumber} ->
-      startGGT(WorkingTime, TerminationTime, Quota, GGTProcessNumber, GroupTeam, StarterNumber, CoordinatorName, ConfigPath, NameService)
-  end
-.
+    not_found ->
+      log(Config, ["service ", atom_to_list(CoordinatorName), " not found..."]),
+      [];
+    {pin, {Name, Node}} ->
+      log(Config, ["coordinator service ", atom_to_list(Name), "(", atom_to_list(Node), ")", " bound..."]),
+      [Name, Node]
+  end.
 
-startGGT(WorkingTime, TerminationTime, Quota, 0, GroupTeam, StartNumber, CoordinatorName, Config, NameService) -> ok;
-
-startGGT(WorkingTime, TerminationTime, Quota, GGTProcessNumber, GroupTeam, StartNumber, CoordinatorName, ConfigPath, Nameservice) ->
-%<PraktikumsgruppenID><TeamID><Nummer des ggT-Prozess><Nummer des Starters>
-  GGTProcessName = erlang:list_to_atom(lists:concat([atom_to_list(GroupTeam), integer_to_list(GGTProcessNumber), atom_to_list(StartNumber)])),
-  Logging = log(ConfigPath),
-  werkzeug:logging(Logging, lists:concat(["starter>>", GGTProcessName, " started \n"])),
-  ggt:start(WorkingTime, TerminationTime, Quota, GGTProcessName, CoordinatorName, Nameservice),
-
-% Der Starter startet die ggT-Prozesse mit den zugehörigen Werten:
-% der Verzögerungszeit, die Terminierungszeit,
-% der Startnummer dieses Prozesses (also der wievielte gestartete ggT-Prozess er ist),
-% seine eindeutige Starternummer, die Praktikumsgruppennummer,
-% die Teamnummer sowie die benötigten Kontaktdaten für den Namensdienst
-% und den Koordinator und die Abstimmungsquote als konkrete Anzahl.
-
-  startGGT(WorkingTime, TerminationTime, Quota, GGTProcessNumber - 1, GroupTeam, StartNumber, CoordinatorName, ConfigPath, Nameservice).
+%%request_steering_values(ConfigPath, CoordinatorName, GroupTeam, StarterNumber, NameService) ->
+%%  CoordinatorName ! {self(), getsteeringval},
+%%  receive
+%%    {steeringval, WorkingTime, TerminationTime, Quota, GGTProcessNumber} ->
+%%      startGGT(WorkingTime, TerminationTime, Quota, GGTProcessNumber, GroupTeam, StarterNumber, CoordinatorName, ConfigPath, NameService)
+%%  end
+%%.
+%%
+%%startGGT(WorkingTime, TerminationTime, Quota, 0, GroupTeam, StartNumber, CoordinatorName, Config, NameService) -> ok;
+%%
+%%startGGT(WorkingTime, TerminationTime, Quota, GGTProcessNumber, GroupTeam, StartNumber, CoordinatorName, ConfigPath, Nameservice) ->
+%%%<PraktikumsgruppenID><TeamID><Nummer des ggT-Prozess><Nummer des Starters>
+%%  GGTProcessName = erlang:list_to_atom(lists:concat([atom_to_list(GroupTeam), integer_to_list(GGTProcessNumber), atom_to_list(StartNumber)])),
+%%  Logging = log(ConfigPath),
+%%  werkzeug:logging(Logging, lists:concat(["starter>>", GGTProcessName, " started \n"])),
+%%  ggt:start(WorkingTime, TerminationTime, Quota, GGTProcessName, CoordinatorName, Nameservice),
+%%
+%%% Der Starter startet die ggT-Prozesse mit den zugehörigen Werten:
+%%% der Verzögerungszeit, die Terminierungszeit,
+%%% der Startnummer dieses Prozesses (also der wievielte gestartete ggT-Prozess er ist),
+%%% seine eindeutige Starternummer, die Praktikumsgruppennummer,
+%%% die Teamnummer sowie die benötigten Kontaktdaten für den Namensdienst
+%%% und den Koordinator und die Abstimmungsquote als konkrete Anzahl.
+%%
+%%  startGGT(WorkingTime, TerminationTime, Quota, GGTProcessNumber - 1, GroupTeam, StartNumber, CoordinatorName, ConfigPath, Nameservice).
 
 %% Starts the starter with unique starterID
 start(StarterID) -> start(StarterID, "./config/ggt.cfg").
@@ -60,25 +72,12 @@ start(StarterID, ConfigPath) ->
   log(NewConfig, ["Starttime: ", werkzeug:timeMilliSecond(), " with PID ", atom_to_list(self())]),
   log(NewConfig, [ConfigPath, " opened..."]),
 
-  {ok, CoordinatorName} = werkzeug:get_config_value(koordinatorname, Config),
   {ok, GroupNumber} = werkzeug:get_config_value(praktikumsgruppe, Config),
   {ok, TeamNumber} = werkzeug:get_config_value(teamnummer, Config),
   log(NewConfig, [ConfigPath, " loaded..."]),
 
   NameService = bind_nameservice(NewConfig),
 
-  NameService ! {self(), {lookup, CoordinatorName}},
-  receive
-    not_found ->
-      log(NewConfig, ["service ", atom_to_list(CoordinatorName), " not found..."]);
-    {pin, {Name, Node}} ->
-      log(NewConfig, ["coordinator service ", atom_to_list(Name), "(", atom_to_list(Node), ")", " bound..."])
-  end,
-
-
-  GroupTeam = erlang:list_to_atom(lists:concat([integer_to_list(GroupNumber), integer_to_list(TeamNumber)])),
-  request_steering_values(ConfigPath, CoordinatorName, GroupTeam, StarterID, NameService).
-
-
-log(ConfigPath) ->
-  erlang:error(not_implemented).
+  [Name, Node] = discover_coordinator(NameService, NewConfig),
+  ok.
+%request_steering_values(ConfigPath, Name, GroupTeam, StarterID, NameService).
