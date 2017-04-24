@@ -1,6 +1,6 @@
 -module(starter_tests).
 -include_lib("eunit/include/eunit.hrl").
--export([name_service/0]).
+-export([name_service/0, coordinator/0]).
 
 name_service() ->
   receive
@@ -9,9 +9,20 @@ name_service() ->
     terminate -> ok
   end.
 
+coordinator() ->
+  receive
+    {From, getsteeringval} ->
+      From ! {steeringval, 1, 42, 1337, 1}, % {steeringval, ArbeitsZeit, TermZeit, Quota, GGTProzessnummer}
+      ok
+  end.
+
 with_redefed_name_service(Name) ->
   PID = spawn(?MODULE, name_service, []),
   yes = global:register_name(Name, PID),
+  PID.
+
+with_redefed_coordinator() ->
+  PID = spawn(?MODULE, coordinator, []),
   PID.
 
 simple_config() ->
@@ -32,6 +43,13 @@ discover_coordinator_test() ->
   timer:sleep(100),
   ?assertEqual(undefined, erlang:process_info(StarterPID)),
   ?assertEqual(undefined, erlang:process_info(NameService)).
+
+get_steering_values_test() ->
+  Coordinator = with_redefed_coordinator(),
+  StarterPID = spawn(starter, get_steering_values, [Coordinator, simple_config()]),
+  timer:sleep(100),
+  ?assertEqual(undefined, erlang:process_info(Coordinator)),
+  ?assertEqual(undefined, erlang:process_info(StarterPID)).
 
 %%simple_test() ->
 %%  werkzeug:ensureNameserviceStarted(),

@@ -8,7 +8,7 @@
 %%%-------------------------------------------------------------------
 -module(starter).
 
--export([start/1, log/2, bind_nameservice/1, discover_coordinator/2]).
+-export([start/1, log/2, bind_nameservice/1, discover_coordinator/2, get_steering_values/2]).
 
 log(Config, Message) ->
   {ok, StarterID} = werkzeug:get_config_value(starterid, Config),
@@ -31,19 +31,20 @@ discover_coordinator(NameService, Config) ->
   receive
     not_found ->
       log(Config, ["service ", atom_to_list(CoordinatorName), " not found..."]),
-      [];
+      {};
     {pin, {Name, Node}} ->
       log(Config, ["coordinator service ", atom_to_list(Name), "(", atom_to_list(Node), ")", " bound..."]),
-      [Name, Node]
+      {Name, Node}
   end.
 
-%%request_steering_values(ConfigPath, CoordinatorName, GroupTeam, StarterNumber, NameService) ->
-%%  CoordinatorName ! {self(), getsteeringval},
-%%  receive
-%%    {steeringval, WorkingTime, TerminationTime, Quota, GGTProcessNumber} ->
-%%      startGGT(WorkingTime, TerminationTime, Quota, GGTProcessNumber, GroupTeam, StarterNumber, CoordinatorName, ConfigPath, NameService)
-%%  end
-%%.
+get_steering_values(Coordinator, Config) ->
+  Coordinator ! {self(), getsteeringval},
+  receive
+    {steeringval, ArbeitsZeit, TermZeit, Quota, GGTProzessnummer} ->
+      log(Config, ["getsteeringval: ", integer_to_list(ArbeitsZeit), " work time; ", integer_to_list(TermZeit), " term time; ", integer_to_list(Quota), " quota; ", integer_to_list(GGTProzessnummer), " #ggT proccesses."]),
+      [ArbeitsZeit, TermZeit, Quota, GGTProzessnummer]
+  end.
+
 %%
 %%startGGT(WorkingTime, TerminationTime, Quota, 0, GroupTeam, StartNumber, CoordinatorName, Config, NameService) -> ok;
 %%
@@ -65,7 +66,6 @@ discover_coordinator(NameService, Config) ->
 
 %% Starts the starter with unique starterID
 start(StarterID) -> start(StarterID, "./config/ggt.cfg").
-%% getsteeringval: 2 Arbeitszeit ggT; 42 Wartezeit Terminierung ggT; 7 Abstimmungsquote ggT; 9-te GGT Prozess.
 start(StarterID, ConfigPath) ->
   Config = werkzeug:loadConfig(ConfigPath),
   NewConfig = lists:concat([Config, [{starterid, StarterID}]]),
@@ -78,6 +78,6 @@ start(StarterID, ConfigPath) ->
 
   NameService = bind_nameservice(NewConfig),
 
-  [Name, Node] = discover_coordinator(NameService, NewConfig),
+  Coordinator = discover_coordinator(NameService, NewConfig),
+  [ArbeitsZeit, TermZeit, Quota, GGTProzessnummer] = get_steering_values(Coordinator, NewConfig),
   ok.
-%request_steering_values(ConfigPath, Name, GroupTeam, StarterID, NameService).
