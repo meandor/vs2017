@@ -65,7 +65,7 @@ start(StarterID, ConfigPath) ->
   {ok, TeamNumber} = werkzeug:get_config_value(teamnummer, Config),
   log(NewConfig, [ConfigPath, " loaded..."]),
 
-  NameService = bindNameService(NewConfig),
+  NameService = bind_nameservice(NewConfig),
 
   NameService ! {self(), {lookup, CoordinatorName}},
   receive
