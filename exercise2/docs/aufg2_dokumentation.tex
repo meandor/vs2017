@@ -25,6 +25,7 @@
 \textbf{Aufgabenteilung:}
 \begin{itemize}
     \item <Aufgabe> (DS, FW)
+    \item Starter (DS)
 \end{itemize}
 
 \textbf{Quellenangaben:}\\
@@ -32,6 +33,7 @@
 \textbf{Bearbeitungszeitraum:}
 \begin{itemize}
 	\item 13.04.2017 3h (FW)
+	\item 24.04.2017 (DS)
 \end{itemize}
 
 \textbf{Aktueller Stand:}
@@ -47,8 +49,32 @@
 \newpage
 
 \section{Einführung und Ziele}
+Mit dem Satz von Euklid ist es möglich, den größten gemeinsamen Teiler (ggT) zweier positiver ganzer Zahlen
+($x,y \in \mathbb{Z}^{*}_{+}$) zu bestimmen (Gleichung \ref{equ:ggt-simple}).
+
+Dabei wird der größte gemeinsame Teiler von $x$ und $y$ auf den größten gemeinsamen Teiler von $y$ und $\bmod{(x,y)}$
+zurückgeführt.
+
+\begin{equation}
+\forall x,y \in \mathbb{Z}^{*}_{+}: ggT(x,y) = ggT(y,\bmod{(x,y)})
+\label{equ:ggt-simple}
+\end{equation}
+
+Das erlaubt eine rekursive Berechnung des größten gemeinsamen Teilers.
+
+Das Produkt soll diesen Algorithmus verteilt ausführen, verwalten und koordinieren, um den größten gemeinsamen Teiler zu
+berechnen.
 
 \subsection{Randbedingungen}
+Um den ggT verteilt mit dem Algorithmus berechnen zu können, muss der Algorithmus angepasst werden
+(Gleichung \ref{equ:ggt-distributed}). Das ermöglicht ein Terminieren in jedem ggT Prozess mit dem ggT und nicht mit 0,
+da bei $ggT(x,x)$ terminiert wird.
+
+\begin{multline}
+\forall x,y \in \mathbb{Z}^{*}_{+}: ggT(x,y) = ggT(y,\bmod{^{*}(x,y)})\\
+\bmod{^{*}(x,y)} := \bmod{(x-1, y)} + 1
+\label{equ:ggt-distributed}
+\end{multline}
 
 \subsection{Kontextbegrenzung}
 Das System soll in Erlang umgesetzt werden. Es muss auf Computern mit Linux Betriebssystem lauffähig sein.
