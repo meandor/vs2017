@@ -2,6 +2,7 @@ _*
 .eunit
 *.o
 *.beam
+!nameservice.beam
 *.plt
 *.swp
 *.swo
