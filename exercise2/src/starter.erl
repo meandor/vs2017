@@ -41,7 +41,7 @@ startGGT(WorkingTime, TerminationTime, Quota, GGTProcessNumber, GroupTeam, Start
 %% Starts the starter with unique starterID
 start(StarterID) -> start(StarterID, "./config/ggt.cfg").
 
-start(StarterNumber, ConfigPath) ->
+start(StarterID, ConfigPath) ->
   Logging = loggingAtom(ConfigPath),
   werkzeug:logging(Logging, lists:concat(["starter>>", ConfigPath, " opened \n"])),
 
@@ -56,10 +56,10 @@ start(StarterNumber, ConfigPath) ->
   %TODO figure out ping?
   NameService = {NSName, NSNode},
   %pong = net_adm:ping(NameService),
-  NameService ! {self(), {rebind, StarterNumber, node()}},
+  NameService ! {self(), {rebind, StarterID, node()}},
 
   {ok, CoordinatorName} = werkzeug:get_config_value(koordinatorname, Config),
   {ok, GroupNumber} = werkzeug:get_config_value(praktikumsgruppe, Config),
   {ok, TeamNumber} = werkzeug:get_config_value(teamnummer, Config),
   GroupTeam = erlang:list_to_atom(lists:concat([integer_to_list(GroupNumber), integer_to_list(TeamNumber)])),
-  request_steering_values(ConfigPath, CoordinatorName, GroupTeam, StarterNumber, NameService).
+  request_steering_values(ConfigPath, CoordinatorName, GroupTeam, StarterID, NameService).
