@@ -1,4 +1,4 @@
-# Message of the Day
+# GGT App
 
 This Erlang OTP App implements a distributed algorithm for the largest common divisor.
 
