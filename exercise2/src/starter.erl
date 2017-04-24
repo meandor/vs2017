@@ -8,7 +8,7 @@
 %%%-------------------------------------------------------------------
 -module(starter).
 
--export([start/1, log/2, bindNameService/1]).
+-export([start/1, log/2, bind_nameservice/1]).
 
 log(Config, Message) ->
   {ok, StarterID} = werkzeug:get_config_value(starterid, Config),
@@ -17,7 +17,7 @@ log(Config, Message) ->
   werkzeug:logging(Logfile, lists:concat(FullMessage)),
   Logfile.
 
-bindNameService(Config) ->
+bind_nameservice(Config) ->
   {ok, NSNode} = werkzeug:get_config_value(nameservicenode, Config),
   {ok, NSName} = werkzeug:get_config_value(nameservicename, Config),
   pong = net_adm:ping(NSNode),
@@ -53,7 +53,6 @@ startGGT(WorkingTime, TerminationTime, Quota, GGTProcessNumber, GroupTeam, Start
 
 %% Starts the starter with unique starterID
 start(StarterID) -> start(StarterID, "./config/ggt.cfg").
-%% Koordinator chef (chef) gebunden.
 %% getsteeringval: 2 Arbeitszeit ggT; 42 Wartezeit Terminierung ggT; 7 Abstimmungsquote ggT; 9-te GGT Prozess.
 start(StarterID, ConfigPath) ->
   Config = werkzeug:loadConfig(ConfigPath),

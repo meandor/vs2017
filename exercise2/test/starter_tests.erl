@@ -16,9 +16,9 @@ logging_test() ->
   Expected = list_to_atom(lists:concat(["ggt42@", atom_to_list(node()), ".log"])),
   ?assert(Expected =:= starter:log([{starterid, 42}], ["foobar"])).
 
-bindNameService_test() ->
+bind_nameService_test() ->
   Expected = withRedefedNameService(foobar),
-  ?assertEqual(Expected, starter:bindNameService([{starterid, 42}, {nameservicenode, node()}, {nameservicename, foobar}])),
+  ?assertEqual(Expected, starter:bind_nameservice([{starterid, 42}, {nameservicenode, node()}, {nameservicename, foobar}])),
   Expected ! terminate.
 
 %%simple_test() ->
