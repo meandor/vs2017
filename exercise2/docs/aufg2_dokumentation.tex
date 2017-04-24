@@ -67,7 +67,7 @@ berechnen.
 
 \subsection{Randbedingungen}
 Um den ggT verteilt mit dem Algorithmus berechnen zu können, muss der Algorithmus angepasst werden
-(Gleichung \ref{equ:ggt-distributed}). Das ermöglicht ein Terminieren in jedem ggT Prozess mit dem ggT und nicht mit 0,
+(Gleichung \ref{equ:ggt-distributed}). Das ermöglicht ein Terminieren in jedem ggT-Prozess mit dem ggT und nicht mit 0,
 da bei $ggT(x,x)$ terminiert wird.
 
 \begin{multline}
@@ -94,28 +94,41 @@ Das System soll in Erlang umgesetzt werden. Es muss auf Computern mit Linux Betr
 
 \subsection{Starter-Modul}
 \subsubsection{Aufgabe und Verantwortung}
-
-Der Starter steht zwischen Koordinator und ggT Prozess. Er übernimmt das starten mehrerer ggT-Prozesse.
-Hierfür benötigt er Initialisierungsdaten für die ggT Prozesse, diese werden für ihn durch das Koordinator - Modul
-bereitgestellt.
-
+Der Starter steht zwischen Koordinator und ggT-Prozess. Er startet mehrere ggT-Prozesse mit den Initialisierungsdaten,
+die vom Koordinator zur Verfügung gestellt werden (asynchron) und seinen konfigurierbaren Parametern.
 
 \subsubsection{Schnittstelle}
+\begin{lstlisting}
+/* Nachricht zum Starten von ggT-Prozessen */
 {steeringval,ArbeitsZeit,TermZeit,Quota,GGTProzessnummer}
-Dies ist eine Schnittstelle für den Koordinator. Nach der Anfrage getsteeringval des Starters sendet der Koordinator alle
-benötigten Informationen für den Start der Prozesse. Ansprechen dieser Schnitstelle bewirkt das starten von <GGTProzessnummer>
-GGT-Prozessen mit gegebenen Werten.
-Hierfür zählt eine Rekursive Funktion von GGTProzessnummer bis 0, und startet in jedem Aufruf einen GGT Prozess,
-dessen namen sich nach Vorgabe aus den config - Parametern und der Prozessnummer zusammensetzt.
-Beim Starten eines GGT Prozesses werden ihm alle benötigten Daten inkl. Starternummer und Adressen von Namensservice und
-Koordinator übergeben. Das ringförmige Verketten der Prozesse übernimmt der Koordinator.
+
+/* Startet einen Starter Prozess */
+start(StarterID): Integer -> PID
+\end{lstlisting}
+\{\textbf{steeringval},ArbeitsZeit,TermZeit,Quota,GGTProzessnummer\}:\\
+Einkommende Nachricht zum Starten von ggT
+Prozessen. Die ArbeitsZeit ist die simulierte Verzögerungszeit zur Berechnung in Sekunden, die TermZeit ist die
+Wartezeit in Sekunden, bis eine Wahl für eine Terminierung initiiert wird, Quota ist die konkrete Anzahl an
+benötigten Zustimmungen zu einer Terminierungsabstimmung und GGTProzessnummer ist die Anzahl der zu startenden
+ggT-Prozesse.\\
+
+\textbf{start(}StarterID\textbf{)}:\\
+Startet den Starter mit der gegebenen eindeutigen Nummer.\\
 
 \subsubsection{Entwurfsentscheidungen}
-Absolute Abstimmungsquote und die Nummer des zu startenden Prozesses werden im Koordinator berechnet und nur übergeben.
-Der Starter hat nur die Aufgabe, die Parameter an die gesetzte Anzahl von Clients weiterzureichen.
-
+Der Starter ruft in seiner Initalisierungsphase an der Schnittstelle vom Koordinator seine benötigten Parameter zum
+Starten von ggT-Prozessen asynchron ab. Zusätzlich werden noch die konfigurierbaren Parameter geladen. Mit diesen Daten
+werden dann die ggT-Prozesse gestartet. Die Anzahl der zu startenden ggT-Prozesse wird durch die GGTProzessnummer in der
+Schnittstelle definiert.
 
 \subsubsection{Konfigurationsparameter}
+\begin{itemize}
+    \item Praktikumsgruppe
+    \item Teamnummer
+    \item Nameservicenode definiert den Node des Nameservices
+    \item Nameservicename definiert den Namen des registrierten Nameservices auf dem Nameservicenode
+    \item Koordinatorname definiert den Namen des Koordinators
+\end{itemize}
 
 \newpage
 
