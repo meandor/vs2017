@@ -1,10 +1,25 @@
 -module(starter_tests).
 -include_lib("eunit/include/eunit.hrl").
--export([]).
+-export([name_service/0]).
+
+name_service() ->
+  receive
+    terminate -> ok
+  end.
+
+withRedefedNameService(Name) ->
+  PID = spawn(?MODULE, name_service, []),
+  yes = global:register_name(Name, PID),
+  PID.
 
 logging_test() ->
   Expected = list_to_atom(lists:concat(["ggt42@", atom_to_list(node()), ".log"])),
   ?assert(Expected =:= starter:log([{starterid, 42}], ["foobar"])).
+
+bindNameService_test() ->
+  Expected = withRedefedNameService(foobar),
+  ?assertEqual(Expected, starter:bindNameService([{starterid, 42}, {nameservicenode, node()}, {nameservicename, foobar}])),
+  Expected ! terminate.
 
 %%simple_test() ->
 %%  werkzeug:ensureNameserviceStarted(),

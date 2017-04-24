@@ -8,7 +8,7 @@
 %%%-------------------------------------------------------------------
 -module(starter).
 
--export([start/1, log/2]).
+-export([start/1, log/2, bindNameService/1]).
 
 log(Config, Message) ->
   {ok, StarterID} = werkzeug:get_config_value(starterid, Config),
@@ -16,6 +16,14 @@ log(Config, Message) ->
   FullMessage = Message ++ ["\n"],
   werkzeug:logging(Logfile, lists:concat(FullMessage)),
   Logfile.
+
+bindNameService(Config) ->
+  {ok, NSNode} = werkzeug:get_config_value(nameservicenode, Config),
+  {ok, NSName} = werkzeug:get_config_value(nameservicename, Config),
+  pong = net_adm:ping(NSNode),
+  NameService = global:whereis_name(NSName),
+  log(Config, ["Nameservice '", pid_to_list(NameService), "' bound..."]),
+  NameService.
 
 request_steering_values(ConfigPath, CoordinatorName, GroupTeam, StarterNumber, NameService) ->
   CoordinatorName ! {self(), getsteeringval},
@@ -45,26 +53,30 @@ startGGT(WorkingTime, TerminationTime, Quota, GGTProcessNumber, GroupTeam, Start
 
 %% Starts the starter with unique starterID
 start(StarterID) -> start(StarterID, "./config/ggt.cfg").
+%% Koordinator chef (chef) gebunden.
+%% getsteeringval: 2 Arbeitszeit ggT; 42 Wartezeit Terminierung ggT; 7 Abstimmungsquote ggT; 9-te GGT Prozess.
 start(StarterID, ConfigPath) ->
-  Logging = log(ConfigPath),
-  werkzeug:logging(Logging, lists:concat(["starter>>", ConfigPath, " opened \n"])),
-
-  %Der Starter liest aus der Datei ggt.cfg die weiteren Werte aus:
-  % die Erlang-Node des Namensdienstes, der Name des Koordinators,
-  % die Nummer der Praktikumsgruppe und die Nummer des Teams.
-
   Config = werkzeug:loadConfig(ConfigPath),
-  {ok, NSNode} = werkzeug:get_config_value(nameservicenode, Config),
-  {ok, NSName} = werkzeug:get_config_value(nameservicename, Config),
-
-  %TODO figure out ping?
-  NameService = {NSName, NSNode},
-  %pong = net_adm:ping(NameService),
-  NameService ! {self(), {rebind, StarterID, node()}},
+  NewConfig = lists:concat([Config, [{starterid, StarterID}]]),
+  log(NewConfig, ["Starttime: ", werkzeug:timeMilliSecond(), " with PID ", atom_to_list(self())]),
+  log(NewConfig, [ConfigPath, " opened..."]),
 
   {ok, CoordinatorName} = werkzeug:get_config_value(koordinatorname, Config),
   {ok, GroupNumber} = werkzeug:get_config_value(praktikumsgruppe, Config),
   {ok, TeamNumber} = werkzeug:get_config_value(teamnummer, Config),
+  log(NewConfig, [ConfigPath, " loaded..."]),
+
+  NameService = bindNameService(NewConfig),
+
+  NameService ! {self(), {lookup, CoordinatorName}},
+  receive
+    not_found ->
+      log(NewConfig, ["service ", atom_to_list(CoordinatorName), " not found..."]);
+    {pin, {Name, Node}} ->
+      log(NewConfig, ["coordinator service ", atom_to_list(Name), "(", atom_to_list(Node), ")", " bound..."])
+  end,
+
+
   GroupTeam = erlang:list_to_atom(lists:concat([integer_to_list(GroupNumber), integer_to_list(TeamNumber)])),
   request_steering_values(ConfigPath, CoordinatorName, GroupTeam, StarterID, NameService).
 
