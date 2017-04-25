@@ -25,6 +25,13 @@ To reload everything in the erlang shell:
 make:all([load]).
 ````
 
+Our modules and processes are dependant on a name service.
+To start one simply start it in your node:
+````erlang
+nameservice:start().
+````
+Make sure to update the config files with the nameservice node name.
+
 ## Test
 To test a <MODULENAME> in the erl shell:
 ````erlang
