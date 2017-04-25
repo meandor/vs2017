@@ -142,10 +142,10 @@ ggt-Prozesses.
 
 Im Koordinator - Modul werden die drei Zustände durch drei receive - Schleifen realisiert. Alle Referenzen auf GGT
 Prozesse werden in einer Erlang - Liste persistiert. Meldet sich ein GGT - Prozess beim Koordinator,
-wird er entweder am Anfang oder am Ende dieser Liste angefügt. So entsteht die entsprechende Zufälligkeit.
+wird er am Ende dieser Liste angefügt.
 
-Im Zustandsübergang zu "bereit" wird durch diese Liste iteriert, und die Knoten bekommen ihre entsprechenden Nachbarn
-zugewiesen.
+Im Zustandsübergang zu "bereit" wird die Liste der GGT-Prozessnummern gemischt, iteriert,
+und die Knoten bekommen ihre entsprechenden Nachbarn zugewiesen.
 
 
 \subsubsection{Schnittstelle}

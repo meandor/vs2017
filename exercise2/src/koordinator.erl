@@ -27,20 +27,12 @@ initial(Config, Clients) ->
       {ok, Quota} = werkzeug:get_config_value(quote, Config),
       {ok, GGTProcessNumber} = werkzeug:get_config_value(ggtprozessnummer, Config),
       From ! {steeringval,WorkingTime,TerminationTime,Quota,GGTProcessNumber} ;
-
     {hello,Clientname} ->
-      % Generate some randomness in the ring
       werkzeug:logging("Koordinator", lists:concat(["Koordinator@chef.log>>" , Clientname, " added \n"])),
-      LeftOrRight = bool_rand(),
-      case LeftOrRight of
-        _Any -> initial(Config, Clients ++ [Clientname]);
-        true -> initial(Config, Clients ++ [Clientname]);
-        false -> initial(Config, [Clientname] ++ Clients)
-      end;
-
+      initial(Config, Clients ++ [Clientname]);
     reset -> initial(Config, []);
     kill -> exit(self(), normal), ok;
-    step -> build_ring(Config, Clients)
+    step -> build_ring(Config, werkzeug:shuffle(Clients))
   end,
   initial(Config, Clients)
 .
