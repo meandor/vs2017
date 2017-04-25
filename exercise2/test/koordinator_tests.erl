@@ -13,9 +13,9 @@ simple_test() ->
 ringbuild_test() ->
   werkzeug:ensureNameserviceStarted(),
   koordinator:start("./test-config/koordinator.cfg"),
+  timer:sleep(100),
   Nodes = [one, two, three, four, five, six],
   start_nodes(Nodes),
-
   timer:sleep(1000),
   chef ! step,
   timer:sleep(1000),
@@ -27,8 +27,15 @@ ringbuild_test() ->
 
   send_node_command(Nodes, kill),
   chef ! kill
+.
 
-
+kill_test() ->
+  werkzeug:ensureNameserviceStarted(),
+  koordinator:start("./test-config/koordinator.cfg"),
+  timer:sleep(100),
+  chef ! kill,
+  timer:sleep(100),
+  ?assert(whereis(chef)  =:= undefined)
 .
 
 start_nodes([]) -> ok;
