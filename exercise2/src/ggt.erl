@@ -4,7 +4,7 @@
 %%% @end
 %%%-------------------------------------------------------------------
 -module(ggt).
--export([start/6, receive_loop/7]).
+-export([start/6, start_ggt_process/1]).
 
 -spec log(map(), list()) -> atom().
 log(Config, Message) ->
@@ -14,17 +14,22 @@ log(Config, Message) ->
   werkzeug:logging(Logfile, lists:concat(FullMessage)),
   Logfile.
 
-receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Nameservice, Koordinator, Config) ->
-  log(Config, [atom_to_list(GGTName), " starttime: ", werkzeug:timeMilliSecond(), " with PID ", pid_to_list(self()), " on ", atom_to_list(node())]),
-  register(GGTName, self()),
+start_ggt_process(Config) ->
+  GgTName = maps:get(ggtname, Config),
+  Coordinator = maps:get(coordinator, Config),
+  WorkingTime = maps:get(workingtime, Config),
+  TermTime = maps:get(termtime, Config),
+  Quota = maps:get(quota, Config),
+  log(Config, [atom_to_list(GgTName), " starttime: ", werkzeug:timeMilliSecond(), " with PID ", pid_to_list(self()), " on ", atom_to_list(node())]),
+  register(GgTName, self()),
   log(Config, ["registered locally"]),
-  Nameservice ! {self(), {rebind, GGTName, node()}},
+  maps:get(nameservice, Config) ! {self(), {rebind, GgTName, node()}},
   receive
     ok -> log(Config, ["registered at nameservice"])
   end,
-  Koordinator ! {hello, GGTName},
+  Coordinator ! {hello, GgTName},
   log(Config, ["registered at coordinator"]),
-  receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, 0, undefined, undefined, -1).
+  receive_loop(WorkingTime, TermTime, Quota, GgTName, Coordinator, 0, undefined, undefined, -1).
 
 receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R, Mi) ->
   receive
@@ -71,5 +76,16 @@ receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R,
 
 %% Starts the ggT Process and registers at the coordinator, nameservice and locally at the node
 start(WorkingTime, TerminationTime, Quota, GgTName, Coordinator, NameService) ->
-  Config = #{ggtname => GgTName},
-  spawn(?MODULE, receive_loop, [WorkingTime, TerminationTime, Quota, GgTName, NameService, Coordinator, Config]).
+  Config = #{
+    ggtname => GgTName,
+    workingtime => WorkingTime,
+    termtime => TerminationTime,
+    quota => Quota,
+    coordinator => Coordinator,
+    nameservice => NameService,
+    leftneighbor => undefined,
+    rightneigbor => undefined,
+    mi => -1,
+    v => 0
+  },
+  spawn(?MODULE, start_ggt_process, [Config]).
