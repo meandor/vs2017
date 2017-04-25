@@ -50,3 +50,8 @@ get_steering_values_test() ->
   timer:sleep(100),
   ?assertEqual(undefined, erlang:process_info(Coordinator)),
   ?assertEqual(undefined, erlang:process_info(StarterPID)).
+
+ggt_id_test_() -> [
+  ?_assertEqual('4321', starter:ggT_id(4, 3, 2, 1)),
+  ?_assertEqual('1337', starter:ggT_id(1, 3, 3, 7))
+].

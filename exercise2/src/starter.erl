@@ -8,7 +8,7 @@
 %%%-------------------------------------------------------------------
 -module(starter).
 
--export([start/1, log/2, bind_nameservice/1, discover_coordinator/2, get_steering_values/2]).
+-export([start/1, log/2, bind_nameservice/1, discover_coordinator/2, get_steering_values/2, ggT_id/4]).
 
 log(Config, Message) ->
   {ok, StarterID} = werkzeug:get_config_value(starterid, Config),
@@ -45,6 +45,10 @@ get_steering_values(Coordinator, Config) ->
       [ArbeitsZeit, TermZeit, Quota, GGTProzessnummer]
   end.
 
+ggT_id(GroupNumber, TeamNumber, GgTProcessNumber, StarterID) ->
+  String = lists:concat([integer_to_list(GroupNumber), integer_to_list(TeamNumber), integer_to_list(GgTProcessNumber), integer_to_list(StarterID)]),
+  list_to_atom(String).
+
 %%
 %%startGGT(WorkingTime, TerminationTime, Quota, 0, GroupTeam, StartNumber, CoordinatorName, Config, NameService) -> ok;
 %%
@@ -79,5 +83,6 @@ start(StarterID, ConfigPath) ->
   NameService = bind_nameservice(NewConfig),
 
   Coordinator = discover_coordinator(NameService, NewConfig),
-  [ArbeitsZeit, TermZeit, Quota, GGTProzessnummer] = get_steering_values(Coordinator, NewConfig),
+  [ArbeitsZeit, TermZeit, Quota, NumberOfGgtProcesses] = get_steering_values(Coordinator, NewConfig),
+  GGTParams = [ArbeitsZeit, TermZeit, NumberOfGgtProcesses, StarterID, GroupNumber, TeamNumber, NameService, Coordinator, Quota],
   ok.
