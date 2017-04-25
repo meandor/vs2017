@@ -142,6 +142,68 @@ relevant sind.
 
 \newpage
 
+\subsection{ggT-Modul}
+\subsubsection{Aufgabe und Verantwortung}
+TODO
+
+\subsubsection{Schnittstelle}
+\begin{lstlisting}
+/* Einkommende Nachricht zum Setzen der Namen der Nachbarn */
+{setneighbors,LeftN,RightN}
+
+/* Einkommende Nachricht zum Setzen der von diesem Prozess */
+/* zu berabeitenden Zahl fuer eine neue Berechnung */
+{setpm,MiNeu}
+
+/* Einkommende Nachricht zum Senden des rekursiven Aufrufes der ggT Berechnung */
+{sendy,Y}
+
+/* Einkommende Wahlnachricht fuer die Terminierung der aktuellen Berechnung */
+{From,{vote,Initiator}}
+
+/* Einkommende Erhaltenes Abstimmungsergebnis */
+{voteYes,Name}
+
+/* Einkommende Nachricht zum Senden des aktuellen Mis an From */
+{From,tellmi}
+
+/* Einkommende Nachricht zum Senden eines pongGGT an From */
+{From,pingGGT}
+
+/* Einkommende Nachricht zum Beenden des ggT-Prozesses */
+kill
+
+/* Funktion, die einen ggT-Prozess startet */
+start(WorkingTime, TerminationTime, Quota, GGTName, Coordinator, NameService):
+Integer X Integer X Integer X Atom X Tupel X PID -> PID
+\end{lstlisting}
+\{\textbf{setneighbors},LeftN,RightN\}: Setzt die Nachbarn. LeftN und RightN sind dabei Namen, die im NameService
+(und lokal im Node) registriert sind.\\
+
+\{From,\{\textbf{vote},Initiator\}\}: Wahlnachricht für die Terminierung der aktuellen Berechnung. Der Initiator ist der
+Initiator dieser Wahl (Name des ggT-Prozesses, keine PID!) und From (ist PID) ist sein Absender.\\
+
+\{\textbf{voteYes},Name\}: Erhaltenes Abstimmungsergebnis, wobei Name der Name des Absenders ist (keine PID!).\\
+
+\{From,\textbf{tellmi}\}: Sendet das aktuelle Mi an From (ist PID): From ! \{mi,Mi\}. Wird vom Koordinator z.B. genutzt,
+um bei einem Berechnungsstillstand die Mi-Situation im Ring anzuzeigen.\\
+
+\{From,\textbf{pingGGT}\}: Sendet ein pongGGT an From (ist PID): From ! \{pongGGT,GGTname\}. Wird vom Koordinator z.B.
+genutzt, um auf manuelle Anforderung hin die Lebendigkeit des Rings zu prüfen.\\
+
+
+\textbf{start(}WorkingTime, TerminationTime, Quota, GGTName, Coordinator, NameService\textbf{)}: Startet einen
+ggT-Prozess mit den gegebenen Parametern. Der GGTName setzt sich zusammen aus <PraktikumsgruppenID><TeamID><Nummer des ggT-Prozess><Nummer des Starters>.
+Die WorkingTime beschreibt einen simulierten Arbeitsaufwand für die Berechnung und die TerminationTime beschreibt die
+Zeit, nach der ein ggT-Prozess eine Terminierungsabstimmung durchführt. Die Quota ist die konkrete Anzahl an
+notwendigen Zustimmungen zu einer Terminierungsabstimmung. Coordinator und NameService sind Referenzen für die
+jeweiligen Dienste.\\
+
+\subsubsection{Entwurfsentscheidungen}
+TODO
+
+\newpage
+
 \subsection{Koordinator-Modul}
 \subsubsection{Aufgabe und Verantwortung}
 
