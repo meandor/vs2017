@@ -109,12 +109,14 @@ die vom Koordinator zur Verfügung gestellt werden (asynchron) und seinen konfig
 /* Nachricht zum Starten von ggT-Prozessen */
 {steeringval,ArbeitsZeit,TermZeit,Quota,GGTProzessnummer}
 
+
 /* Startet einen Starter Prozess */
 start(StarterID): Integer -> PID
 \end{lstlisting}
 \{\textbf{steeringval},ArbeitsZeit,TermZeit,Quota,GGTProzessnummer\}:\\
-Einkommende Nachricht zum Starten von ggT
-Prozessen. Die ArbeitsZeit ist die simulierte Verzögerungszeit zur Berechnung in Sekunden, die TermZeit ist die
+Diese Schnittstelle wird für den Koordinator bereitgestelt und ermöglicht die Übergabe benötigter Konfigurationsparameter,
+nach der Anfrage des Starters über getsteeringval.
+Nach dem Ansprechen dieser Schittstelle sollte der Startvorgang der GGT Prozesse eingeleitet werden. Die ArbeitsZeit ist die simulierte Verzögerungszeit zur Berechnung in Sekunden, die TermZeit ist die
 Wartezeit in Sekunden, bis eine Wahl für eine Terminierung initiiert wird, Quota ist die konkrete Anzahl an
 benötigten Zustimmungen zu einer Terminierungsabstimmung und GGTProzessnummer ist die Anzahl der zu startenden
 ggT-Prozesse.\\
@@ -126,7 +128,8 @@ Startet den Starter mit der gegebenen eindeutigen Nummer.\\
 Der Starter ruft in seiner Initalisierungsphase an der Schnittstelle vom Koordinator seine benötigten Parameter zum
 Starten von ggT-Prozessen asynchron ab. Zusätzlich werden noch die konfigurierbaren Parameter geladen. Mit diesen Daten
 werden dann die ggT-Prozesse gestartet. Die Anzahl der zu startenden ggT-Prozesse wird durch die GGTProzessnummer in der
-Schnittstelle definiert.
+Schnittstelle definiert. Der Koordinator hält keine Referenz zu Starter - Prozessen, da nur die ggT Prozesse für Ihn
+relevant sind.
 
 \subsubsection{Konfigurationsparameter}
 \begin{itemize}
