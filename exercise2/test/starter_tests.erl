@@ -55,3 +55,20 @@ ggt_id_test_() -> [
   ?_assertEqual('4321', starter:ggT_id(4, 3, 2, 1)),
   ?_assertEqual('1337', starter:ggT_id(1, 3, 3, 7))
 ].
+
+param_map() ->
+  #{worktime => 1337,
+    termtime => 42,
+    starterid => 147,
+    groupnumber => 1,
+    teamnumber => 3,
+    nameservice => {foo, bar},
+    coordinator => something,
+    quota => 7}.
+
+start_ggT_processes_test() ->
+  starter:start_ggT_processes(4, param_map(), fun(_1, _2, _3, Counter, _5, _6) -> Counter end, []),
+  Actual = starter:start_ggT_processes(4, param_map(), fun(1337, 42, 7, Counter, something, {foo, bar}) ->
+    Counter end, []),
+
+  ?assertEqual(['134147', '133147', '132147', '131147'], Actual).

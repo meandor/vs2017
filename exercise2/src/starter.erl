@@ -8,7 +8,7 @@
 %%%-------------------------------------------------------------------
 -module(starter).
 
--export([start/1, log/2, bind_nameservice/1, discover_coordinator/2, get_steering_values/2, ggT_id/4]).
+-export([start/1, log/2, bind_nameservice/1, discover_coordinator/2, get_steering_values/2, ggT_id/4, start_ggT_processes/4]).
 
 log(Config, Message) ->
   {ok, StarterID} = werkzeug:get_config_value(starterid, Config),
@@ -49,24 +49,12 @@ ggT_id(GroupNumber, TeamNumber, GgTProcessNumber, StarterID) ->
   String = lists:concat([integer_to_list(GroupNumber), integer_to_list(TeamNumber), integer_to_list(GgTProcessNumber), integer_to_list(StarterID)]),
   list_to_atom(String).
 
-%%
-%%startGGT(WorkingTime, TerminationTime, Quota, 0, GroupTeam, StartNumber, CoordinatorName, Config, NameService) -> ok;
-%%
-%%startGGT(WorkingTime, TerminationTime, Quota, GGTProcessNumber, GroupTeam, StartNumber, CoordinatorName, ConfigPath, Nameservice) ->
-%%%<PraktikumsgruppenID><TeamID><Nummer des ggT-Prozess><Nummer des Starters>
-%%  GGTProcessName = erlang:list_to_atom(lists:concat([atom_to_list(GroupTeam), integer_to_list(GGTProcessNumber), atom_to_list(StartNumber)])),
-%%  Logging = log(ConfigPath),
-%%  werkzeug:logging(Logging, lists:concat(["starter>>", GGTProcessName, " started \n"])),
-%%  ggt:start(WorkingTime, TerminationTime, Quota, GGTProcessName, CoordinatorName, Nameservice),
-%%
-%%% Der Starter startet die ggT-Prozesse mit den zugehörigen Werten:
-%%% der Verzögerungszeit, die Terminierungszeit,
-%%% der Startnummer dieses Prozesses (also der wievielte gestartete ggT-Prozess er ist),
-%%% seine eindeutige Starternummer, die Praktikumsgruppennummer,
-%%% die Teamnummer sowie die benötigten Kontaktdaten für den Namensdienst
-%%% und den Koordinator und die Abstimmungsquote als konkrete Anzahl.
-%%
-%%  startGGT(WorkingTime, TerminationTime, Quota, GGTProcessNumber - 1, GroupTeam, StartNumber, CoordinatorName, ConfigPath, Nameservice).
+-spec start_ggT_processes(integer(), map(), fun(), list()) -> any().
+start_ggT_processes(0, _ParamMap, _Fun, Result) -> Result;
+start_ggT_processes(NumberOfGgtProcesses, ParamMap, Fun, Result) ->
+  GgTID = ggT_id(maps:get(groupnumber, ParamMap), maps:get(teamnumber, ParamMap), NumberOfGgtProcesses, maps:get(starterid, ParamMap)),
+  NewResult = Result ++ [Fun(maps:get(worktime, ParamMap), maps:get(termtime, ParamMap), maps:get(quota, ParamMap), GgTID, maps:get(coordinator, ParamMap), maps:get(nameservice, ParamMap))],
+  start_ggT_processes(NumberOfGgtProcesses - 1, ParamMap, Fun, NewResult).
 
 %% Starts the starter with unique starterID
 start(StarterID) -> start(StarterID, "./config/ggt.cfg").
@@ -84,5 +72,5 @@ start(StarterID, ConfigPath) ->
 
   Coordinator = discover_coordinator(NameService, NewConfig),
   [ArbeitsZeit, TermZeit, Quota, NumberOfGgtProcesses] = get_steering_values(Coordinator, NewConfig),
-  GGTParams = [ArbeitsZeit, TermZeit, NumberOfGgtProcesses, StarterID, GroupNumber, TeamNumber, NameService, Coordinator, Quota],
-  ok.
+  ParamMap = #{worktime => ArbeitsZeit, termtime => TermZeit, starterid => StarterID, groupnumber => GroupNumber, teamnumber => TeamNumber, nameservice => NameService, coordinator => Coordinator, quota => Quota},
+  start_ggT_processes(NumberOfGgtProcesses, ParamMap, fun ggt:start/6, []).
