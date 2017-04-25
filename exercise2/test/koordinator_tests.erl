@@ -13,7 +13,6 @@ simple_test() ->
 ringbuild_test() ->
   werkzeug:ensureNameserviceStarted(),
   koordinator:start("./test-config/koordinator.cfg"),
-  timer:sleep(100),
   Nodes = [one, two, three, four, five, six],
   start_nodes(Nodes),
   timer:sleep(1000),
@@ -32,11 +31,19 @@ ringbuild_test() ->
 kill_test() ->
   werkzeug:ensureNameserviceStarted(),
   koordinator:start("./test-config/koordinator.cfg"),
-  timer:sleep(100),
   chef ! kill,
   timer:sleep(100),
   ?assert(whereis(chef)  =:= undefined)
 .
+
+steering_interval_test() ->
+  koordinator:start("./test-config/koordinator.cfg"),
+  chef ! {self(), getsteeringval},
+  receive
+    {steeringval,WorkingTime,TerminationTime,Quota,GGTProcessNumber}-> ?assert(true)
+  end
+.
+
 
 start_nodes([]) -> ok;
 start_nodes([H | T]) ->

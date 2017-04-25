@@ -12,7 +12,8 @@ start() -> start("./config/koordinator.cfg").
 start(Config) ->
   ConfigDict = werkzeug:loadConfig(Config),
   {ok, KoordinatorName} = werkzeug:get_config_value(koordinatorname, ConfigDict),
-  spawn(?MODULE, receive_loop, [ConfigDict, KoordinatorName]).
+  spawn(?MODULE, receive_loop, [ConfigDict, KoordinatorName]),
+  timer:sleep(10).
 
 receive_loop(Config, RegisterName) ->
   werkzeug:register_safe(RegisterName, self()),
