@@ -68,8 +68,8 @@ zurückgeführt.
 
 Das erlaubt eine rekursive Berechnung des größten gemeinsamen Teilers.
 
-Das Produkt soll diesen Algorithmus verteilt ausführen, verwalten und koordinieren, um den größten gemeinsamen Teiler zu
-berechnen.
+Das Produkt soll diesen Algorithmus verteilt ausführen, verwalten und koordinieren, um den größten gemeinsamen Teiler
+mehrerer verschiedener Zahlen zu berechnen.
 
 \subsection{Randbedingungen}
 Um den ggT verteilt mit dem Algorithmus berechnen zu können, muss der Algorithmus angepasst werden
@@ -208,23 +208,21 @@ und für den Betrieb des ggT-Moduls gespeichert.
 
 \subsection{Koordinator-Modul}
 \subsubsection{Aufgabe und Verantwortung}
-
-Der Koordinator verwaltet alle ggT Prozesse. Er kommuniziert mit Starter-Prozessen um diesen die benötigten
-Werte zum Starten der ggT-Prozesse zu übergeben. Alle ggT-Prozesse müssen sich außerdem bei ihm anmelden,
-und er übernimmt die Anordnung dieser in einem Ring, darüber hinaus die Terminierung des gesamten Systems auf Befehl eines
-ggt-Prozesses.
-
-Im Koordinator - Modul werden die drei Zustände durch drei receive - Schleifen realisiert. Alle Referenzen auf GGT
-Prozesse werden in einer Erlang - Liste persistiert. Meldet sich ein GGT - Prozess beim Koordinator,
-wird er am Ende dieser Liste angefügt.
-
-Im Zustandsübergang zu "bereit" wird die Liste der GGT-Prozessnummern gemischt, iteriert,
-und die Knoten bekommen ihre entsprechenden Nachbarn zugewiesen.
-
+Der Koordinator verwaltet alle ggT Prozesse und ordnet sie in einem Ring an. Er kommuniziert mit Starter-Prozessen
+um diesen die benötigten Werte zum Starten der ggT-Prozesse zu übergeben. Außerdem koordiniert er die Terminierung des
+gesamten Systems auf Befehl eines ggt-Prozesses oder des Nutzers.
 
 \subsubsection{Schnittstelle}
 
 \subsubsection{Entwurfsentscheidungen}
+Im Koordinator - Modul werden die drei Zustände realisiert. Das sind die Initialisierungsphase, die Arbeitsphase und
+die Beendigungsphase.
+
+Die Schnittstellen der möglichen Nachrichten verändert sich je nach Zustand (durch drei receive - Schleifen).
+
+Alle registrierten ggT-Prozesse werden im State des Koordinators mit ihrem Namen gespeichert.
+
+Im Zustandsübergang zu "bereit"  wird die Liste der ggTs gemischt, iteriert, und die Knoten bekommen ihre entsprechenden Nachbarn zugewiesen.
 
 \subsubsection{Konfigurationsparameter}
 
