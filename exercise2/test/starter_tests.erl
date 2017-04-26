@@ -32,11 +32,6 @@ logging_test() ->
   Expected = list_to_atom(lists:concat(["ggt42@", atom_to_list(node()), ".log"])),
   ?assert(Expected =:= starter:log([{starterid, 42}], ["foobar"])).
 
-bind_name_service_test() ->
-  Expected = with_redefed_name_service(foobar),
-  ?assertEqual(Expected, starter:bind_nameservice(simple_config())),
-  Expected ! terminate.
-
 discover_coordinator_test() ->
   NameService = with_redefed_name_service(foobar),
   StarterPID = spawn(starter, discover_coordinator, [NameService, simple_config()]),

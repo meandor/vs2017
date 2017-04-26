@@ -8,7 +8,7 @@
 %%%-------------------------------------------------------------------
 -module(starter).
 
--export([start/1, log/2, bind_nameservice/1, discover_coordinator/2, get_steering_values/2, ggT_id/4, start_ggT_processes/4]).
+-export([start/1, log/2, discover_coordinator/2, get_steering_values/2, ggT_id/4, start_ggT_processes/4]).
 
 log(Config, Message) ->
   {ok, StarterID} = werkzeug:get_config_value(starterid, Config),
@@ -16,14 +16,6 @@ log(Config, Message) ->
   FullMessage = Message ++ ["\n"],
   werkzeug:logging(Logfile, lists:concat(FullMessage)),
   Logfile.
-
-bind_nameservice(Config) ->
-  {ok, NSNode} = werkzeug:get_config_value(nameservicenode, Config),
-  {ok, NSName} = werkzeug:get_config_value(nameservicename, Config),
-  pong = net_adm:ping(NSNode),
-  NameService = global:whereis_name(NSName),
-  log(Config, ["Nameservice '", pid_to_list(NameService), "' bound..."]),
-  NameService.
 
 discover_coordinator(NameService, Config) ->
   {ok, CoordinatorName} = werkzeug:get_config_value(koordinatorname, Config),
@@ -69,7 +61,8 @@ start(StarterID, ConfigPath) ->
   {ok, TeamNumber} = werkzeug:get_config_value(teamnummer, Config),
   log(NewConfig, [ConfigPath, " loaded..."]),
 
-  NameService = bind_nameservice(NewConfig),
+  NameService = utils:bind_nameservice(NewConfig),
+  log(Config, ["Nameservice '", pid_to_list(NameService), "' bound..."]),
 
   Coordinator = discover_coordinator(NameService, NewConfig),
   [ArbeitsZeit, TermZeit, Quota, NumberOfGgtProcesses] = get_steering_values(Coordinator, NewConfig),
