@@ -66,6 +66,19 @@ get_steering_interval_and_kill_test() ->
   timer:sleep(100),
   ?assertEqual(undefined, erlang:process_info(Testee)).
 
+send_hello_test() ->
+  Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => []}]),
+  timer:sleep(100),
+
+  ?assertNotEqual(undefined, erlang:process_info(Testee)),
+  Testee ! {hello, foobar1},
+  timer:sleep(100),
+  ?assertNotEqual(undefined, erlang:process_info(Testee)),
+
+  Testee ! kill,
+  timer:sleep(100),
+  ?assertEqual(undefined, erlang:process_info(Testee)).
+
 %%ringbuild_test() ->
 %%  werkzeug:ensureNameserviceStarted(),
 %%  koordinator:start("./test-config/koordinator.cfg"),
@@ -82,14 +95,6 @@ get_steering_interval_and_kill_test() ->
 %%
 %%  send_node_command(Nodes, kill),
 %%  chef ! kill
-%%.
-
-%%kill_test() ->
-%%  werkzeug:ensureNameserviceStarted(),
-%%  koordinator:start("./test-config/koordinator.cfg"),
-%%  chef ! kill,
-%%  timer:sleep(100),
-%%  ?assert(whereis(chef)  =:= undefined)
 %%.
 
 start_nodes([]) -> ok;

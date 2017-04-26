@@ -12,7 +12,7 @@ log(Message) ->
   werkzeug:logging(Logfile, lists:concat(FullMessage)),
   Logfile.
 
--spec initial_state(map()) -> any().
+-spec initial_state(map()) -> map().
 initial_state(State) ->
   receive
     {From, getsteeringval} ->
@@ -23,14 +23,17 @@ initial_state(State) ->
       {ok, GGTProcessNumber} = werkzeug:get_config_value(ggtprozessnummer, Config),
       Quota = max(2, round(GGTProcessNumber * QuotaPercentage / 100)),
       From ! {steeringval, WorkingTime, TerminationTime, Quota, GGTProcessNumber},
+      log(["getsteeringval: ", pid_to_list(From)]),
       initial_state(State);
     {hello, ClientName} ->
-      werkzeug:logging("Koordinator", lists:concat(["Koordinator@chef.log>>", ClientName, " added \n"])),
-      initial_state(maps:update_with(clients, fun(OldList) -> OldList ++ [ClientName] end, State));
+      NewState = maps:update(clients, maps:get(clients, State) ++ [ClientName], State),
+      log(["hello: ", atom_to_list(ClientName), " #ofclients: ", integer_to_list(length(maps:get(clients, NewState)))]),
+      initial_state(NewState);
     reset -> initial_state(maps:update(clients, [], State));
-    kill -> exit(self(), normal), ok;
+    kill -> ok;
     step -> build_ring(maps:get(config, State), werkzeug:shuffle(maps:get(clients, State)))
-  end.
+  end,
+  State.
 
 build_ring(Config, Clients) ->
   set_neighbors(Clients, Clients),
