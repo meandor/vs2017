@@ -33,6 +33,7 @@ discover_coordinator(NameService, Config) ->
       log(Config, ["service ", atom_to_list(CoordinatorName), " not found..."]),
       {};
     {pin, {Name, Node}} ->
+      pong = net_adm:ping(Node),
       log(Config, ["coordinator service ", atom_to_list(Name), "(", atom_to_list(Node), ")", " bound..."]),
       {Name, Node}
   end.
