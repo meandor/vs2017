@@ -7,7 +7,7 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
--export([name_service/0]).
+-export([name_service/0, starter/4]).
 
 name_service() ->
   receive
@@ -17,13 +17,25 @@ name_service() ->
     terminate -> ok
   end.
 
+starter(WorkingTime, TermTime, Quota, Processes) ->
+  receive
+    {steeringval, WorkingTime, TermTime, Quota, Processes} -> ok
+  end.
+
 with_redefed_name_service(Name) ->
   PID = spawn(?MODULE, name_service, []),
   yes = global:register_name(Name, PID),
   PID.
 
 simple_config() ->
-  [{nameservicenode, node()}, {nameservicename, foobar}, {koordinatorname, coordfoobar}].
+  [{nameservicenode, node()},
+    {nameservicename, foobar},
+    {koordinatorname, coordfoobar},
+    {arbeitszeit, 2},
+    {termzeit, 42},
+    {ggtprozessnummer, 2},
+    {quote, 80},
+    {korrigieren, 1}].
 
 start_and_kill_test() ->
   NameService = with_redefed_name_service(foobar),
@@ -34,6 +46,22 @@ start_and_kill_test() ->
   ?assertEqual(undefined, erlang:process_info(NameService)),
   ?assertNotEqual(undefined, erlang:process_info(Testee)),
 
+  Testee ! kill,
+  timer:sleep(100),
+  ?assertEqual(undefined, erlang:process_info(Testee)).
+
+get_steering_interval_and_kill_test() ->
+  Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => []}]),
+  Starter = spawn(?MODULE, starter, [2, 42, 2, 2]),
+  timer:sleep(100),
+
+  ?assertNotEqual(undefined, erlang:process_info(Testee)),
+  ?assertNotEqual(undefined, erlang:process_info(Starter)),
+  Testee ! {Starter, getsteeringval},
+  timer:sleep(100),
+
+  % Starter got correct values
+  ?assertEqual(undefined, erlang:process_info(Starter)),
   Testee ! kill,
   timer:sleep(100),
   ?assertEqual(undefined, erlang:process_info(Testee)).
@@ -63,15 +91,6 @@ start_and_kill_test() ->
 %%  timer:sleep(100),
 %%  ?assert(whereis(chef)  =:= undefined)
 %%.
-
-%%steering_interval_test() ->
-%%  koordinator:start("./test-config/koordinator.cfg"),
-%%  chef ! {self(), getsteeringval},
-%%  receive
-%%    {steeringval,WorkingTime,TerminationTime,Quota,GGTProcessNumber}-> ?assert(true)
-%%  end
-%%.
-
 
 start_nodes([]) -> ok;
 start_nodes([H | T]) ->

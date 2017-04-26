@@ -4,7 +4,7 @@
 %%% @end
 %%%-------------------------------------------------------------------
 -module(koordinator).
--export([start/0, init_coordinator/1]).
+-export([start/0, init_coordinator/1, initial_state/1]).
 
 log(Message) ->
   Logfile = list_to_atom(lists:concat(["Koordinator@", atom_to_list(node()), ".log"])),
@@ -12,22 +12,25 @@ log(Message) ->
   werkzeug:logging(Logfile, lists:concat(FullMessage)),
   Logfile.
 
-initial(Config, Clients) ->
+-spec initial_state(map()) -> any().
+initial_state(State) ->
   receive
     {From, getsteeringval} ->
+      Config = maps:get(config, State),
       {ok, WorkingTime} = werkzeug:get_config_value(arbeitszeit, Config),
       {ok, TerminationTime} = werkzeug:get_config_value(termzeit, Config),
-      {ok, Quota} = werkzeug:get_config_value(quote, Config),
+      {ok, QuotaPercentage} = werkzeug:get_config_value(quote, Config),
       {ok, GGTProcessNumber} = werkzeug:get_config_value(ggtprozessnummer, Config),
-      From ! {steeringval, WorkingTime, TerminationTime, Quota, GGTProcessNumber};
-    {hello, Clientname} ->
-      werkzeug:logging("Koordinator", lists:concat(["Koordinator@chef.log>>", Clientname, " added \n"])),
-      initial(Config, Clients ++ [Clientname]);
-    reset -> initial(Config, []);
+      Quota = max(2, round(GGTProcessNumber * QuotaPercentage / 100)),
+      From ! {steeringval, WorkingTime, TerminationTime, Quota, GGTProcessNumber},
+      initial_state(State);
+    {hello, ClientName} ->
+      werkzeug:logging("Koordinator", lists:concat(["Koordinator@chef.log>>", ClientName, " added \n"])),
+      initial_state(maps:update_with(clients, fun(OldList) -> OldList ++ [ClientName] end, State));
+    reset -> initial_state(maps:update(clients, [], State));
     kill -> exit(self(), normal), ok;
-    step -> build_ring(Config, werkzeug:shuffle(Clients))
-  end,
-  initial(Config, Clients).
+    step -> build_ring(maps:get(config, State), werkzeug:shuffle(maps:get(clients, State)))
+  end.
 
 build_ring(Config, Clients) ->
   set_neighbors(Clients, Clients),
@@ -71,7 +74,8 @@ init_coordinator(Config) ->
   receive
     ok -> log(["registered with nameservice..."])
   end,
-  initial(Config, []).
+  State = #{config => Config, clients => []},
+  initial_state(State).
 
 start() -> start("./config/koordinator.cfg").
 
