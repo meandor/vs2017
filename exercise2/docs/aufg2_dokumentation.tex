@@ -220,6 +220,45 @@ Er stellt Konfigurationsparameter für Starter-Prozesse bereit. Außerdem koordi
 gesamten Systems auf Befehl eines ggt-Prozesses oder des Nutzers.
 
 \subsubsection{Schnittstelle}
+\begin{lstlisting}
+/* Einkommende Nachricht zur Anfrage nach den steuernden Werten */
+/* Sendet Werte zurueck an From */
+{From,getsteeringval}
+
+/* Einkommende Nachricht zur Registrierung von ggT-Prozessen */
+{hello,Clientname}
+
+/* Einkommende Nachricht vom ggT-Prozess mit neuem Mi vom ggT-Prozess */
+{briefmi,{Clientname,CMi,CZeit}}
+
+/* Einkommende Nachricht, die das Beenden der Berechnung signalisiert. */
+/* CMi und CZeit signalisieren das Ergebnis und die Uhrzeit der Terminierung */
+{From,briefterm,{Clientname,CMi,CZeit}}
+
+/* Einkommende Nachricht zum beenden aller ggT-Prozessen und setzt */
+/* den Zustand auf Initialisierungsphase. */
+reset
+
+/* Zustandsuebergang Nachricht fuer Initialphase -> Arbeitsphase. */
+step
+
+/* Einkommende Nachricht zum loggen der Mis der ggT-Prozesse. */
+prompt
+
+/* Einkommende Nachricht zum loggen der Lebenszustaende der ggT-Prozesse. */
+nudge
+
+/* Wechselt das Flag zur Korrektur bei falschen Terminierungsmeldungen. */
+toggle
+
+/* Einkommende Nachricht zum Starten einer neuen ggT-Berechnung */
+/* mit Wunsch-ggT WggT */
+{calc,WggT}
+
+/* Einkommende Nachricht zum Beenden des Koordinator */
+/* und aller verbundenen ggT-Prozesse */
+kill
+\end{lstlisting}
 
 \subsubsection{Entwurfsentscheidungen}
 Im Koordinator - Modul werden die drei Zustände realisiert. Das sind die Initialisierungsphase, die Arbeitsphase und
@@ -229,7 +268,20 @@ Die Schnittstellen der möglichen Nachrichten verändert sich je nach Zustand (d
 
 Alle registrierten ggT-Prozesse werden im State des Koordinators mit ihrem Namen gespeichert.
 
-Im Zustandsübergang zu "bereit"  wird die Liste der ggTs gemischt, iteriert, und die Knoten bekommen ihre entsprechenden Nachbarn zugewiesen.
+Um den Ring zu bauen, werden die ggT-Prozesse im State gemischt und dann in einem Ring angeordnet.
+
+Danach wird der Zustand von Bereit auf Arbeiten gewechselt. In diesem Zustand kann dann der Berechnungsvorgang für eine
+feste Anzahl an Zahlen und ggT Prozessen angestoßen werden.
+
+Um in den Zustand Beenden zu wechseln, kann dem Koordinator dieser Übergang explizit mit \textbf{kill} mitgeteilt werden.
+Dann werden alle ggT-Prozesse und danach der Koordinator heruntergefahren.
+
+Der Koordinator kann auch in den Beenden Zustand wechseln, wenn er von einem ggT-Prozess die Nachricht \textbf{briefterm}
+empfängt (siehe Schnittstelle).
+
+Falls die Korrektur der Terminierungsnachrichten (\textbf{briefterm}) aktiviert ist, wird eine Terminierungsnachricht
+anhand des gesendeten Mis und dem Wunsch ggT im State des Koordinators validiert. Eine Korrektur äußert sich darin,
+dass eine Terminierungsnachricht mit zu hohem berechnetem ggT eintrifft. Dabei wird die Terminierung ignoriert.
 
 \subsubsection{Konfigurationsparameter}
 
