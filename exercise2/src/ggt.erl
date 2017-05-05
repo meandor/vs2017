@@ -44,6 +44,7 @@ receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R,
   % The heart of the recursive algorithm
     {sendy, Y} ->
       if Y < Mi ->
+        timer:sleep(WorkingTime),
         NewMi = ((Mi - 1) rem Y) + 1,
         werkzeug:logging(lists:concat([GGTName, "@vsp"]), lists:concat(["mi: ", Y, ", Old mi:", Mi, " NEW MI:", NewMi, "\n"])),
         L ! {sendy, NewMi},
