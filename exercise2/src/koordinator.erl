@@ -55,14 +55,37 @@ set_neighbors([Left, Middle, Right | Tail], Clients) ->
 step(Config, Clients, Toggled) ->
   receive
     toggle -> step(Config, Clients, not(Toggled));
-    prompt -> ok;
-    nudge -> ok;
+    prompt -> promt_all_ggt(Clients);
+    nudge -> check_status_all_ggt(Clients);
     {calc, WggT} -> ok;
     kill -> exit(self(), normal), ok;
     {briefmi, {Clientname, CMi, CZeit}} -> ok;
     {From, briefterm, {Clientname, CMi, CZeit}} -> ok
   end
 .
+
+promt_all_ggt([]) -> ok;
+promt_all_ggt([Client | RestClients]) ->
+  Client ! {self(), tellmi},
+  receive
+    {mi, Mi} -> log(["client: ", Client, " has mi: ", Mi])
+  end,
+  promt_all_ggt(RestClients)
+.
+
+check_status_all_ggt([]) -> ok;
+check_status_all_ggt([Client | RestClients]) ->
+  ClientPID = whereis(Client),
+  case ClientPID of
+    undefined  -> log(["client: ", Client, " is dead"]);
+    _Else -> Client ! {self(), pingGGT},
+      receive
+        {pongGGT, ClientName} -> log(["client: ", ClientName, " is alive"])
+      end
+  end,
+  check_status_all_ggt(RestClients)
+.
+
 
 init_coordinator(Config) ->
   log(["starttime: ", werkzeug:timeMilliSecond(), " with PID ", pid_to_list(self())]),
