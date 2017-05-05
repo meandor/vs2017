@@ -103,7 +103,7 @@ Das System soll in Erlang umgesetzt werden. Es muss auf Computern mit Linux Betr
     \centering
     \includegraphics[width=1.0\textwidth]{sequence-diagram.png}
     \caption[seq-dia]{Eine ggT Berechnung mit Abbruch per Voting}
-    \label{fig:component-diagram}
+    \label{fig:seq-diagram}
 \end{figure}
 
 \newpage
@@ -152,7 +152,7 @@ Schnittstelle definiert.
 
 \subsection{ggT-Modul}
 \subsubsection{Aufgabe und Verantwortung}
-TODO
+Berechnung des ggTs mit dem Algorithmus verteilt auf mehrere Prozesse.
 
 \subsubsection{Schnittstelle}
 \begin{lstlisting}
@@ -211,6 +211,23 @@ jeweiligen Dienste.\\
 Das Modul hält sich seinen State mit einer Config-Map. In dieser Map sind alle benötigten Variablen für den Algorithmus
 und für den Betrieb des ggT-Moduls gespeichert.
 
+Jeder Prozess Pi hat seine eigene Variable Mi, in der die von ihm zu verwaltende Zahl steht.
+Alle Prozesse sind in einem Ring angeordnet.\\
+
+Der ggT aller am Anfang bestehender Mi wird wie folgt berechnet:
+\begin{lstlisting}
+  {Eine Nachricht <y> ist eingetroffen}
+  if y < Mi
+    then Mi := mod(Mi-1,y)+1;
+         send #Mi to all neighbours;
+  fi
+\end{lstlisting}
+
+Wenn ein ggT-Prozess eine Terminierung einleitet (nach Ablauf der Termzeit), wird ein multicast an den Nameservice
+gesendet. An alle ggT-Prozesse wird dann ein vote vom Nameservice gesendet (siehe Abbildung \ref{fig:seq-diagram}).
+
+Ist dabei seit dem letzten Empfang einer Zahl mehr als Termzeit/2 Sekunden vergangen, dann antwortet er dem Initiator
+mit voteYes (explizites Zustimmen). Sonst ignoriert er die Nachricht (implizites ablehnen).
 \newpage
 
 \subsection{Koordinator-Modul}
