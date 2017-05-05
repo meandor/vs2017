@@ -37,7 +37,8 @@ initial_state(State) ->
 
 build_ring(Config, Clients) ->
   set_neighbors(Clients, Clients),
-  step(Config, Clients, false).
+  {ok, Correct} = werkzeug:get_config_value(korrigieren, Config),
+  step(Config, Clients, Correct).
 
 set_neighbors([Middle, Last], [First, Second | _Tail]) ->
   werkzeug:logging("Koordinator", lists:concat(["Koordinator@chef.log>>", Middle, " <- ", Last, " -> ", First, " neighbours set \n"])),
