@@ -63,7 +63,7 @@ receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R,
       werkzeug:logging(lists:concat([GGTName, "@vsp"]), lists:concat(["Received vote from ", Name, "\n"])),
       if
         V >= Quota -> Koordinator ! kill;
-        true -> receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V + 1, L, R, Mi)
+        true -> receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V + 1, L, R, Mi, LastReceive)
       end;
   % Just a getter for current Mi Value
     {From, tellmi} -> From ! {mi, Mi};
@@ -71,7 +71,7 @@ receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R,
     {From, pingGGT} -> From ! {pongGGT, GGTName};
     kill -> exit(self(), normal), ok
   end,
-  receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R, Mi)
+  receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R, Mi, LastReceive)
 .
 
 %% Starts the ggT Process and registers at the coordinator, nameservice and locally at the node
