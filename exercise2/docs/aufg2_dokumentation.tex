@@ -293,16 +293,21 @@ kill
 
 \subsubsection{Entwurfsentscheidungen}
 Im Koordinator - Modul werden die drei Zustände realisiert. Das sind die Initialisierungsphase, die Arbeitsphase und
-die Beendigungsphase.
+die Beendigungsphase. In seinem State speichert er sich die kleinste empfangene Zahl von den ggT-Prozessen, eine Liste
+der registrierten ggT-Prozessen und seine Config.
 
 Die Schnittstellen der möglichen Nachrichten verändert sich je nach Zustand (durch drei receive - Schleifen).
 
-Alle registrierten ggT-Prozesse werden im State des Koordinators mit ihrem Namen gespeichert.
+Alle registrierten ggT-Prozesse werden im State des Koordinators mit ihrem Namen gespeichert.\\
 
-Um den Ring zu bauen, werden die ggT-Prozesse im State gemischt und dann in einem Ring angeordnet.
+Um den Ring zu bauen, werden die ggT-Prozesse im State gemischt und dann in einem Ring angeordnet. Dabei können sich
+ab diesem Punkt keine neuen ggT-Prozesse mehr anmelden und auch keine Auskunft über die Parameter mehr gegeben werden.
 
 Danach wird der Zustand von Bereit auf Arbeiten gewechselt. In diesem Zustand kann dann der Berechnungsvorgang für eine
-feste Anzahl an Zahlen und ggT Prozessen angestoßen werden.
+feste Anzahl an Zahlen für ein Wunsch ggT und eine feste Anzahl an ggT Prozessen angestoßen werden (calc).
+
+Der Koordinator wählt dann per Zufall 20\% aller ggT-Prozesse aus, denen er zum Start der Berechnung eine Zahl per sendy
+sendet. Dabei erzeugt er für jeden der zufällig gewählten ggT-Prozessen eine Zahl (mit Wunsch ggT), die gesendet wird.\\
 
 Um in den Zustand Beenden zu wechseln, kann dem Koordinator dieser Übergang explizit mit \textbf{kill} mitgeteilt werden.
 Dann werden alle ggT-Prozesse und danach der Koordinator heruntergefahren.
@@ -311,8 +316,12 @@ Der Koordinator kann auch in den Beenden Zustand wechseln, wenn er von einem ggT
 empfängt (siehe Schnittstelle).
 
 Falls die Korrektur der Terminierungsnachrichten (\textbf{briefterm}) aktiviert ist, wird eine Terminierungsnachricht
-anhand des gesendeten Mis und dem Wunsch ggT im State des Koordinators validiert. Eine Korrektur äußert sich darin,
-dass eine Terminierungsnachricht mit zu hohem berechnetem ggT eintrifft. Dabei wird die Terminierung ignoriert.
+anhand des gesendeten Mis und der gespeicherten kleinsten empfangenen Zahl im State des Koordinators validiert.
+
+Wenn die gesendete Zahl der Terminierung größer als die gespeicherte kleinste Zahl ist, wird eine Fehlermeldung geloggt
+und die gespeicherte kleinste Zahl aus dem State dem ggT-Prozess per sendy gesendet.
+
+Das Senden der kleinsten Zahl passiert bei deaktivierter Korrektur nicht.
 
 \subsubsection{Konfigurationsparameter}
 \begin{itemize}
