@@ -213,10 +213,12 @@ notwendigen Zustimmungen zu einer Terminierungsabstimmung. Coordinator und NameS
 jeweiligen Dienste.\\
 
 \subsubsection{Entwurfsentscheidungen}
-Das Modul hält sich seinen State mit einer Config-Map. In dieser Map sind alle benötigten Variablen für den Algorithmus
-und für den Betrieb des ggT-Moduls gespeichert.
+Das Modul hält sich seinen State mit einer Map. In dieser Map sind alle benötigten Variablen für den Algorithmus
+und für den Betrieb des ggT-Moduls gespeichert (Config). Außerdem sind im State die Zahl Mi, der Zeitstempel der letzten
+ Änderung von Mi, die Nachbarn, ein Flag für die Terminierung und die Anzahl der empfangenen yesVotes gespeichert.
 
-Jeder Prozess Pi hat seine eigene Variable Mi, in der die von ihm zu verwaltende Zahl steht.
+Jeder Prozess Pi hat seine eigene Variable Mi, in der die von ihm zu verwaltende Zahl steht. Diese Variable Mi kann
+jederzeit von außen verändert werden.
 Alle Prozesse sind in einem Ring angeordnet.\\
 
 Der ggT aller am Anfang bestehender Mi wird wie folgt berechnet:
@@ -225,12 +227,15 @@ Der ggT aller am Anfang bestehender Mi wird wie folgt berechnet:
   if y < Mi
     then Mi := mod(Mi-1,y)+1;
          send #Mi to all neighbours;
+         send #Mi,#Time,#Name to coordinator;
   fi
 \end{lstlisting}
+Eine Terminierung wird eingeleitet, wenn die Termzeit abläuft und noch keine Terminierung gesendet wurde (Terminating
+Flag). Die Termzeit und das Flag für Terminating wird zurückgesetzt, wenn einer Zahl empfangen wird.
 
-Wenn ein ggT-Prozess eine Terminierung einleitet (nach Ablauf der Termzeit), wird ein multicast an den Nameservice
-gesendet. Dabei wird die Anzahl der empfangenen Votes im Statue auf 0 gesetzt.
-An alle ggT-Prozesse wird dann ein vote vom Nameservice gesendet (siehe Abbildung \ref{fig:seq-diagram}).
+Wenn ein ggT-Prozess eine Terminierung einleitet, wird ein multicast an den Nameservice gesendet. Dabei wird die Anzahl
+der empfangenen Votes im Statue auf 0 gesetzt. An alle ggT-Prozesse wird dann ein vote vom Nameservice gesendet (siehe
+Abbildung \ref{fig:seq-diagram}).
 
 Es darf vom ggT-Prozess nur genau eine Terminierung zur Zeit eingeleitet werden. Weitere können vom Prozess frühstens
 dann gestartet werden, wenn zwischenzeitlich eine Zahl (sendy, setpm) an ihn gesendet wurde. Das wird über ein Flag im
@@ -238,7 +243,7 @@ State des ggT-Prozesses geregelt.
 
 Ist dabei seit dem letzten Empfang einer Zahl mehr als Termzeit/2 Sekunden vergangen, dann antwortet er dem Initiator
 mit voteYes (explizites Zustimmen). Sonst ignoriert er die Nachricht (implizites ablehnen). Der Initiator zählt alle
-einkommenden voteYes Nachrichten.
+einkommenden voteYes Nachrichten (im State).
 
 Wenn dabei die Anzahl der eingetroffenen voteYes größer gleich der Quota ist, wird der Terminierungsprozess beim
 Koordinator eingeleitet.
