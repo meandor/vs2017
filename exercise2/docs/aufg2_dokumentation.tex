@@ -25,6 +25,8 @@
 \textbf{Aufgabenteilung:}
 \begin{itemize}
     \item Starter (DS)
+    \item Koordinator (FW)
+    \item ggT (DS,FW)
 \end{itemize}
 
 \textbf{Quellenangaben:}
@@ -227,10 +229,19 @@ Der ggT aller am Anfang bestehender Mi wird wie folgt berechnet:
 \end{lstlisting}
 
 Wenn ein ggT-Prozess eine Terminierung einleitet (nach Ablauf der Termzeit), wird ein multicast an den Nameservice
-gesendet. An alle ggT-Prozesse wird dann ein vote vom Nameservice gesendet (siehe Abbildung \ref{fig:seq-diagram}).
+gesendet. Dabei wird die Anzahl der empfangenen Votes im Statue auf 0 gesetzt.
+An alle ggT-Prozesse wird dann ein vote vom Nameservice gesendet (siehe Abbildung \ref{fig:seq-diagram}).
+
+Es darf vom ggT-Prozess nur genau eine Terminierung zur Zeit eingeleitet werden. Weitere können vom Prozess frühstens
+dann gestartet werden, wenn zwischenzeitlich eine Zahl (sendy, setpm) an ihn gesendet wurde. Das wird über ein Flag im
+State des ggT-Prozesses geregelt.
 
 Ist dabei seit dem letzten Empfang einer Zahl mehr als Termzeit/2 Sekunden vergangen, dann antwortet er dem Initiator
-mit voteYes (explizites Zustimmen). Sonst ignoriert er die Nachricht (implizites ablehnen).
+mit voteYes (explizites Zustimmen). Sonst ignoriert er die Nachricht (implizites ablehnen). Der Initiator zählt alle
+einkommenden voteYes Nachrichten.
+
+Wenn dabei die Anzahl der eingetroffenen voteYes größer gleich der Quota ist, wird der Terminierungsprozess beim
+Koordinator eingeleitet.
 \newpage
 
 \subsection{Koordinator-Modul}
