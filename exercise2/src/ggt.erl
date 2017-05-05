@@ -29,28 +29,27 @@ start_ggt_process(Config) ->
   end,
   Coordinator ! {hello, GgTName},
   log(Config, ["registered at coordinator"]),
-  receive_loop(WorkingTime, TermTime, Quota, GgTName, Coordinator, 0, undefined, undefined, -1).
+  receive_loop(WorkingTime, TermTime, Quota, GgTName, Coordinator, 0, undefined, undefined, -1, erlang:now()).
 
-receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R, Mi) ->
+receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R, Mi, LastReceive) ->
   receive
 
   % Sets the right and left neighbour processes for the recursive algorithm
     {setneighbors, LeftNeighbour, RightNeighbour} ->
-      receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, LeftNeighbour, RightNeighbour, Mi);
+      receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, LeftNeighbour, RightNeighbour, Mi, erlang:now());
 
   % Sets a new Mi to calculate
-    {setpm, MiNeu} -> receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R, MiNeu);
+    {setpm, MiNeu} -> receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R, MiNeu, erlang:now());
 
   % The heart of the recursive algorithm
     {sendy, Y} ->
-
       if Y < Mi ->
         NewMi = ((Mi - 1) rem Y) + 1,
         werkzeug:logging(lists:concat([GGTName, "@vsp"]), lists:concat(["mi: ", Y, ", Old mi:", Mi, " NEW MI:", NewMi, "\n"])),
         L ! {sendy, NewMi},
         R ! {sendy, NewMi},
         Koordinator ! {briefmi, {GGTName, NewMi, erlang:now()}},
-        receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R, NewMi)
+        receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V, L, R, NewMi, erlang:now())
       ;true -> werkzeug:logging(lists:concat([GGTName, "@vsp"]), lists:concat(["else zweig \n"]))
       end;
 
