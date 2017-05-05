@@ -7,7 +7,16 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
--export([name_service/0, starter/4]).
+-export([name_service/0, starter/4, nonterminating_name_service/0]).
+
+nonterminating_name_service() ->
+  receive
+    {From, {rebind, _Coordfoobar, Node}} ->
+      Node = node(),
+      From ! ok,
+      name_service();
+    terminate -> ok
+  end.
 
 name_service() ->
   receive
@@ -27,6 +36,11 @@ with_redefed_name_service(Name) ->
   yes = global:register_name(Name, PID),
   PID.
 
+with_redefed_nonterminating_name_service(Name) ->
+  PID = spawn(?MODULE, nonterminating_name_service, []),
+  yes = global:register_name(Name, PID),
+  PID.
+
 simple_config() ->
   [{nameservicenode, node()},
     {nameservicename, foobar},
@@ -37,70 +51,72 @@ simple_config() ->
     {quote, 80},
     {korrigieren, 1}].
 
-start_and_kill_test() ->
-  NameService = with_redefed_name_service(foobar),
-
-  Testee = spawn(koordinator, init_coordinator, [simple_config()]),
-
-  timer:sleep(100),
-  ?assertEqual(undefined, erlang:process_info(NameService)),
-  ?assertNotEqual(undefined, erlang:process_info(Testee)),
-
-  Testee ! kill,
-  timer:sleep(100),
-  ?assertEqual(undefined, erlang:process_info(Testee)).
-
-get_steering_interval_and_kill_test() ->
-  Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => []}]),
-  Starter = spawn(?MODULE, starter, [2, 42, 2, 2]),
-  timer:sleep(100),
-
-  ?assertNotEqual(undefined, erlang:process_info(Testee)),
-  ?assertNotEqual(undefined, erlang:process_info(Starter)),
-  Testee ! {Starter, getsteeringval},
-  timer:sleep(100),
-
-  % Starter got correct values
-  ?assertEqual(undefined, erlang:process_info(Starter)),
-  Testee ! kill,
-  timer:sleep(100),
-  ?assertEqual(undefined, erlang:process_info(Testee)).
-
-send_hello_test() ->
-  Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => []}]),
-  timer:sleep(100),
-
-  ?assertNotEqual(undefined, erlang:process_info(Testee)),
-  Testee ! {hello, foobar1},
-  timer:sleep(100),
-  ?assertNotEqual(undefined, erlang:process_info(Testee)),
-
-  Testee ! kill,
-  timer:sleep(100),
-  ?assertEqual(undefined, erlang:process_info(Testee)).
-
-%%ringbuild_test() ->
-%%  werkzeug:ensureNameserviceStarted(),
-%%  koordinator:start("./test-config/koordinator.cfg"),
-%%  Nodes = [one, two, three, four, five, six],
-%%  start_nodes(Nodes),
-%%  timer:sleep(1000),
-%%  chef ! step,
-%%  timer:sleep(1000),
-%%  send_node_command(Nodes, {setpm, 6}),
-%%  three ! {sendy, 3},
-%%  % Without this sleep not working
-%%  timer:sleep(100),
-%%  assert_three(Nodes),
+%%start_and_kill_test() ->
+%%  NameService = with_redefed_name_service(foobar),
 %%
-%%  send_node_command(Nodes, kill),
-%%  chef ! kill
-%%.
+%%  Testee = spawn(koordinator, init_coordinator, [simple_config()]),
+%%
+%%  timer:sleep(100),
+%%  ?assertEqual(undefined, erlang:process_info(NameService)),
+%%  ?assertNotEqual(undefined, erlang:process_info(Testee)),
+%%
+%%  Testee ! kill,
+%%  timer:sleep(100),
+%%  ?assertEqual(undefined, erlang:process_info(Testee)).
+%%
+%%get_steering_interval_and_kill_test() ->
+%%  Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => []}]),
+%%  Starter = spawn(?MODULE, starter, [2, 42, 2, 2]),
+%%  timer:sleep(100),
+%%
+%%  ?assertNotEqual(undefined, erlang:process_info(Testee)),
+%%  ?assertNotEqual(undefined, erlang:process_info(Starter)),
+%%  Testee ! {Starter, getsteeringval},
+%%  timer:sleep(100),
+%%
+%%  % Starter got correct values
+%%  ?assertEqual(undefined, erlang:process_info(Starter)),
+%%  Testee ! kill,
+%%  timer:sleep(100),
+%%  ?assertEqual(undefined, erlang:process_info(Testee)).
+%%
+%%send_hello_test() ->
+%%  Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => []}]),
+%%  timer:sleep(100),
+%%
+%%  ?assertNotEqual(undefined, erlang:process_info(Testee)),
+%%  Testee ! {hello, foobar1},
+%%  timer:sleep(100),
+%%  ?assertNotEqual(undefined, erlang:process_info(Testee)),
+%%
+%%  Testee ! kill,
+%%  timer:sleep(100),
+%%  ?assertEqual(undefined, erlang:process_info(Testee)).
 
-start_nodes([]) -> ok;
-start_nodes([H | T]) ->
-  ggt:start(2000, 20000, 6, H, chef, nameservice),
-  start_nodes(T).
+ringbuild_test() ->
+  NameService = with_redefed_nonterminating_name_service(foobar2),
+  Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => []}]),
+  Nodes = [one, two, three, four, five, six],
+  start_nodes(Nodes, Testee, NameService),
+  timer:sleep(1000),
+  Testee ! step,
+  timer:sleep(1000),
+  send_node_command(Nodes, {setpm, 6}),
+  one ! {sendy, 3},
+  % Without this sleep not working
+  timer:sleep(100),
+
+  NameService ! terminate,
+  assert_three(Nodes),
+
+  send_node_command(Nodes, kill),
+  Testee ! kill
+.
+
+start_nodes([], _Koordinator, _Nameservice) -> ok;
+start_nodes([H | T], Koordinator, Nameservice) ->
+  ggt:start(2000, 20000, 6, H, Koordinator, Nameservice),
+  start_nodes(T, Koordinator, Nameservice).
 
 send_node_command([], _Command) -> ok;
 send_node_command([H | T], Command) ->
