@@ -7,7 +7,7 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
--export([name_service/0, coordinator/1]).
+-export([name_service/0, coordinator/1, mock_ggt/1]).
 
 name_service() ->
   receive
@@ -22,6 +22,11 @@ coordinator(GgTName) ->
     {briefmi, {GGTName, _NewMi, _Timestamp}} -> ok
   end.
 
+mock_ggt(Mi) ->
+  receive
+    {sendy, Mi} -> ok
+  end.
+
 with_redefed_coordinator(GgTName) ->
   PID = spawn(?MODULE, coordinator, [GgTName]),
   PID.
@@ -29,6 +34,10 @@ with_redefed_coordinator(GgTName) ->
 with_redefed_name_service(Name) ->
   PID = spawn(?MODULE, name_service, []),
   yes = global:register_name(Name, PID),
+  PID.
+
+with_redefed_neighbour(Mi) ->
+  PID = spawn(?MODULE, mock_ggt, [Mi]),
   PID.
 
 simple_state(Coordinator, NameService, LeftN, RightN, Mi) ->
@@ -54,7 +63,7 @@ start_ggt_process_and_kill_test() ->
   PID = ggt:start(2000, 20000, 6, '4321', Coordinator, NameServer),
   timer:sleep(100),
   ?assertEqual(undefined, erlang:process_info(NameServer)),
-  ?assertEqual(undefined, erlang:process_info(Coordinator)),
+  ?assert(undefined =:= erlang:process_info(Coordinator)),
   ?assertNotEqual(undefined, erlang:process_info(PID)),
 
   % Kill the ggT process
@@ -64,18 +73,21 @@ start_ggt_process_and_kill_test() ->
 
 
 set_mi_and_tell_mi_test() ->
-  NameServer = with_redefed_name_service(nameservice),
-  Coordinator = with_redefed_coordinator('1234'),
-  PID = ggt:start(2000, 20000, 6, '4321', Coordinator, NameServer),
+  NameService = with_redefed_name_service(nameservice),
+  Coordinator = with_redefed_coordinator('4321'),
+  PID = ggt:start(2000, 20000, 6, '4321', Coordinator, NameService),
   timer:sleep(100),
+
   PID ! {setpm, 3456},
   PID ! {self(), tellmi},
   receive
     {mi, Mi} -> ?assert(Mi =:= 3456)
   end,
+  
   PID ! kill,
   timer:sleep(100),
-  ?assertEqual(undefined, erlang:process_info(PID)).
+  ?assert(undefined =:= erlang:process_info(PID)),
+  ?assert(undefined =:= erlang:process_info(Coordinator)).
 
 
 %%set_neigbours_test() ->
@@ -130,12 +142,22 @@ set_pm_test() ->
   ?assertNotEqual(0, maps:get(lastMiUpdate, NewState)),
   ?assertEqual(123, maps:get(mi, NewState)).
 
-euler_test() ->
+updating_new_mi_test() ->
   Coordinator = with_redefed_coordinator('ggt1'),
+  L = with_redefed_neighbour(3),
+  R = with_redefed_neighbour(3),
   timer:sleep(100),
-  ?assertNotEqual(undefined, erlang:process_info(Coordinator)),
+  ?assert(undefined =/= erlang:process_info(Coordinator)),
+  ?assert(undefined =/= erlang:process_info(L)),
+  ?assert(undefined =/= erlang:process_info(R)),
 
-  NewState = ggt:maybe_update_mi(3, #{mi => 6, coordinator => Coordinator, ggtname => 'ggt1'}),
+  NewState = ggt:maybe_update_mi(3, simple_state(Coordinator, undefined, L, R, 6)),
   timer:sleep(100),
   ?assertEqual(3, maps:get(mi, NewState)),
-  ?assertEqual(undefined, erlang:process_info(Coordinator)).
+  ?assert(undefined =:= erlang:process_info(Coordinator)),
+  ?assert(undefined =:= erlang:process_info(L)),
+  ?assert(undefined =:= erlang:process_info(R)).
+
+updating_new_mi_do_nothing_test() ->
+  NewState = ggt:maybe_update_mi(6, simple_state(undefined, undefined, undefined, undefined, 6)),
+  ?assertEqual(6, maps:get(mi, NewState)).

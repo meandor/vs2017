@@ -44,20 +44,22 @@ set_pm(Mi, State) ->
 
 maybe_update_mi(Y, State) ->
   Mi = maps:get(mi, State),
-  L = maps:get(mi, State),
-  R = maps:get(mi, State),
-  Koordinator = maps:get(coordinator, State),
-  GGTName = maps:get(mi, State),
+  L = maps:get(leftneighbor, State),
+  R = maps:get(rightneigbor, State),
+  Coordinator = maps:get(coordinator, State),
+  GgTName = maps:get(mi, State),
   if
     Y < Mi ->
-      %timer:sleep(maps:get(workingtime, State)),
+      timer:sleep(maps:get(workingtime, State)),
       NewMi = ((Mi - 1) rem Y) + 1,
-      %log(State, ["mi: ", Y, ", Old mi:", Mi, " NEW MI:", NewMi]),
-      %L ! {sendy, NewMi},
-      %R ! {sendy, NewMi},
-      Koordinator ! {briefmi, {GGTName, NewMi, erlang:now()}},
+      L ! {sendy, NewMi},
+      R ! {sendy, NewMi},
+      Coordinator ! {briefmi, {GgTName, NewMi, erlang:now()}},
+      log(State, ["sendy: ", integer_to_list(Y), " (", integer_to_list(Mi), "); new mi: ", integer_to_list(NewMi), werkzeug:timeMilliSecond()]),
       maps:update(mi, NewMi, State);
-    true -> State
+    true ->
+      log(State, ["sendy: ", integer_to_list(Y), " (", integer_to_list(Mi), "); no new mi"]),
+      State
   end.
 
 handle_messages(State) ->
