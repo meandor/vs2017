@@ -18,7 +18,8 @@ name_service() ->
 
 coordinator(GgTName) ->
   receive
-    {hello, GgTName} -> ok
+    {hello, GgTName} -> ok;
+    {briefmi, {GGTName, _NewMi, _Timestamp}} -> ok
   end.
 
 with_redefed_coordinator(GgTName) ->
@@ -29,6 +30,20 @@ with_redefed_name_service(Name) ->
   PID = spawn(?MODULE, name_service, []),
   yes = global:register_name(Name, PID),
   PID.
+
+simple_state(Coordinator, NameService, LeftN, RightN, Mi) ->
+  #{ggtname => 'testggT',
+    workingtime => 3,
+    termtime => 2,
+    quota => 2,
+    coordinator => Coordinator,
+    nameservice => NameService,
+    leftneighbor => LeftN,
+    rightneigbor => RightN,
+    mi => Mi,
+    yesVotes => 0,
+    lastMiUpdate => 0,
+    isTerminating => false}.
 
 start_ggt_process_and_kill_test() ->
   % Setup
@@ -100,3 +115,22 @@ set_mi_test() ->
 %%  NameServer ! terminate,
 %%  timer:sleep(100),
 %%  ?assertEqual(undefined, erlang:process_info(GGTUnderTest)).
+
+set_neighbours_test() ->
+  Actual = ggt:update_neighbours('left', 'right', simple_state('undefined', 'nameservice', 'undefined', 'undefined', 0)),
+  ?assertEqual('left', maps:get(leftneighbor, Actual)),
+  ?assertEqual('right', maps:get(rightneigbor, Actual)).
+
+update_mi_state_test() ->
+  NewState = ggt:update_mi_state(#{lastMiUpdate => 0, ggtname => 'testggT'}),
+  ?assertNotEqual(0, maps:get(lastMiUpdate, NewState)).
+
+euler_test() ->
+  Coordinator = with_redefed_coordinator('ggt1'),
+  timer:sleep(100),
+  ?assertNotEqual(undefined, erlang:process_info(Coordinator)),
+
+  NewState = ggt:maybe_update_mi(3, #{mi => 6, coordinator => Coordinator, ggtname => 'ggt1'}),
+  timer:sleep(100),
+  ?assertEqual(3, maps:get(mi, NewState)),
+  ?assertEqual(undefined, erlang:process_info(Coordinator)).
