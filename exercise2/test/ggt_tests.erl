@@ -125,6 +125,11 @@ update_mi_state_test() ->
   NewState = ggt:update_mi_state(#{lastMiUpdate => 0, ggtname => 'testggT'}),
   ?assertNotEqual(0, maps:get(lastMiUpdate, NewState)).
 
+set_pm_test() ->
+  NewState = ggt:set_pm(123, simple_state('undefined', 'nameservice', 'undefined', 'undefined', 0)),
+  ?assertNotEqual(0, maps:get(lastMiUpdate, NewState)),
+  ?assertEqual(123, maps:get(mi, NewState)).
+
 euler_test() ->
   Coordinator = with_redefed_coordinator('ggt1'),
   timer:sleep(100),

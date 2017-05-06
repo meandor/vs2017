@@ -4,7 +4,7 @@
 %%% @end
 %%%-------------------------------------------------------------------
 -module(ggt).
--export([start/6, start_ggt_process/1, update_mi_state/1, maybe_update_mi/2, update_neighbours/3]).
+-export([start/6, start_ggt_process/1, update_mi_state/1, maybe_update_mi/2, update_neighbours/3, set_pm/2]).
 
 -spec log(map(), list()) -> atom().
 log(Config, Message) ->
@@ -37,6 +37,11 @@ update_neighbours(Left, Right, State) ->
   UpdatedNeighborMaps = maps:update(rightneigbor, Right, maps:update(leftneighbor, Left, State)),
   update_mi_state(UpdatedNeighborMaps).
 
+set_pm(Mi, State) ->
+  log(State, ["setpm: ", integer_to_list(Mi)]),
+  NewState = maps:update(mi, Mi, State),
+  update_mi_state(NewState).
+
 maybe_update_mi(Y, State) ->
   Mi = maps:get(mi, State),
   L = maps:get(mi, State),
@@ -62,7 +67,7 @@ receive_loop(State) ->
       receive_loop(update_neighbours(LeftNeighbour, RightNeighbour, State));
   % Sets a new Mi to calculate
     {setpm, NewMi} ->
-      receive_loop(update_mi_state(maps:update(mi, NewMi, State)));
+      receive_loop(set_pm(NewMi, State));
   % The heart of the recursive algorithm
     {sendy, Y} ->
       receive_loop(maybe_update_mi(Y, State));
