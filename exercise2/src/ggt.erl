@@ -26,7 +26,7 @@ start_ggt_process(State) ->
   end,
   Coordinator ! {hello, GgTName},
   log(State, ["registered at coordinator"]),
-  receive_loop(State).
+  handle_messages(State).
 
 update_mi_state(State) ->
   maps:update(lastMiUpdate, erlang:now(), State).
@@ -60,17 +60,17 @@ maybe_update_mi(Y, State) ->
     true -> State
   end.
 
-receive_loop(State) ->
+handle_messages(State) ->
   receive
   % Sets the right and left neighbour processes for the recursive algorithm
     {setneighbors, LeftNeighbour, RightNeighbour} ->
-      receive_loop(update_neighbours(LeftNeighbour, RightNeighbour, State));
+      handle_messages(update_neighbours(LeftNeighbour, RightNeighbour, State));
   % Sets a new Mi to calculate
     {setpm, NewMi} ->
-      receive_loop(set_pm(NewMi, State));
+      handle_messages(set_pm(NewMi, State));
   % The heart of the recursive algorithm
     {sendy, Y} ->
-      receive_loop(maybe_update_mi(Y, State));
+      handle_messages(maybe_update_mi(Y, State));
   % TODO Wahlnachricht für die Terminierung der aktuellen Berechnung;
   % TODO Initiator ist der Initiator dieser Wahl (Name des ggT-Prozesses, keine PID!) und From (ist PID) ist sein Absender.
     {_From, {vote, _Initiator}} -> ok;
@@ -87,7 +87,7 @@ receive_loop(State) ->
       From ! {pongGGT, maps:get(ggtname, State)};
     kill -> exit(self(), normal), ok
   end,
-  receive_loop(State).
+  handle_messages(State).
 
 
 %% Starts the ggT Process and registers at the coordinator, nameservice and locally at the node
