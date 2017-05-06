@@ -63,7 +63,7 @@ start_ggt_process_and_kill_test() ->
   ?assertEqual(undefined, erlang:process_info(PID)).
 
 
-set_mi_test() ->
+set_mi_and_tell_mi_test() ->
   NameServer = with_redefed_name_service(nameservice),
   Coordinator = with_redefed_coordinator('1234'),
   PID = ggt:start(2000, 20000, 6, '4321', Coordinator, NameServer),

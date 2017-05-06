@@ -73,7 +73,7 @@ receive_loop(State) ->
       receive_loop(maybe_update_mi(Y, State));
   % TODO Wahlnachricht für die Terminierung der aktuellen Berechnung;
   % TODO Initiator ist der Initiator dieser Wahl (Name des ggT-Prozesses, keine PID!) und From (ist PID) ist sein Absender.
-    {_From, {vote, _Initiator}} -> ok
+    {_From, {vote, _Initiator}} -> ok;
 % Another ggT Process votes for a termination
 %%    {voteYes, Name} ->
   %werkzeug:logging(lists:concat([GGTName, "@vsp"]), lists:concat(["Received vote from ", Name, "\n"])),
@@ -81,11 +81,11 @@ receive_loop(State) ->
   %V >= Quota -> Koordinator ! kill;
   %true -> receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V + 1, L, R, Mi, LastReceive)
   %end;
-% Just a getter for current Mi Value
-%%    {From, tellmi} -> From ! {mi, Mi};
-%%
-%%    {From, pingGGT} -> From ! {pongGGT, GGTName};
-%%    kill -> exit(self(), normal), ok
+    {From, tellmi} ->
+      From ! {mi, maps:get(mi, State)};
+    {From, pingGGT} ->
+      From ! {pongGGT, maps:get(ggtname, State)};
+    kill -> exit(self(), normal), ok
   end,
   receive_loop(State).
 
