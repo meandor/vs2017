@@ -4,7 +4,7 @@
 %%% @end
 %%%-------------------------------------------------------------------
 -module(koordinator).
--export([start/0, init_coordinator/1, initial_state/1, twenty_percent_of/1, update_minimum/2, handle_briefterm/4]).
+-export([start/0, init_coordinator/1, initial_state/1, twenty_percent_of/1, update_minimum/2, handle_briefterm/4, set_initial_mis/2]).
 
 log(Message) ->
   Logfile = list_to_atom(lists:concat(["Koordinator@", atom_to_list(node()), ".log"])),
@@ -98,9 +98,13 @@ update_minimum(CMi, CurrentMinimum) ->
 startCalculation(WggT, Clients) ->
   ClientsToStart = twenty_percent_of(Clients),
   SetPMMis = werkzeug:bestimme_mis(WggT, length(ClientsToStart)),
-  StartMis = werkzeug:bestimme_mis(WggT, length(ClientsToStart)),
+  StartMis = lower_by_ggt(SetPMMis, WggT),
   set_initial_mis(SetPMMis, ClientsToStart),
   sendMisToClients(StartMis, ClientsToStart).
+
+lower_by_ggt([], _Ggt) -> [];
+lower_by_ggt([Mi | Tail], GGt) ->
+  lists:append([Mi - GGt * 20], lower_by_ggt(Tail, GGt)).
 
 set_initial_mis([], []) -> ok;
 set_initial_mis([Mi | Tail], [Client | ClientTail]) ->

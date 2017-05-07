@@ -30,6 +30,7 @@ name_service() ->
 fake_client() ->
   receive
     {sendy, Mi} -> ok;
+    {setpm, Mi2} -> ok;
     kill -> ok
   end.
 
@@ -100,23 +101,23 @@ send_hello_test() ->
   timer:sleep(100),
   ?assertEqual(undefined, erlang:process_info(Testee)).
 
-ringbuild_test() ->
-  NameService = with_redefed_nonterminating_name_service(foobar2),
-  Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => []}]),
-  Nodes = [one, two, three, four, five, six],
-  timer:sleep(100),
-  start_nodes(Nodes, Testee, NameService),
-  Testee ! step,
-  timer:sleep(100),
-  send_node_command(Nodes, {setpm, 6}),
-  one ! {sendy, 3},
-  % Without this sleep not working
-  timer:sleep(100),
-
-  NameService ! terminate,
-  assert_three(Nodes),
-  Testee ! kill
-.
+%%ringbuild_test() ->
+%%  NameService = with_redefed_nonterminating_name_service(foobar2),
+%%  Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => []}]),
+%%  Nodes = [one, two, three, four, five, six],
+%%  timer:sleep(100),
+%%  start_nodes(Nodes, Testee, NameService),
+%%  Testee ! step,
+%%  timer:sleep(100),
+%%  send_node_command(Nodes, {setpm, 6}),
+%%  one ! {sendy, 3},
+%%  % Without this sleep not working
+%%  timer:sleep(100),
+%%
+%%  NameService ! terminate,
+%%  assert_three(Nodes),
+%%  Testee ! kill
+%%.
 
 
 start_nodes([], _Koordinator, _Nameservice) -> ok;
@@ -157,6 +158,22 @@ kill_test() ->
   timer:sleep(100),
   ?assertEqual(undefined, erlang:process_info(Client1))
  ,?assertEqual(undefined, erlang:process_info(Client2))
+.
+
+set_initial_mis_test() ->
+  Mis = werkzeug:bestimme_mis(4, 3),
+  Client1 =  spawn(?MODULE, fake_client, []),
+  register(fake_ggt1, Client1),
+  Client2 =  spawn(?MODULE, fake_client, []),
+  register(fake_ggt2, Client2),
+  Client3 =  spawn(?MODULE, fake_client, []),
+  register(fake_ggt3, Client3),
+  Clients = [fake_ggt1, fake_ggt2, fake_ggt3],
+  koordinator:set_initial_mis(Mis, Clients),
+  timer:sleep(100),
+  ?assertEqual(undefined, erlang:process_info(Client1))
+  ,?assertEqual(undefined, erlang:process_info(Client2))
+  ,?assertEqual(undefined, erlang:process_info(Client3))
 .
 
 assert_three([]) -> ok;
