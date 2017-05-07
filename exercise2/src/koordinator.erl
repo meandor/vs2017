@@ -4,7 +4,7 @@
 %%% @end
 %%%-------------------------------------------------------------------
 -module(koordinator).
--export([start/0, init_coordinator/1, initial_state/1]).
+-export([start/0, init_coordinator/1, initial_state/1, twenty_percent_of/1]).
 
 log(Message) ->
   Logfile = list_to_atom(lists:concat(["Koordinator@", atom_to_list(node()), ".log"])),
@@ -58,12 +58,29 @@ step(Config, Clients, Toggled) ->
     toggle -> step(Config, Clients, not(Toggled));
     prompt -> promt_all_ggt(Clients);
     nudge -> check_status_all_ggt(Clients);
-    {calc, WggT} -> ok;
+    {calc, WggT} -> startCalculation(WggT, Clients);
     kill -> exit(self(), normal), ok;
     {briefmi, {Clientname, CMi, CZeit}} -> ok;
     {From, briefterm, {Clientname, CMi, CZeit}} -> ok
   end
 .
+
+startCalculation(WggT, Clients) ->
+  ClientsToStart = twenty_percent_of(Clients),
+  Mis = werkzeug:bestimme_mis(WggT, length(Clients)),
+  sendMisToClients(Mis, ClientsToStart).
+
+sendMisToClients([Mi | Tail], [Client | ClientTail]) ->
+  Client ! {sendy, Mi},
+  sendMisToClients(Tail, ClientTail)
+.
+
+twenty_percent_of(Clients) ->
+  TwentyPercent = utils:ceiling(length(Clients) * 0.2),
+  lists:nthtail(length(Clients) - TwentyPercent, werkzeug:shuffle(Clients)).
+
+
+
 
 promt_all_ggt([]) -> ok;
 promt_all_ggt([Client | RestClients]) ->

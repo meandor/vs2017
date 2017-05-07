@@ -6,7 +6,7 @@
 -module(utils).
 
 %% API
--export([bind_nameservice/1]).
+-export([bind_nameservice/1, ceiling/1]).
 
 bind_nameservice(Config) ->
   {ok, NSNode} = werkzeug:get_config_value(nameservicenode, Config),
@@ -14,3 +14,12 @@ bind_nameservice(Config) ->
   pong = net_adm:ping(NSNode),
   NameService = global:whereis_name(NSName),
   NameService.
+
+ceiling(X) when X < 0 ->
+  trunc(X);
+ceiling(X) ->
+  T = trunc(X),
+  case X - T == 0 of
+    true -> T;
+    false -> T + 1
+  end.
