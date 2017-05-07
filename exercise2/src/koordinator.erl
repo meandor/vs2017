@@ -30,7 +30,7 @@ initial_state(State) ->
       log(["hello: ", atom_to_list(ClientName), " #ofclients: ", integer_to_list(length(maps:get(clients, NewState)))]),
       initial_state(NewState);
     reset -> initial_state(maps:update(clients, [], State));
-    kill -> ok;
+    kill -> shutdown(maps:get(config, State), maps:get(clients, State));
     step -> build_ring(maps:get(config, State), werkzeug:shuffle(maps:get(clients, State)))
   end,
   State.
@@ -59,26 +59,36 @@ step(Config, Clients, Toggled, Minimum) ->
     prompt -> promt_all_ggt(Clients);
     nudge -> check_status_all_ggt(Clients);
     {calc, WggT} -> startCalculation(WggT, Clients);
-    kill -> exit(self(), normal), ok;
+    kill -> shutdown(Config, Clients);
     {briefmi, {Clientname, CMi, CZeit}} ->
       log(["Client "  + Clientname + " informs about new Mi " , CMi, " at ", CZeit]),
       NewMinimum = update_minimum(CMi,Minimum),
       step(Config, Clients, Toggled, NewMinimum);
     {From, briefterm, {Clientname, CMi, CZeit}} ->
       if
-        Toggled -> handle_briefterm(CMi, Minimum, From, CZeit)
+        Toggled -> handle_briefterm(CMi, Minimum, From, CZeit);
+        true -> log(["Client" , Clientname, " reports result ",CMi])
       end
   end
 .
 
+shutdown(Config, Clients) ->
+  kill_clients(Clients),
+  exit(self(), normal), ok.
+
+kill_clients([]) -> ok;
+kill_clients([Client | Tail]) ->
+  Client ! kill,
+  kill_clients(Tail).
 
 handle_briefterm(CMi, Minimum, Client, CZeit) ->
   if
     CMi > Minimum ->
       %TODO Logging
-      log(["Client sent false termination message"]),
+     %log(["Client ", Client, " sent false termination message"]),
       Client ! {sendy, Minimum}
-  end .
+  end
+.
 
 update_minimum(CMi, CurrentMinimum) ->
   min(CMi, CurrentMinimum)
@@ -97,9 +107,6 @@ sendMisToClients([Mi | Tail], [Client | ClientTail]) ->
 twenty_percent_of(Clients) ->
   TwentyPercent = utils:ceiling(length(Clients) * 0.2),
   lists:nthtail(length(Clients) - TwentyPercent, werkzeug:shuffle(Clients)).
-
-
-
 
 promt_all_ggt([]) -> ok;
 promt_all_ggt([Client | RestClients]) ->

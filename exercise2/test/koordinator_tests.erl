@@ -24,11 +24,13 @@ name_service() ->
       Node = node(),
       From ! ok;
     terminate -> ok
-  end.
+  end
+.
 
 fake_client() ->
   receive
-    {sendy, Mi} -> ok
+    {sendy, Mi} -> ok;
+    kill -> ok
   end.
 
 starter(WorkingTime, TermTime, Quota, Processes) ->
@@ -139,9 +141,24 @@ update_minimum_test() ->
 
 handle_briefterm_test() ->
   Client =  spawn(?MODULE, fake_client, []),
-  koordinator:handle_briefterm(50, 5, Client, erlang:now()),
+  register(fake_ggt, Client),
+  koordinator:handle_briefterm(50, 5, fake_ggt, erlang:now()),
   timer:sleep(100),
   ?assertEqual(undefined, erlang:process_info(Client)).
+
+kill_test() ->
+  Client1 =  spawn(?MODULE, fake_client, []),
+  register(fake_ggt1, Client1),
+  Client2 =  spawn(?MODULE, fake_client, []),
+  register(fake_ggt2, Client2),
+  Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => [fake_ggt1, fake_ggt2]}]),
+  Testee ! kill,
+  timer:sleep(100),
+  ?assertEqual(undefined, erlang:process_info(Client1)),
+  ?assertEqual(undefined, erlang:process_info(Client2))
+.
+
+
 
 assert_three([]) -> ok;
 assert_three([H | T]) ->
