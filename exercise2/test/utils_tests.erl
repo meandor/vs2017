@@ -24,10 +24,10 @@ with_redefed_name_service(Name) ->
 simple_config() ->
   [{nameservicenode, node()}, {nameservicename, foobar}].
 
-%%bind_name_service_test() ->
-%%  Expected = with_redefed_name_service(foobar),
-%%  ?assertEqual(Expected, utils:bind_nameservice(simple_config())),
-%%  Expected ! terminate.
+bind_name_service_test() ->
+  Expected = with_redefed_name_service(foobar),
+  ?assertEqual(Expected, utils:bind_nameservice(simple_config())),
+  Expected ! terminate.
 
 
 ceiling_test() ->

@@ -73,12 +73,17 @@ step(Config, Clients, Toggled, Minimum) ->
 .
 
 shutdown(Config, Clients) ->
+  log(["Clients: " , Clients]),
   kill_clients(Clients),
   exit(self(), normal), ok.
 
 kill_clients([]) -> ok;
 kill_clients([Client | Tail]) ->
-  Client ! kill,
+  WhereIs = whereis(Client),
+  case WhereIs of
+    undefined -> ok;
+    _Else -> Client ! kill
+  end,
   kill_clients(Tail).
 
 handle_briefterm(CMi, Minimum, Client, CZeit) ->
