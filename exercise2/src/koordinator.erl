@@ -41,15 +41,11 @@ build_ring(Config, Clients) ->
   step(Config, Clients, Correct, utils:max_int_value()).
 
 set_neighbors([Middle, Last], [First, Second | _Tail]) ->
-  werkzeug:logging("Koordinator", lists:concat(["Koordinator@chef.log>>", Middle, " <- ", Last, " -> ", First, " neighbours set \n"])),
-  werkzeug:logging("Koordinator", lists:concat(["Koordinator@chef.log>>", Last, " <- ", First, " -> ", Second, " neighbours set \n"])),
-
   Last ! {setneighbors, Middle, First},
   First ! {setneighbors, Last, Second};
 
 
 set_neighbors([Left, Middle, Right | Tail], Clients) ->
-  werkzeug:logging("Koordinator", lists:concat(["Koordinator@chef.log>>", Left, " <- ", Middle, " -> ", Right, " neighbours set \n"])),
   Middle ! {setneighbors, Left, Right},
   set_neighbors([Middle, Right] ++ Tail, Clients).
 
@@ -101,9 +97,19 @@ update_minimum(CMi, CurrentMinimum) ->
 
 startCalculation(WggT, Clients) ->
   ClientsToStart = twenty_percent_of(Clients),
-  Mis = werkzeug:bestimme_mis(WggT, length(Clients)),
-  sendMisToClients(Mis, ClientsToStart).
+  SetPMMis = werkzeug:bestimme_mis(WggT, length(ClientsToStart)),
+  StartMis = werkzeug:bestimme_mis(WggT, length(ClientsToStart)),
+  set_initial_mis(SetPMMis, ClientsToStart),
+  sendMisToClients(StartMis, ClientsToStart).
 
+set_initial_mis([], []) -> ok;
+set_initial_mis([Mi | Tail], [Client | ClientTail]) ->
+  Client ! {setpm, Mi},
+  set_initial_mis(Tail, ClientTail)
+.
+
+
+sendMisToClients([], []) -> ok;
 sendMisToClients([Mi | Tail], [Client | ClientTail]) ->
   Client ! {sendy, Mi},
   sendMisToClients(Tail, ClientTail)

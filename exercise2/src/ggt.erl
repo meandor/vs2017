@@ -47,7 +47,7 @@ maybe_update_mi(Y, State) ->
   L = maps:get(leftneighbor, State),
   R = maps:get(rightneigbor, State),
   Coordinator = maps:get(coordinator, State),
-  GgTName = maps:get(mi, State),
+  GgTName = maps:get(ggtname, State),
   if
     Y < Mi ->
       timer:sleep(maps:get(workingtime, State)),

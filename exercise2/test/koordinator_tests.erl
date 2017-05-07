@@ -100,24 +100,23 @@ send_hello_test() ->
   timer:sleep(100),
   ?assertEqual(undefined, erlang:process_info(Testee)).
 
-%%ringbuild_test() ->
-%%  NameService = with_redefed_nonterminating_name_service(foobar2),
-%%  Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => []}]),
-%%  Nodes = [one, two, three, four, five, six],
-%%  start_nodes(Nodes, Testee, NameService),
-%%  timer:sleep(1000),
-%%  Testee ! step,
-%%  timer:sleep(1000),
-%%  send_node_command(Nodes, {setpm, 6}),
-%%  one ! {sendy, 3},
-%%  % Without this sleep not working
-%%  timer:sleep(100),
-%%
-%%  NameService ! terminate,
-%%  assert_three(Nodes),
-%%
-%%  send_node_command(Nodes, kill),
-%%  Testee ! kill
+ringbuild_test() ->
+  NameService = with_redefed_nonterminating_name_service(foobar2),
+  Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => []}]),
+  Nodes = [one, two, three, four, five, six],
+  timer:sleep(100),
+  start_nodes(Nodes, Testee, NameService),
+  Testee ! step,
+  timer:sleep(100),
+  send_node_command(Nodes, {setpm, 6}),
+  one ! {sendy, 3},
+  % Without this sleep not working
+  timer:sleep(100),
+
+  NameService ! terminate,
+  assert_three(Nodes),
+  Testee ! kill
+.
 
 
 start_nodes([], _Koordinator, _Nameservice) -> ok;
@@ -157,7 +156,7 @@ kill_test() ->
   Testee ! kill,
   timer:sleep(100),
   ?assertEqual(undefined, erlang:process_info(Client1))
- %,?assertEqual(undefined, erlang:process_info(Client2))
+ ,?assertEqual(undefined, erlang:process_info(Client2))
 .
 
 assert_three([]) -> ok;

@@ -54,7 +54,7 @@ start(StarterID) -> start(StarterID, "./config/ggt.cfg").
 start(StarterID, ConfigPath) ->
   Config = werkzeug:loadConfig(ConfigPath),
   NewConfig = lists:concat([Config, [{starterid, StarterID}]]),
-  log(NewConfig, ["Starttime: ", werkzeug:timeMilliSecond(), " with PID ", atom_to_list(self())]),
+  log(NewConfig, ["Starttime: ", werkzeug:timeMilliSecond(), " with PID ", pid_to_list(self())]),
   log(NewConfig, [ConfigPath, " opened..."]),
 
   {ok, GroupNumber} = werkzeug:get_config_value(praktikumsgruppe, Config),
@@ -62,7 +62,7 @@ start(StarterID, ConfigPath) ->
   log(NewConfig, [ConfigPath, " loaded..."]),
 
   NameService = utils:bind_nameservice(NewConfig),
-  log(Config, ["Nameservice '", pid_to_list(NameService), "' bound..."]),
+  log(NewConfig, ["Nameservice '", pid_to_list(NameService), "' bound..."]),
 
   Coordinator = discover_coordinator(NameService, NewConfig),
   [ArbeitsZeit, TermZeit, Quota, NumberOfGgtProcesses] = get_steering_values(Coordinator, NewConfig),
