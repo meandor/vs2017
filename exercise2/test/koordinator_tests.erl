@@ -7,7 +7,7 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
--export([name_service/0, starter/4, nonterminating_name_service/0]).
+-export([name_service/0, starter/4, nonterminating_name_service/0, fake_client/0]).
 
 nonterminating_name_service() ->
   receive
@@ -24,6 +24,11 @@ name_service() ->
       Node = node(),
       From ! ok;
     terminate -> ok
+  end.
+
+fake_client() ->
+  receive
+    {sendy, Mi} -> ok
   end.
 
 starter(WorkingTime, TermTime, Quota, Processes) ->
@@ -51,18 +56,18 @@ simple_config() ->
     {quote, 80},
     {korrigieren, 1}].
 
-start_and_kill_test() ->
-  NameService = with_redefed_name_service(foobar),
-
-  Testee = spawn(koordinator, init_coordinator, [simple_config()]),
-
-  timer:sleep(100),
-  ?assertEqual(undefined, erlang:process_info(NameService)),
-  ?assertNotEqual(undefined, erlang:process_info(Testee)),
-
-  Testee ! kill,
-  timer:sleep(100),
-  ?assertEqual(undefined, erlang:process_info(Testee)).
+%%start_and_kill_test() ->
+%%  NameService = with_redefed_name_service(foobar),
+%%
+%%  Testee = spawn(koordinator, init_coordinator, [simple_config()]),
+%%
+%%  timer:sleep(100),
+%%  ?assertEqual(undefined, erlang:process_info(NameService)),
+%%  ?assertNotEqual(undefined, erlang:process_info(Testee)),
+%%
+%%  Testee ! kill,
+%%  timer:sleep(100),
+%%  ?assertEqual(undefined, erlang:process_info(Testee)).
 
 get_steering_interval_and_kill_test() ->
   Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => []}]),
@@ -126,6 +131,17 @@ send_node_command([H | T], Command) ->
 twenty_percent_clients_test() ->
   Clients = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
   ?assertEqual(length(koordinator:twenty_percent_of(Clients)), 2).
+
+update_minimum_test() ->
+  ?assertEqual(koordinator:update_minimum(4, 5), 4),
+  ?assertEqual(koordinator:update_minimum(1000, 3), 3)
+.
+
+handle_briefterm_test() ->
+  Client =  spawn(?MODULE, fake_client, []),
+  koordinator:handle_briefterm(50, 5, Client, erlang:now()),
+  timer:sleep(100),
+  ?assertEqual(undefined, erlang:process_info(Client)).
 
 assert_three([]) -> ok;
 assert_three([H | T]) ->

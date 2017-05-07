@@ -4,7 +4,7 @@
 %%% @end
 %%%-------------------------------------------------------------------
 -module(koordinator).
--export([start/0, init_coordinator/1, initial_state/1, twenty_percent_of/1]).
+-export([start/0, init_coordinator/1, initial_state/1, twenty_percent_of/1, update_minimum/2, handle_briefterm/4]).
 
 log(Message) ->
   Logfile = list_to_atom(lists:concat(["Koordinator@", atom_to_list(node()), ".log"])),
@@ -38,7 +38,7 @@ initial_state(State) ->
 build_ring(Config, Clients) ->
   set_neighbors(Clients, Clients),
   {ok, Correct} = werkzeug:get_config_value(korrigieren, Config),
-  step(Config, Clients, Correct).
+  step(Config, Clients, Correct, utils:max_int_value()).
 
 set_neighbors([Middle, Last], [First, Second | _Tail]) ->
   werkzeug:logging("Koordinator", lists:concat(["Koordinator@chef.log>>", Middle, " <- ", Last, " -> ", First, " neighbours set \n"])),
@@ -53,16 +53,35 @@ set_neighbors([Left, Middle, Right | Tail], Clients) ->
   Middle ! {setneighbors, Left, Right},
   set_neighbors([Middle, Right] ++ Tail, Clients).
 
-step(Config, Clients, Toggled) ->
+step(Config, Clients, Toggled, Minimum) ->
   receive
-    toggle -> step(Config, Clients, not(Toggled));
+    toggle -> step(Config, Clients, not(Toggled), Minimum);
     prompt -> promt_all_ggt(Clients);
     nudge -> check_status_all_ggt(Clients);
     {calc, WggT} -> startCalculation(WggT, Clients);
     kill -> exit(self(), normal), ok;
-    {briefmi, {Clientname, CMi, CZeit}} -> ok;
-    {From, briefterm, {Clientname, CMi, CZeit}} -> ok
+    {briefmi, {Clientname, CMi, CZeit}} ->
+      log(["Client "  + Clientname + " informs about new Mi " , CMi, " at ", CZeit]),
+      NewMinimum = update_minimum(CMi,Minimum),
+      step(Config, Clients, Toggled, NewMinimum);
+    {From, briefterm, {Clientname, CMi, CZeit}} ->
+      if
+        Toggled -> handle_briefterm(CMi, Minimum, From, CZeit)
+      end
   end
+.
+
+
+handle_briefterm(CMi, Minimum, Client, CZeit) ->
+  if
+    CMi > Minimum ->
+      %TODO Logging
+      log(["Client sent false termination message"]),
+      Client ! {sendy, Minimum}
+  end .
+
+update_minimum(CMi, CurrentMinimum) ->
+  min(CMi, CurrentMinimum)
 .
 
 startCalculation(WggT, Clients) ->
@@ -126,3 +145,4 @@ start() -> start("./config/koordinator.cfg").
 start(ConfigPath) ->
   Config = werkzeug:loadConfig(ConfigPath),
   spawn(?MODULE, init_coordinator, [Config]).
+

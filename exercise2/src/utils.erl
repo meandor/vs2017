@@ -6,7 +6,7 @@
 -module(utils).
 
 %% API
--export([bind_nameservice/1, ceiling/1]).
+-export([bind_nameservice/1, ceiling/1, max_int_value/0]).
 
 bind_nameservice(Config) ->
   {ok, NSNode} = werkzeug:get_config_value(nameservicenode, Config),
@@ -14,6 +14,8 @@ bind_nameservice(Config) ->
   pong = net_adm:ping(NSNode),
   NameService = global:whereis_name(NSName),
   NameService.
+
+max_int_value() -> 134217728.
 
 ceiling(X) when X < 0 ->
   trunc(X);
