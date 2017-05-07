@@ -39,7 +39,7 @@ update_neighbours(Left, Right, State) ->
 
 set_pm(Mi, State) ->
   log(State, ["setpm: ", integer_to_list(Mi)]),
-  NewState = maps:update(mi, Mi, State),
+  NewState = maps:update(mi, Mi, maps:update(isTerminating, false, State)),
   update_mi_state(NewState).
 
 maybe_update_mi(Y, State) ->
@@ -56,10 +56,10 @@ maybe_update_mi(Y, State) ->
       R ! {sendy, NewMi},
       Coordinator ! {briefmi, {GgTName, NewMi, erlang:now()}},
       log(State, ["sendy: ", integer_to_list(Y), " (", integer_to_list(Mi), "); new mi: ", integer_to_list(NewMi), werkzeug:timeMilliSecond()]),
-      maps:update(mi, NewMi, State);
+      maps:update(mi, NewMi, maps:update(isTerminating, false, State));
     true ->
       log(State, ["sendy: ", integer_to_list(Y), " (", integer_to_list(Mi), "); no new mi"]),
-      State
+      maps:update(isTerminating, false, State)
   end.
 
 handle_messages(State) ->
@@ -70,19 +70,10 @@ handle_messages(State) ->
   % Sets a new Mi to calculate
     {setpm, NewMi} ->
       handle_messages(set_pm(NewMi, State));
-  % The heart of the recursive algorithm
+  % Starts the algorithm to calculate a ggT if possible
     {sendy, Y} ->
       handle_messages(maybe_update_mi(Y, State));
-  % TODO Wahlnachricht für die Terminierung der aktuellen Berechnung;
-  % TODO Initiator ist der Initiator dieser Wahl (Name des ggT-Prozesses, keine PID!) und From (ist PID) ist sein Absender.
     {_From, {vote, _Initiator}} -> ok;
-% Another ggT Process votes for a termination
-%%    {voteYes, Name} ->
-  %werkzeug:logging(lists:concat([GGTName, "@vsp"]), lists:concat(["Received vote from ", Name, "\n"])),
-  %if
-  %V >= Quota -> Koordinator ! kill;
-  %true -> receive_loop(WorkingTime, TerminationTime, Quota, GGTName, Koordinator, V + 1, L, R, Mi, LastReceive)
-  %end;
     {From, tellmi} ->
       From ! {mi, maps:get(mi, State)};
     {From, pingGGT} ->

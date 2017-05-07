@@ -19,7 +19,7 @@ name_service() ->
 coordinator(GgTName) ->
   receive
     {hello, GgTName} -> ok;
-    {briefmi, {GGTName, _NewMi, _Timestamp}} -> ok
+    {briefmi, {GgTName, _NewMi, _Timestamp}} -> ok
   end.
 
 mock_ggt(Mi) ->
@@ -52,7 +52,7 @@ simple_state(Coordinator, NameService, LeftN, RightN, Mi) ->
     mi => Mi,
     yesVotes => 0,
     lastMiUpdate => 0,
-    isTerminating => false}.
+    isTerminating => true}.
 
 start_ggt_process_and_kill_test() ->
   % Setup
@@ -83,7 +83,7 @@ set_mi_and_tell_mi_test() ->
   receive
     {mi, Mi} -> ?assert(Mi =:= 3456)
   end,
-  
+
   PID ! kill,
   timer:sleep(100),
   ?assert(undefined =:= erlang:process_info(PID)),
@@ -140,10 +140,11 @@ update_mi_state_test() ->
 set_pm_test() ->
   NewState = ggt:set_pm(123, simple_state('undefined', 'nameservice', 'undefined', 'undefined', 0)),
   ?assertNotEqual(0, maps:get(lastMiUpdate, NewState)),
-  ?assertEqual(123, maps:get(mi, NewState)).
+  ?assertEqual(123, maps:get(mi, NewState)),
+  ?assertEqual(false, maps:get(isTerminating, NewState)).
 
 updating_new_mi_test() ->
-  Coordinator = with_redefed_coordinator('ggt1'),
+  Coordinator = with_redefed_coordinator('testggT'),
   L = with_redefed_neighbour(3),
   R = with_redefed_neighbour(3),
   timer:sleep(100),
@@ -154,10 +155,12 @@ updating_new_mi_test() ->
   NewState = ggt:maybe_update_mi(3, simple_state(Coordinator, undefined, L, R, 6)),
   timer:sleep(100),
   ?assertEqual(3, maps:get(mi, NewState)),
+  ?assertEqual(false, maps:get(isTerminating, NewState)),
   ?assert(undefined =:= erlang:process_info(Coordinator)),
   ?assert(undefined =:= erlang:process_info(L)),
   ?assert(undefined =:= erlang:process_info(R)).
 
 updating_new_mi_do_nothing_test() ->
   NewState = ggt:maybe_update_mi(6, simple_state(undefined, undefined, undefined, undefined, 6)),
-  ?assertEqual(6, maps:get(mi, NewState)).
+  ?assertEqual(6, maps:get(mi, NewState)),
+  ?assertEqual(false, maps:get(isTerminating, NewState)).
