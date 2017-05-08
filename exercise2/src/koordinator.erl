@@ -12,9 +12,9 @@ log(Message) ->
   werkzeug:logging(Logfile, lists:concat(FullMessage)),
   Logfile.
 
-step(Config, Clients, Toggled, Minimum) ->
+calculation_state(Config, Clients, Toggled, Minimum) ->
   receive
-    toggle -> step(Config, Clients, not(Toggled), Minimum);
+    toggle -> calculation_state(Config, Clients, not(Toggled), Minimum);
     prompt -> promt_all_ggt(Clients);
     nudge -> check_status_all_ggt(Clients);
     {calc, WggT} -> startCalculation(WggT, Clients);
@@ -22,7 +22,7 @@ step(Config, Clients, Toggled, Minimum) ->
     {briefmi, {Clientname, CMi, CZeit}} ->
       log(["Client " + Clientname + " informs about new Mi ", CMi, " at ", CZeit]),
       NewMinimum = update_minimum(CMi, Minimum),
-      step(Config, Clients, Toggled, NewMinimum);
+      calculation_state(Config, Clients, Toggled, NewMinimum);
     {From, briefterm, {Clientname, CMi, CZeit}} ->
       if
         Toggled -> handle_briefterm(CMi, Minimum, From, CZeit);
@@ -103,10 +103,20 @@ set_neighbors([Left, Middle, Right | Tail], Clients) ->
   Middle ! {setneighbors, Left, Right},
   set_neighbors([Middle, Right] ++ Tail, Clients).
 
-build_ring(Config, Clients) ->
-  set_neighbors(Clients, Clients),
+build_ring(Clients) ->
+  set_neighbors(Clients, Clients).
+
+transition_to_calculation_state(State) ->
+  Config = maps:get(config, State),
+  {ok, ExpectedClients} = werkzeug:get_config_value(ggtprozessnummer, Config),
+  ActualClients = length(maps:get(clients, State)),
+  log(["Initial state completed. Registered ", integer_to_list(ExpectedClients), "/", integer_to_list(ActualClients), " ggT-processes"]),
+  log(["Start building ring"]),
+  build_ring(werkzeug:shuffle(ActualClients)),
+  log(["Done building ring"]),
+  log(["Switching to calculation state"]),
   {ok, Correct} = werkzeug:get_config_value(korrigieren, Config),
-  step(Config, Clients, Correct, utils:max_int_value()).
+  calculation_state(Config, ActualClients, Correct, utils:max_int_value()).
 
 kill_clients([]) -> ok;
 kill_clients([Client | Tail]) ->
@@ -141,7 +151,7 @@ initial_state(State) ->
       initial_state(NewState);
     reset -> initial_state(maps:update(clients, [], State));
     kill -> shutdown(State);
-    step -> build_ring(maps:get(config, State), werkzeug:shuffle(maps:get(clients, State)))
+    step -> transition_to_calculation_state(State)
   end,
   State.
 
