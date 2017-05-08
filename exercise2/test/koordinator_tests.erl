@@ -7,7 +7,7 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
--export([name_service/1, starter/4, nonterminating_name_service/0, ggTProcess/0]).
+-export([name_service/1, mock_starter/4, nonterminating_name_service/0, ggT_process/0]).
 
 nonterminating_name_service() ->
   receive
@@ -34,7 +34,7 @@ name_service(PIDMap) ->
     terminate -> ok
   end.
 
-ggTProcess() ->
+ggT_process() ->
   receive
     {sendy, _Mi} -> ok;
     {setpm, _Mi} -> ok;
@@ -44,7 +44,7 @@ ggTProcess() ->
     kill -> ok
   end.
 
-starter(WorkingTime, TermTime, Quota, Processes) ->
+mock_starter(WorkingTime, TermTime, Quota, Processes) ->
   receive
     {steeringval, WorkingTime, TermTime, Quota, Processes} -> ok
   end.
@@ -55,7 +55,7 @@ with_redefed_name_service(Name, PIDMap) ->
   PID.
 
 with_redefed_ggt(GgTName) ->
-  PID = spawn(?MODULE, ggTProcess, []),
+  PID = spawn(?MODULE, ggT_process, []),
   erlang:register(GgTName, PID),
   PID.
 
@@ -87,7 +87,7 @@ start_and_kill_test() ->
 
 get_steering_interval_and_kill_test() ->
   Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => []}]),
-  Starter = spawn(?MODULE, starter, [2, 42, 2, 2]),
+  Starter = spawn(?MODULE, mock_starter, [2, 42, 2, 3]),
   timer:sleep(100),
 
   ?assertNotEqual(undefined, erlang:process_info(Testee)),
@@ -142,7 +142,7 @@ update_minimum_test() ->
   ?assertEqual(koordinator:update_minimum(1000, 3), 3).
 
 handle_briefterm_test() ->
-  Client = spawn(?MODULE, ggTProcess, []),
+  Client = spawn(?MODULE, ggT_process, []),
   register(fake_ggt, Client),
   koordinator:handle_briefterm(50, 5, fake_ggt, erlang:now()),
   timer:sleep(100),
@@ -151,9 +151,9 @@ handle_briefterm_test() ->
 kill_test() ->
   Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => [fake_ggt1, fake_ggt2]}]),
   timer:sleep(100),
-  Client1 = spawn(?MODULE, ggTProcess, []),
+  Client1 = spawn(?MODULE, ggT_process, []),
   register(fake_ggt1, Client1),
-  Client2 = spawn(?MODULE, ggTProcess, []),
+  Client2 = spawn(?MODULE, ggT_process, []),
   register(fake_ggt2, Client2),
   timer:sleep(1000),
   Testee ! kill,
@@ -163,11 +163,11 @@ kill_test() ->
 
 set_initial_mis_test() ->
   Mis = werkzeug:bestimme_mis(4, 3),
-  Client1 = spawn(?MODULE, ggTProcess, []),
+  Client1 = spawn(?MODULE, ggT_process, []),
   register(fake_ggt1, Client1),
-  Client2 = spawn(?MODULE, ggTProcess, []),
+  Client2 = spawn(?MODULE, ggT_process, []),
   register(fake_ggt2, Client2),
-  Client3 = spawn(?MODULE, ggTProcess, []),
+  Client3 = spawn(?MODULE, ggT_process, []),
   register(fake_ggt3, Client3),
   Clients = [fake_ggt1, fake_ggt2, fake_ggt3],
   koordinator:set_initial_mis(Mis, Clients),
