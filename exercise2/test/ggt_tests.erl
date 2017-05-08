@@ -53,7 +53,8 @@ simple_state(Coordinator, NameService, LeftN, RightN, Mi) ->
     rightneigbor => RightN,
     mi => Mi,
     yesVotes => 0,
-    terminateTimer => undefined,
+    terminateTimer => 0,
+    lastNumberReceived => 0,
     isTerminating => true}.
 
 start_ggt_process_and_kill_test() ->
@@ -99,6 +100,7 @@ set_neighbours_test() ->
 set_pm_test() ->
   NewState = ggt:set_pm(123, simple_state('undefined', 'nameservice', 'undefined', 'undefined', 0)),
   ?assertNotEqual(0, maps:get(terminateTimer, NewState)),
+  ?assertNotEqual(0, maps:get(lastNumberReceived, NewState)),
   ?assertEqual(123, maps:get(mi, NewState)),
   ?assertEqual(false, maps:get(isTerminating, NewState)).
 
@@ -115,6 +117,7 @@ updating_new_mi_test() ->
   timer:sleep(1500),
   ?assertEqual(3, maps:get(mi, NewState)),
   ?assertEqual(false, maps:get(isTerminating, NewState)),
+  ?assertNotEqual(0, maps:get(lastNumberReceived, NewState)),
   ?assert(undefined =:= erlang:process_info(Coordinator)),
   ?assert(undefined =:= erlang:process_info(L)),
   ?assert(undefined =:= erlang:process_info(R)).
@@ -122,7 +125,8 @@ updating_new_mi_test() ->
 updating_new_mi_do_nothing_test() ->
   NewState = ggt:maybe_update_mi(6, simple_state(undefined, undefined, undefined, undefined, 6)),
   ?assertEqual(6, maps:get(mi, NewState)),
-  ?assertEqual(false, maps:get(isTerminating, NewState)).
+  ?assertEqual(false, maps:get(isTerminating, NewState)),
+  ?assertNotEqual(0, maps:get(lastNumberReceived, NewState)).
 
 term_request_test() ->
   NameService = with_redefed_name_service(nameservice),

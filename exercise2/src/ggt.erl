@@ -34,7 +34,9 @@ reset_terminate_timer(State) ->
   timer:cancel(maps:get(terminateTimer, State)),
   TermTime = maps:get(termtime, State) * 1000,
   NewTimer = timer:apply_after(TermTime, ?MODULE, term_request, [State]),
-  maps:update(terminateTimer, NewTimer, State).
+  UpdatedTerm = maps:update(isTerminating, false, State),
+  UpdatedTimestamp = maps:update(lastNumberReceived, erlang:timestamp(), UpdatedTerm),
+  maps:update(terminateTimer, NewTimer, UpdatedTimestamp).
 
 update_neighbours(Left, Right, State) ->
   log(State, ["left neighbour registered: ", atom_to_list(Left)]),
@@ -43,8 +45,8 @@ update_neighbours(Left, Right, State) ->
 
 set_pm(Mi, State) ->
   log(State, ["setpm: ", integer_to_list(Mi)]),
-  NewState = maps:update(mi, Mi, maps:update(isTerminating, false, State)),
-  reset_terminate_timer(NewState).
+  NewState = reset_terminate_timer(State),
+  maps:update(mi, Mi, NewState).
 
 maybe_update_mi(Y, State) ->
   Mi = maps:get(mi, State),
@@ -60,11 +62,10 @@ maybe_update_mi(Y, State) ->
       R ! {sendy, NewMi},
       Coordinator ! {briefmi, {GgTName, NewMi, erlang:now()}},
       log(State, ["sendy: ", integer_to_list(Y), " (", integer_to_list(Mi), "); new mi: ", integer_to_list(NewMi), " ", werkzeug:timeMilliSecond()]),
-      NewState = maps:update(mi, NewMi, maps:update(isTerminating, false, State)),
-      reset_terminate_timer(NewState);
+      maps:update(mi, NewMi, reset_terminate_timer(State));
     true ->
       log(State, ["sendy: ", integer_to_list(Y), " (", integer_to_list(Mi), "); no new mi"]),
-      maps:update(isTerminating, false, State)
+      reset_terminate_timer(State)
   end.
 
 term_request(State) ->
@@ -111,6 +112,7 @@ start(WorkingTime, TerminationTime, Quota, GgTName, Coordinator, NameService) ->
     mi => undefined,
     yesVotes => 0,
     terminateTimer => undefined,
+    lastNumberReceived => 0,
     isTerminating => false
   },
   spawn(?MODULE, start_ggt_process, [State]).
