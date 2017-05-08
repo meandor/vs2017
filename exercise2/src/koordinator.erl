@@ -21,7 +21,7 @@ initial_state(State) ->
       {ok, TerminationTime} = werkzeug:get_config_value(termzeit, Config),
       {ok, QuotaPercentage} = werkzeug:get_config_value(quote, Config),
       {ok, GGTProcessNumber} = werkzeug:get_config_value(ggtprozessnummer, Config),
-      Quota = max(2, round(GGTProcessNumber * QuotaPercentage / 100)),
+      Quota = max(2, round(length(maps:get(clients, State)) * QuotaPercentage / 100)),
       From ! {steeringval, WorkingTime, TerminationTime, Quota, GGTProcessNumber},
       log(["getsteeringval: ", pid_to_list(From)]),
       initial_state(State);
@@ -57,19 +57,19 @@ step(Config, Clients, Toggled, Minimum) ->
     {calc, WggT} -> startCalculation(WggT, Clients);
     kill -> shutdown(Config, Clients);
     {briefmi, {Clientname, CMi, CZeit}} ->
-      log(["Client "  + Clientname + " informs about new Mi " , CMi, " at ", CZeit]),
-      NewMinimum = update_minimum(CMi,Minimum),
+      log(["Client " + Clientname + " informs about new Mi ", CMi, " at ", CZeit]),
+      NewMinimum = update_minimum(CMi, Minimum),
       step(Config, Clients, Toggled, NewMinimum);
     {From, briefterm, {Clientname, CMi, CZeit}} ->
       if
         Toggled -> handle_briefterm(CMi, Minimum, From, CZeit);
-        true -> log(["Client" , Clientname, " reports result ",CMi])
+        true -> log(["Client", Clientname, " reports result ", CMi])
       end
   end
 .
 
 shutdown(Config, Clients) ->
-  log(["Clients: " , Clients]),
+  log(["Clients: ", Clients]),
   kill_clients(Clients),
   exit(self(), normal), ok.
 
@@ -86,7 +86,7 @@ handle_briefterm(CMi, Minimum, Client, CZeit) ->
   if
     CMi > Minimum ->
       %TODO Logging
-     %log(["Client ", Client, " sent false termination message"]),
+      %log(["Client ", Client, " sent false termination message"]),
       Client ! {sendy, Minimum}
   end
 .
@@ -136,7 +136,7 @@ check_status_all_ggt([]) -> ok;
 check_status_all_ggt([Client | RestClients]) ->
   ClientPID = whereis(Client),
   case ClientPID of
-    undefined  -> log(["client: ", Client, " is dead"]);
+    undefined -> log(["client: ", Client, " is dead"]);
     _Else -> Client ! {self(), pingGGT},
       receive
         {pongGGT, ClientName} -> log(["client: ", ClientName, " is alive"])
