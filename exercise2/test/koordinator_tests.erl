@@ -59,18 +59,18 @@ simple_config() ->
     {quote, 80},
     {korrigieren, 1}].
 
-%%start_and_kill_test() ->
-%%  NameService = with_redefed_name_service(foobar),
-%%
-%%  Testee = spawn(koordinator, init_coordinator, [simple_config()]),
-%%
-%%  timer:sleep(100),
-%%  ?assertEqual(undefined, erlang:process_info(NameService)),
-%%  ?assertNotEqual(undefined, erlang:process_info(Testee)),
-%%
-%%  Testee ! kill,
-%%  timer:sleep(100),
-%%  ?assertEqual(undefined, erlang:process_info(Testee)).
+start_and_kill_test() ->
+  NameService = with_redefed_name_service(foobar),
+
+  Testee = spawn(koordinator, init_coordinator, [simple_config()]),
+
+  timer:sleep(100),
+  ?assertEqual(undefined, erlang:process_info(NameService)),
+  ?assertNotEqual(undefined, erlang:process_info(Testee)),
+
+  Testee ! kill,
+  timer:sleep(100),
+  ?assertEqual(undefined, erlang:process_info(Testee)).
 
 get_steering_interval_and_kill_test() ->
   Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => []}]),
@@ -140,7 +140,7 @@ update_minimum_test() ->
 .
 
 handle_briefterm_test() ->
-  Client =  spawn(?MODULE, fake_client, []),
+  Client = spawn(?MODULE, fake_client, []),
   register(fake_ggt, Client),
   koordinator:handle_briefterm(50, 5, fake_ggt, erlang:now()),
   timer:sleep(100),
@@ -149,31 +149,31 @@ handle_briefterm_test() ->
 kill_test() ->
   Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => [fake_ggt1, fake_ggt2]}]),
   timer:sleep(100),
-  Client1 =  spawn(?MODULE, fake_client, []),
+  Client1 = spawn(?MODULE, fake_client, []),
   register(fake_ggt1, Client1),
-  Client2 =  spawn(?MODULE, fake_client, []),
+  Client2 = spawn(?MODULE, fake_client, []),
   register(fake_ggt2, Client2),
   timer:sleep(1000),
   Testee ! kill,
   timer:sleep(100),
   ?assertEqual(undefined, erlang:process_info(Client1))
- ,?assertEqual(undefined, erlang:process_info(Client2))
+  , ?assertEqual(undefined, erlang:process_info(Client2))
 .
 
 set_initial_mis_test() ->
   Mis = werkzeug:bestimme_mis(4, 3),
-  Client1 =  spawn(?MODULE, fake_client, []),
+  Client1 = spawn(?MODULE, fake_client, []),
   register(fake_ggt1, Client1),
-  Client2 =  spawn(?MODULE, fake_client, []),
+  Client2 = spawn(?MODULE, fake_client, []),
   register(fake_ggt2, Client2),
-  Client3 =  spawn(?MODULE, fake_client, []),
+  Client3 = spawn(?MODULE, fake_client, []),
   register(fake_ggt3, Client3),
   Clients = [fake_ggt1, fake_ggt2, fake_ggt3],
   koordinator:set_initial_mis(Mis, Clients),
   timer:sleep(100),
   ?assertEqual(undefined, erlang:process_info(Client1))
-  ,?assertEqual(undefined, erlang:process_info(Client2))
-  ,?assertEqual(undefined, erlang:process_info(Client3))
+  , ?assertEqual(undefined, erlang:process_info(Client2))
+  , ?assertEqual(undefined, erlang:process_info(Client3))
 .
 
 assert_three([]) -> ok;
