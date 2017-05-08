@@ -4,7 +4,7 @@
 %%% @end
 %%%-------------------------------------------------------------------
 -module(koordinator).
--export([start/0, init_coordinator/1, initial_state/1, twenty_percent_of/1, update_minimum/2, handle_briefterm/4, set_initial_mis/2]).
+-export([start/0, init_coordinator/1, initial_state/1, twenty_percent_of/1, update_minimum/2, handle_briefterm/4, set_initial_mis/2, transition_to_calculation_state/1]).
 
 log(Message) ->
   Logfile = list_to_atom(lists:concat(["Koordinator@", atom_to_list(node()), ".log"])),
@@ -94,17 +94,35 @@ check_status_all_ggt([Client | RestClients]) ->
   check_status_all_ggt(RestClients)
 .
 
-set_neighbors([Middle, Last], [First, Second | _Tail]) ->
-  Last ! {setneighbors, Middle, First},
-  First ! {setneighbors, Last, Second};
+set_neighbors(NameService, [Middle, Last], [First, Second | _Tail]) ->
+  NameService ! {self(), {lookup, Last}},
+  receive
+    not_found ->
+      log(["Could not bind ", atom_to_list(Last)]);
+    {pin, LastPID} ->
+      log(["Bound ggT-process with neighbours: ", atom_to_list(Middle), " ", atom_to_list(First)]),
+      LastPID ! {setneighbors, Middle, First}
+  end,
 
+  NameService ! {self(), {lookup, First}},
+  receive
+    not_found ->
+      log(["Could not bind ", atom_to_list(First)]);
+    {pin, FirstPID} ->
+      log(["Bound ggT-process with neighbours: ", atom_to_list(Last), " ", atom_to_list(Second)]),
+      FirstPID ! {setneighbors, Last, Second}
+  end;
 
-set_neighbors([Left, Middle, Right | Tail], Clients) ->
-  Middle ! {setneighbors, Left, Right},
-  set_neighbors([Middle, Right] ++ Tail, Clients).
-
-build_ring(Clients) ->
-  set_neighbors(Clients, Clients).
+set_neighbors(NameService, [Left, Middle, Right | Tail], Clients) ->
+  NameService ! {self(), {lookup, Middle}},
+  receive
+    not_found ->
+      log(["Could not bind ", atom_to_list(Middle)]);
+    {pin, MiddlePID} ->
+      log(["Bound ggT-process with neighbours: ", atom_to_list(Left), " ", atom_to_list(Right)]),
+      MiddlePID ! {setneighbors, Left, Right}
+  end,
+  set_neighbors(NameService, [Middle, Right] ++ Tail, Clients).
 
 transition_to_calculation_state(State) ->
   Config = maps:get(config, State),
@@ -112,11 +130,14 @@ transition_to_calculation_state(State) ->
   ActualClients = length(maps:get(clients, State)),
   log(["Initial state completed. Registered ", integer_to_list(ExpectedClients), "/", integer_to_list(ActualClients), " ggT-processes"]),
   log(["Start building ring"]),
-  build_ring(werkzeug:shuffle(ActualClients)),
+  NameService = utils:bind_nameservice(Config),
+  % build ring
+  ShuffledClients = werkzeug:shuffle(maps:get(clients, State)),
+  set_neighbors(NameService, ShuffledClients, ShuffledClients),
   log(["Done building ring"]),
   log(["Switching to calculation state"]),
   {ok, Correct} = werkzeug:get_config_value(korrigieren, Config),
-  calculation_state(Config, ActualClients, Correct, utils:max_int_value()).
+  calculation_state(Config, maps:get(clients, State), Correct, utils:max_int_value()).
 
 kill_clients([]) -> ok;
 kill_clients([Client | Tail]) ->
