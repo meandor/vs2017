@@ -7,14 +7,15 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
--export([name_service/0, coordinator/1, mock_ggt/1]).
+-export([name_service/1, coordinator/1, mock_ggt/1]).
 
-name_service() ->
+name_service(Initiator) ->
   receive
     {From, {rebind, _GgTName, _Node}} ->
       From ! ok;
     {_From, {multicast, vote, _GgTName}} ->
       ok;
+    {PID, {lookup, _GgTName}} -> PID ! {pin, Initiator};
     terminate -> ok
   end.
 
@@ -26,15 +27,16 @@ coordinator(GgTName) ->
 
 mock_ggt(Mi) ->
   receive
-    {sendy, Mi} -> ok
+    {sendy, Mi} -> ok;
+    {voteYes, _Name} -> ok
   end.
 
 with_redefed_coordinator(GgTName) ->
   PID = spawn(?MODULE, coordinator, [GgTName]),
   PID.
 
-with_redefed_name_service(Name) ->
-  PID = spawn(?MODULE, name_service, []),
+with_redefed_name_service(Name, LookupPid) ->
+  PID = spawn(?MODULE, name_service, [LookupPid]),
   yes = global:register_name(Name, PID),
   PID.
 
@@ -45,7 +47,7 @@ with_redefed_neighbour(Mi) ->
 simple_state(Coordinator, NameService, LeftN, RightN, Mi) ->
   #{ggtname => 'testggT',
     workingtime => 1,
-    termtime => 20,
+    termtime => 3,
     quota => 2,
     coordinator => Coordinator,
     nameservice => NameService,
@@ -59,7 +61,7 @@ simple_state(Coordinator, NameService, LeftN, RightN, Mi) ->
 
 start_ggt_process_and_kill_test() ->
   % Setup
-  NameServer = with_redefed_name_service(nameservice),
+  NameServer = with_redefed_name_service(nameservice, foobar),
   Coordinator = with_redefed_coordinator('4321'),
 
   % Start a ggT process
@@ -76,7 +78,7 @@ start_ggt_process_and_kill_test() ->
 
 
 set_mi_and_tell_mi_test() ->
-  NameService = with_redefed_name_service(nameservice),
+  NameService = with_redefed_name_service(nameservice, foobar),
   Coordinator = with_redefed_coordinator('4321'),
   PID = ggt:start(2000, 20000, 6, '4321', Coordinator, NameService),
   timer:sleep(100),
@@ -129,7 +131,7 @@ updating_new_mi_do_nothing_test() ->
   ?assertNotEqual(0, maps:get(lastNumberReceived, NewState)).
 
 term_request_test() ->
-  NameService = with_redefed_name_service(nameservice),
+  NameService = with_redefed_name_service(nameservice, foobar),
   State = simple_state(undefined, NameService, undefined, undefined, 0),
   timer:sleep(100),
   ?assert(undefined =/= erlang:process_info(NameService)),
@@ -142,3 +144,20 @@ term_request_test() ->
   ggt:term_request(NewState),
   timer:sleep(100),
   ?assert(undefined =:= erlang:process_info(NameService)).
+
+send_vote_response_test() ->
+  GgT = with_redefed_neighbour(3),
+  NameService = with_redefed_name_service(nameservice, GgT),
+  State = simple_state(undefined, NameService, undefined, undefined, 3),
+  UpdatedState = maps:update(lastNumberReceived, erlang:timestamp(), State),
+  timer:sleep(100),
+  ?assert(undefined =/= erlang:process_info(GgT)),
+
+  ggt:voting_response(foobar, UpdatedState),
+  timer:sleep(100),
+  ?assert(undefined =/= erlang:process_info(GgT)),
+  timer:sleep(3000),
+
+  ggt:voting_response(foobar, UpdatedState),
+  timer:sleep(100),
+  ?assert(undefined =:= erlang:process_info(GgT)).

@@ -4,7 +4,7 @@
 %%% @end
 %%%-------------------------------------------------------------------
 -module(ggt).
--export([start/6, start_ggt_process/1, reset_terminate_timer/1, maybe_update_mi/2, update_neighbours/3, set_pm/2, term_request/1]).
+-export([start/6, start_ggt_process/1, reset_terminate_timer/1, maybe_update_mi/2, update_neighbours/3, set_pm/2, term_request/1, voting_response/2]).
 
 -spec log(map(), list()) -> atom().
 log(Config, Message) ->
@@ -74,7 +74,28 @@ term_request(State) ->
     IsTerminating ->
       ok;
     true ->
+      log(State, ["Start termination voting ", werkzeug:timeMilliSecond()]),
       maps:get(nameservice, State) ! {self(), {multicast, vote, maps:get(ggtname, State)}}
+  end.
+
+-spec voting_response(atom(), map()) -> atom().
+voting_response(GgTName, State) ->
+  Threshold = round(maps:get(termtime, State) / 2),
+  log(State, ["DEBUG: voting response | threshold: ", integer_to_list(Threshold)]),
+  PassedTime = round(timer:now_diff(erlang:timestamp(), maps:get(lastNumberReceived, State)) / 1000000),
+  log(State, ["DEBUG: voting response | passed time: ", integer_to_list(PassedTime)]),
+  if
+    PassedTime > Threshold ->
+      maps:get(nameservice, State) ! {self(), {lookup, GgTName}},
+      receive
+        not_found ->
+          log(State, ["Warning: Could not find the ggT process '", atom_to_list(GgTName), "'"]);
+        {pin, Initiator} ->
+          log(State, ["Sending voteYes to ", atom_to_list(GgTName)]),
+          Initiator ! {voteYes, maps:get(ggtname, State)}
+      end;
+    true ->
+      ok
   end.
 
 handle_messages(State) ->
@@ -88,12 +109,21 @@ handle_messages(State) ->
   % Starts the algorithm to calculate a ggT if possible
     {sendy, Y} ->
       handle_messages(maybe_update_mi(Y, State));
-    {_From, {vote, _Initiator}} -> ok;
+  % Starts the voting process answer
+    {_From, {vote, Initiator}} ->
+      voting_response(Initiator, State),
+      handle_messages(State);
+  % Used for getting status
     {From, tellmi} ->
-      From ! {mi, maps:get(mi, State)};
+      From ! {mi, maps:get(mi, State)},
+      handle_messages(State);
+  % Used for getting status
     {From, pingGGT} ->
-      From ! {pongGGT, maps:get(ggtname, State)};
-    kill -> exit(self(), normal), ok
+      From ! {pongGGT, maps:get(ggtname, State)},
+      handle_messages(State);
+    kill ->
+      exit(self(), normal),
+      ok
   end,
   handle_messages(State).
 
