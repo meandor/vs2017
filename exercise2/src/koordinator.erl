@@ -12,50 +12,13 @@ log(Message) ->
   werkzeug:logging(Logfile, lists:concat(FullMessage)),
   Logfile.
 
--spec initial_state(map()) -> map().
-initial_state(State) ->
-  receive
-    {From, getsteeringval} ->
-      Config = maps:get(config, State),
-      {ok, WorkingTime} = werkzeug:get_config_value(arbeitszeit, Config),
-      {ok, TerminationTime} = werkzeug:get_config_value(termzeit, Config),
-      {ok, QuotaPercentage} = werkzeug:get_config_value(quote, Config),
-      {ok, GGTProcessNumber} = werkzeug:get_config_value(ggtprozessnummer, Config),
-      Quota = max(2, round(length(maps:get(clients, State)) * QuotaPercentage / 100)),
-      From ! {steeringval, WorkingTime, TerminationTime, Quota, GGTProcessNumber},
-      log(["getsteeringval: ", pid_to_list(From)]),
-      initial_state(State);
-    {hello, ClientName} ->
-      NewState = maps:update(clients, maps:get(clients, State) ++ [ClientName], State),
-      log(["hello: ", atom_to_list(ClientName), " #ofclients: ", integer_to_list(length(maps:get(clients, NewState)))]),
-      initial_state(NewState);
-    reset -> initial_state(maps:update(clients, [], State));
-    kill -> shutdown(maps:get(config, State), maps:get(clients, State));
-    step -> build_ring(maps:get(config, State), werkzeug:shuffle(maps:get(clients, State)))
-  end,
-  State.
-
-build_ring(Config, Clients) ->
-  set_neighbors(Clients, Clients),
-  {ok, Correct} = werkzeug:get_config_value(korrigieren, Config),
-  step(Config, Clients, Correct, utils:max_int_value()).
-
-set_neighbors([Middle, Last], [First, Second | _Tail]) ->
-  Last ! {setneighbors, Middle, First},
-  First ! {setneighbors, Last, Second};
-
-
-set_neighbors([Left, Middle, Right | Tail], Clients) ->
-  Middle ! {setneighbors, Left, Right},
-  set_neighbors([Middle, Right] ++ Tail, Clients).
-
 step(Config, Clients, Toggled, Minimum) ->
   receive
     toggle -> step(Config, Clients, not(Toggled), Minimum);
     prompt -> promt_all_ggt(Clients);
     nudge -> check_status_all_ggt(Clients);
     {calc, WggT} -> startCalculation(WggT, Clients);
-    kill -> shutdown(Config, Clients);
+    kill -> shutdown(#{config => Config, clients=> Clients});
     {briefmi, {Clientname, CMi, CZeit}} ->
       log(["Client " + Clientname + " informs about new Mi ", CMi, " at ", CZeit]),
       NewMinimum = update_minimum(CMi, Minimum),
@@ -67,20 +30,6 @@ step(Config, Clients, Toggled, Minimum) ->
       end
   end
 .
-
-shutdown(Config, Clients) ->
-  log(["Clients: ", Clients]),
-  kill_clients(Clients),
-  exit(self(), normal), ok.
-
-kill_clients([]) -> ok;
-kill_clients([Client | Tail]) ->
-  WhereIs = whereis(Client),
-  case WhereIs of
-    undefined -> ok;
-    _Else -> Client ! kill
-  end,
-  kill_clients(Tail).
 
 handle_briefterm(CMi, Minimum, Client, CZeit) ->
   if
@@ -145,6 +94,56 @@ check_status_all_ggt([Client | RestClients]) ->
   check_status_all_ggt(RestClients)
 .
 
+set_neighbors([Middle, Last], [First, Second | _Tail]) ->
+  Last ! {setneighbors, Middle, First},
+  First ! {setneighbors, Last, Second};
+
+
+set_neighbors([Left, Middle, Right | Tail], Clients) ->
+  Middle ! {setneighbors, Left, Right},
+  set_neighbors([Middle, Right] ++ Tail, Clients).
+
+build_ring(Config, Clients) ->
+  set_neighbors(Clients, Clients),
+  {ok, Correct} = werkzeug:get_config_value(korrigieren, Config),
+  step(Config, Clients, Correct, utils:max_int_value()).
+
+kill_clients([]) -> ok;
+kill_clients([Client | Tail]) ->
+  WhereIs = whereis(Client),
+  case WhereIs of
+    undefined -> ok;
+    _Else -> Client ! kill
+  end,
+  kill_clients(Tail).
+
+shutdown(State) ->
+  log(["Shutting down ", integer_to_list(length(maps:get(clients, State))), " ggT-processes"]),
+  kill_clients(maps:get(clients, State)),
+  exit(self(), normal), ok.
+
+-spec initial_state(map()) -> map().
+initial_state(State) ->
+  receive
+    {From, getsteeringval} ->
+      Config = maps:get(config, State),
+      {ok, WorkingTime} = werkzeug:get_config_value(arbeitszeit, Config),
+      {ok, TerminationTime} = werkzeug:get_config_value(termzeit, Config),
+      {ok, QuotaPercentage} = werkzeug:get_config_value(quote, Config),
+      {ok, GGTProcessNumber} = werkzeug:get_config_value(ggtprozessnummer, Config),
+      Quota = max(2, round(length(maps:get(clients, State)) * QuotaPercentage / 100)),
+      From ! {steeringval, WorkingTime, TerminationTime, Quota, GGTProcessNumber},
+      log(["getsteeringval: ", pid_to_list(From)]),
+      initial_state(State);
+    {hello, ClientName} ->
+      NewState = maps:update(clients, maps:get(clients, State) ++ [ClientName], State),
+      log(["hello: ", atom_to_list(ClientName), " #ofclients: ", integer_to_list(length(maps:get(clients, NewState)))]),
+      initial_state(NewState);
+    reset -> initial_state(maps:update(clients, [], State));
+    kill -> shutdown(State);
+    step -> build_ring(maps:get(config, State), werkzeug:shuffle(maps:get(clients, State)))
+  end,
+  State.
 
 init_coordinator(Config) ->
   log(["starttime: ", werkzeug:timeMilliSecond(), " with PID ", pid_to_list(self())]),
@@ -167,4 +166,3 @@ start() -> start("./config/koordinator.cfg").
 start(ConfigPath) ->
   Config = werkzeug:loadConfig(ConfigPath),
   spawn(?MODULE, init_coordinator, [Config]).
-
