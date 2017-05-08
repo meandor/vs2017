@@ -44,11 +44,6 @@ with_redefed_name_service(Name) ->
   yes = global:register_name(Name, PID),
   PID.
 
-with_redefed_nonterminating_name_service(Name) ->
-  PID = spawn(?MODULE, nonterminating_name_service, []),
-  yes = global:register_name(Name, PID),
-  PID.
-
 simple_config() ->
   [{nameservicenode, node()},
     {nameservicename, foobar},
@@ -101,34 +96,9 @@ send_hello_test() ->
   timer:sleep(100),
   ?assertEqual(undefined, erlang:process_info(Testee)).
 
-%%ringbuild_test() ->
-%%  NameService = with_redefed_nonterminating_name_service(foobar2),
-%%  Testee = spawn(koordinator, initial_state, [#{config => simple_config(), clients => []}]),
-%%  Nodes = [one, two, three, four, five, six],
-%%  timer:sleep(100),
-%%  start_nodes(Nodes, Testee, NameService),
-%%  Testee ! step,
-%%  timer:sleep(100),
-%%  send_node_command(Nodes, {setpm, 6}),
-%%  one ! {sendy, 3},
-%%  % Without this sleep not working
-%%  timer:sleep(100),
-%%
-%%  NameService ! terminate,
-%%  assert_three(Nodes),
-%%  Testee ! kill
-%%.
+ringbuild_with_3_ggTs_test() ->
+  ok.
 
-
-start_nodes([], _Koordinator, _Nameservice) -> ok;
-start_nodes([H | T], Koordinator, Nameservice) ->
-  ggt:start(2000, 20000, 6, H, Koordinator, Nameservice),
-  start_nodes(T, Koordinator, Nameservice).
-
-send_node_command([], _Command) -> ok;
-send_node_command([H | T], Command) ->
-  H ! Command,
-  send_node_command(T, Command).
 
 twenty_percent_clients_test() ->
   Clients = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -136,8 +106,7 @@ twenty_percent_clients_test() ->
 
 update_minimum_test() ->
   ?assertEqual(koordinator:update_minimum(4, 5), 4),
-  ?assertEqual(koordinator:update_minimum(1000, 3), 3)
-.
+  ?assertEqual(koordinator:update_minimum(1000, 3), 3).
 
 handle_briefterm_test() ->
   Client = spawn(?MODULE, fake_client, []),
@@ -156,9 +125,8 @@ kill_test() ->
   timer:sleep(1000),
   Testee ! kill,
   timer:sleep(100),
-  ?assertEqual(undefined, erlang:process_info(Client1))
-  , ?assertEqual(undefined, erlang:process_info(Client2))
-.
+  ?assertEqual(undefined, erlang:process_info(Client1)),
+  ?assertEqual(undefined, erlang:process_info(Client2)).
 
 set_initial_mis_test() ->
   Mis = werkzeug:bestimme_mis(4, 3),
@@ -171,15 +139,6 @@ set_initial_mis_test() ->
   Clients = [fake_ggt1, fake_ggt2, fake_ggt3],
   koordinator:set_initial_mis(Mis, Clients),
   timer:sleep(100),
-  ?assertEqual(undefined, erlang:process_info(Client1))
-  , ?assertEqual(undefined, erlang:process_info(Client2))
-  , ?assertEqual(undefined, erlang:process_info(Client3))
-.
-
-assert_three([]) -> ok;
-assert_three([H | T]) ->
-  H ! {self(), tellmi},
-  receive
-    {mi, Mi} -> ?assert(Mi =:= 3)
-  end,
-  assert_three(T).
+  ?assertEqual(undefined, erlang:process_info(Client1)),
+  ?assertEqual(undefined, erlang:process_info(Client2)),
+  ?assertEqual(undefined, erlang:process_info(Client3)).
