@@ -177,3 +177,23 @@ maybe_send_brief_term_test() ->
   ?assertEqual(1, maps:get(terminatedCalculations, TwoVoteState)),
   timer:sleep(100),
   ?assert(undefined =:= erlang:process_info(Coordinator)).
+
+set_pm_and_term_integration_test() ->
+  % Setup
+  NameServer = with_redefed_name_service(nameservice, foobar),
+  Coordinator = with_redefed_coordinator('4321'),
+
+  % Start a ggT process
+  PID = ggt:start(2, 3, 2, '4321', Coordinator, NameServer),
+  timer:sleep(100),
+  ?assert(undefined =:= erlang:process_info(NameServer)),
+  ?assert(undefined =:= erlang:process_info(Coordinator)),
+  ?assert(undefined =/= erlang:process_info(PID)),
+
+  % Set pm
+  PID ! {setpm, 789},
+  timer:sleep(3000),
+  PID ! kill,
+  timer:sleep(100),
+  ?assert(undefined =:= erlang:process_info(PID)).
+

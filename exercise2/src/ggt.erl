@@ -27,16 +27,17 @@ start_ggt_process(State) ->
   Coordinator ! {hello, GgTName},
   log(State, ["registered at coordinator"]),
   TermTime = maps:get(termtime, State) * 1000,
-  NewState = maps:update(terminateTimer, timer:apply_after(TermTime, ?MODULE, term_request, [State]), State),
+  {ok, TRef} = timer:apply_after(TermTime, ?MODULE, term_request, [State]),
+  NewState = maps:update(terminateTimer, TRef, State),
   handle_messages(NewState).
 
 reset_terminate_timer(State) ->
   timer:cancel(maps:get(terminateTimer, State)),
   TermTime = maps:get(termtime, State) * 1000,
-  NewTimer = timer:apply_after(TermTime, ?MODULE, term_request, [State]),
+  {ok, TRef} = timer:apply_after(TermTime, ?MODULE, term_request, [State]),
   UpdatedTerm = maps:update(isTerminating, false, State),
   UpdatedTimestamp = maps:update(lastNumberReceived, erlang:timestamp(), UpdatedTerm),
-  maps:update(terminateTimer, NewTimer, UpdatedTimestamp).
+  maps:update(terminateTimer, TRef, UpdatedTimestamp).
 
 update_neighbours(Left, Right, State) ->
   log(State, ["left neighbour registered: ", atom_to_list(Left)]),
