@@ -22,7 +22,8 @@ name_service(Initiator) ->
 coordinator(GgTName) ->
   receive
     {hello, GgTName} -> ok;
-    {briefmi, {GgTName, _NewMi, _Timestamp}} -> ok
+    {briefmi, {GgTName, _NewMi, _Timestamp}} -> ok;
+    {_PID, briefterm, {GgTName, _Mi, _Timestamp}} -> ok
   end.
 
 mock_ggt(Mi) ->
@@ -57,7 +58,8 @@ simple_state(Coordinator, NameService, LeftN, RightN, Mi) ->
     yesVotes => 0,
     terminateTimer => 0,
     lastNumberReceived => 0,
-    isTerminating => true}.
+    isTerminating => true,
+    terminatedCalculations => 0}.
 
 start_ggt_process_and_kill_test() ->
   % Setup
@@ -161,3 +163,17 @@ send_vote_response_test() ->
   ggt:voting_response(foobar, UpdatedState),
   timer:sleep(100),
   ?assert(undefined =:= erlang:process_info(GgT)).
+
+maybe_send_brief_term_test() ->
+  Coordinator = with_redefed_coordinator(testggT),
+  State = simple_state(Coordinator, undefined, undefined, undefined, 0),
+
+  OneVoteState = ggt:maybe_send_brief_term(foobar1, State),
+  ?assertEqual(1, maps:get(yesVotes, OneVoteState)),
+  ?assertEqual(0, maps:get(terminatedCalculations, OneVoteState)),
+
+  TwoVoteState = ggt:maybe_send_brief_term(foobar2, OneVoteState),
+  ?assertEqual(2, maps:get(yesVotes, TwoVoteState)),
+  ?assertEqual(1, maps:get(terminatedCalculations, TwoVoteState)),
+  timer:sleep(100),
+  ?assert(undefined =:= erlang:process_info(Coordinator)).

@@ -4,7 +4,7 @@
 %%% @end
 %%%-------------------------------------------------------------------
 -module(ggt).
--export([start/6, start_ggt_process/1, reset_terminate_timer/1, maybe_update_mi/2, update_neighbours/3, set_pm/2, term_request/1, voting_response/2]).
+-export([start/6, start_ggt_process/1, reset_terminate_timer/1, maybe_update_mi/2, update_neighbours/3, set_pm/2, term_request/1, voting_response/2, maybe_send_brief_term/2]).
 
 -spec log(map(), list()) -> atom().
 log(Config, Message) ->
@@ -95,7 +95,25 @@ voting_response(GgTName, State) ->
           Initiator ! {voteYes, maps:get(ggtname, State)}
       end;
     true ->
+      log(State, ["Voting no for term request with ignoring"]),
       ok
+  end.
+
+maybe_send_brief_term(GgTName, State) ->
+  CurrentVotes = maps:get(yesVotes, State),
+  Quota = maps:get(quota, State),
+  NewVotes = CurrentVotes + 1,
+  log(State, ["received yes vote from ", atom_to_list(GgTName), " with a total votes of ", integer_to_list(NewVotes), " ", werkzeug:timeMilliSecond()]),
+  NewState = maps:update(yesVotes, NewVotes, State),
+  if
+    NewVotes >= Quota ->
+      Coordinator = maps:get(coordinator, State),
+      Coordinator ! {self(), briefterm, {maps:get(ggtname, State), maps:get(mi, State), erlang:now()}},
+      NewTermsCount = maps:get(terminatedCalculations, NewState) + 1,
+      log(State, ["Send #", integer_to_list(NewTermsCount), " terminated brief to coordinator"]),
+      maps:update(terminatedCalculations, NewTermsCount, NewState);
+    true ->
+      NewState
   end.
 
 handle_messages(State) ->
@@ -113,11 +131,14 @@ handle_messages(State) ->
     {_From, {vote, Initiator}} ->
       voting_response(Initiator, State),
       handle_messages(State);
+  % Sends brief mi to coordinator if enough yes votes came in
+    {voteYes, Name} ->
+      handle_messages(maybe_send_brief_term(Name, State));
   % Used for getting status
     {From, tellmi} ->
       From ! {mi, maps:get(mi, State)},
       handle_messages(State);
-  % Used for getting status
+% Used for getting status
     {From, pingGGT} ->
       From ! {pongGGT, maps:get(ggtname, State)},
       handle_messages(State);
@@ -143,6 +164,7 @@ start(WorkingTime, TerminationTime, Quota, GgTName, Coordinator, NameService) ->
     yesVotes => 0,
     terminateTimer => undefined,
     lastNumberReceived => 0,
-    isTerminating => false
+    isTerminating => false,
+    terminatedCalculations => 0
   },
   spawn(?MODULE, start_ggt_process, [State]).
