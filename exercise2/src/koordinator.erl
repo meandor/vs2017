@@ -4,7 +4,7 @@
 %%% @end
 %%%-------------------------------------------------------------------
 -module(koordinator).
--export([start/0, init_coordinator/1, initial_state/1, twenty_percent_of/1, update_minimum/2, handle_briefterm/4, set_initial_mis/2, transition_to_calculation_state/1]).
+-export([start/0, init_coordinator/1, initial_state/1, twenty_percent_of/1, update_minimum/2, handle_briefterm/4, set_initial_mis/3, transition_to_calculation_state/1]).
 
 log(Message) ->
   Logfile = list_to_atom(lists:concat(["Koordinator@", atom_to_list(node()), ".log"])),
@@ -25,15 +25,6 @@ handle_briefterm(CMi, Minimum, Clientname, CZeit) ->
 update_minimum(CMi, CurrentMinimum) ->
   min(CMi, CurrentMinimum)
 .
-
-sendMisToClients([], []) -> [];
-sendMisToClients([Mi | Tail], [Client | ClientTail]) ->
-  Client ! {sendy, Mi},
-  sendMisToClients(Tail, ClientTail).
-
-twenty_percent_of(Clients) ->
-  TwentyPercent = utils:ceiling(length(Clients) * 0.2),
-  lists:nthtail(length(Clients) - TwentyPercent, werkzeug:shuffle(Clients)).
 
 promt_all_ggt([]) -> [];
 promt_all_ggt([Client | RestClients]) ->
@@ -56,27 +47,40 @@ check_status_all_ggt([Client | RestClients]) ->
   end,
   check_status_all_ggt(RestClients).
 
-set_initial_mis([], []) -> ok;
-set_initial_mis([Mi | Tail], [Client | ClientTail]) ->
-  Client ! {setpm, Mi},
-  set_initial_mis(Tail, ClientTail).
+send_ys_to_ggTs([], [], _ClientsToPID) -> ok;
+send_ys_to_ggTs([Mi | Tail], [Client | ClientTail], ClientsToPID) ->
+  maps:get(Client, ClientsToPID) ! {sendy, Mi},
+  send_ys_to_ggTs(Tail, ClientTail, ClientsToPID).
 
--spec startCalculation(integer(), list()) -> any().
-startCalculation(WggT, Clients) ->
+twenty_percent_of(Clients) ->
+  EightyPercent = utils:ceiling(length(Clients) * 0.8),
+  lists:nthtail(EightyPercent, werkzeug:shuffle(Clients)).
+
+set_initial_mis([], [], _ClientsToPID) -> ok;
+set_initial_mis([Mi | Tail], [Client | ClientTail], ClientsToPID) ->
+  maps:get(Client, ClientsToPID) ! {setpm, Mi},
+  set_initial_mis(Tail, ClientTail, ClientsToPID).
+
+-spec start_calculation(integer(), list(), map()) -> any().
+start_calculation(WggT, Clients, ClientsToPID) ->
   log(["Start calculation for ggT: ", integer_to_list(WggT)]),
   Mis = werkzeug:bestimme_mis(WggT, length(Clients)),
-  set_initial_mis(Mis, Clients),
+  set_initial_mis(Mis, Clients, ClientsToPID),
   StartingClients = twenty_percent_of(Clients),
-  StartMis = werkzeug:bestimme_mis(WggT, length(StartingClients)),
-  sendMisToClients(StartMis, StartingClients).
+  StartYs = werkzeug:bestimme_mis(WggT, length(StartingClients)),
+  send_ys_to_ggTs(StartYs, StartingClients, ClientsToPID).
 
 calculation_state(State) ->
   receive
     {calc, WggT} ->
-      startCalculation(WggT, maps:get(clients, State));
-%%    toggle ->
-%%      log(["Correct flag is now set to: ", not(Toggled)]),
-%%      calculation_state(Config, Clients, not(Toggled), Minimum);
+      start_calculation(WggT, maps:get(clients, State), maps:get(clientsToPID, State));
+    toggle ->
+      Config = maps:get(config, State),
+      {ok, CorrectFlag} = werkzeug:get_config_value(korrigieren, Config),
+      NewFlag = (CorrectFlag + 1) rem 2,
+      UpdatedState = maps:update(config, lists:keyreplace(korrigieren, 1, Config, {korrigieren, NewFlag}), State),
+      log(["Correct flag is now set to: ", NewFlag, " from: ", CorrectFlag]),
+      calculation_state(UpdatedState);
 %%    prompt -> promt_all_ggt(Clients);
 %%    nudge -> check_status_all_ggt(Clients);
     kill -> shutdown(State)

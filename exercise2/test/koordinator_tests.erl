@@ -170,7 +170,7 @@ ring_build_with_4_ggTs_test() ->
 
 twenty_percent_clients_test() ->
   Clients = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-  ?assertEqual(length(koordinator:twenty_percent_of(Clients)), 2).
+  ?assertEqual(2, length(koordinator:twenty_percent_of(Clients))).
 
 update_minimum_test() ->
   ?assertEqual(koordinator:update_minimum(4, 5), 4),
@@ -205,7 +205,7 @@ set_initial_mis_test() ->
   Client3 = spawn(?MODULE, ggT_process, []),
   register(fake_ggt3, Client3),
   Clients = [fake_ggt1, fake_ggt2, fake_ggt3],
-  koordinator:set_initial_mis(Mis, Clients),
+  koordinator:set_initial_mis(Mis, Clients, #{fake_ggt1 => Client1, fake_ggt2 => Client2, fake_ggt3 => Client3}),
   timer:sleep(100),
   ?assertEqual(undefined, erlang:process_info(Client1)),
   ?assertEqual(undefined, erlang:process_info(Client2)),
