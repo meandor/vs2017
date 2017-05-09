@@ -120,7 +120,7 @@ maybe_send_brief_term(GgTName, State) ->
       Coordinator ! {self(), briefterm, {maps:get(ggtname, State), maps:get(mi, State), erlang:now()}},
       NewTermsCount = maps:get(terminatedCalculations, NewState) + 1,
       log(State, ["Send #", integer_to_list(NewTermsCount), " terminated brief to coordinator"]),
-      maps:update(terminatedCalculations, NewTermsCount, NewState);
+      maps:update(terminatedCalculations, NewTermsCount, maps:update(yesVotes, 0, NewState));
     true ->
       NewState
   end.
