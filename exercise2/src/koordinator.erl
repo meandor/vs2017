@@ -20,23 +20,24 @@ calculation_state(Config, Clients, Toggled, Minimum) ->
     {calc, WggT} -> startCalculation(WggT, Clients);
     kill -> shutdown(#{config => Config, clients=> Clients});
     {briefmi, {Clientname, CMi, CZeit}} ->
-      log(["Client " + Clientname + " informs about new Mi ", CMi, " at ", CZeit]),
+      log([Clientname , " reports new Mi ", CMi, " at ", werkzeug:now2string(CZeit)]),
       NewMinimum = update_minimum(CMi, Minimum),
       calculation_state(Config, Clients, Toggled, NewMinimum);
-    {From, briefterm, {Clientname, CMi, CZeit}} ->
+    {From, briefterm, {Clientname, CMi, CTermZeit}} ->
       if
-        Toggled -> handle_briefterm(CMi, Minimum, From, CZeit);
-        true -> log(["Client", Clientname, " reports result ", CMi])
+        Toggled =:= 1 -> handle_briefterm(CMi, Minimum, From,  werkzeug:now2string(CTermZeit));
+        true -> log([atom_to_list(Clientname) , " reports termination with ggT ", CMi, " at ", werkzeug:now2string(CTermZeit)])
       end
-  end
+  end,
+  calculation_state(Config, Clients, Toggled, Minimum)
 .
 
-handle_briefterm(CMi, Minimum, Client, CZeit) ->
+handle_briefterm(CMi, Minimum, Clientname, CZeit) ->
   if
     CMi > Minimum ->
-      %TODO Logging
-      %log(["Client ", Client, " sent false termination message"]),
-      Client ! {sendy, Minimum}
+      log([Clientname , " reports false termination with ggT ", CMi, " at ", werkzeug:now2string(CZeit)]),
+      Clientname ! {sendy, Minimum};
+    true -> log([Clientname , " reports termination with ggT ", CMi, " at ",  werkzeug:now2string(CZeit)])
   end
 .
 
@@ -46,23 +47,19 @@ update_minimum(CMi, CurrentMinimum) ->
 
 startCalculation(WggT, Clients) ->
   ClientsToStart = twenty_percent_of(Clients),
-  SetPMMis = werkzeug:bestimme_mis(WggT, length(ClientsToStart)),
-  StartMis = lower_by_ggt(SetPMMis, WggT),
-  set_initial_mis(SetPMMis, ClientsToStart),
+  SetPMMis = werkzeug:bestimme_mis(WggT, length(Clients)),
+  StartMis =  werkzeug:bestimme_mis(WggT, length(ClientsToStart)),
+  set_initial_mis(SetPMMis, Clients),
   sendMisToClients(StartMis, ClientsToStart).
 
-lower_by_ggt([], _Ggt) -> [];
-lower_by_ggt([Mi | Tail], GGt) ->
-  lists:append([Mi - GGt * 20], lower_by_ggt(Tail, GGt)).
-
-set_initial_mis([], []) -> ok;
+set_initial_mis([], []) -> [];
 set_initial_mis([Mi | Tail], [Client | ClientTail]) ->
   Client ! {setpm, Mi},
   set_initial_mis(Tail, ClientTail)
 .
 
 
-sendMisToClients([], []) -> ok;
+sendMisToClients([], []) -> [];
 sendMisToClients([Mi | Tail], [Client | ClientTail]) ->
   Client ! {sendy, Mi},
   sendMisToClients(Tail, ClientTail)
@@ -72,7 +69,7 @@ twenty_percent_of(Clients) ->
   TwentyPercent = utils:ceiling(length(Clients) * 0.2),
   lists:nthtail(length(Clients) - TwentyPercent, werkzeug:shuffle(Clients)).
 
-promt_all_ggt([]) -> ok;
+promt_all_ggt([]) -> [];
 promt_all_ggt([Client | RestClients]) ->
   Client ! {self(), tellmi},
   receive
@@ -81,7 +78,7 @@ promt_all_ggt([Client | RestClients]) ->
   promt_all_ggt(RestClients)
 .
 
-check_status_all_ggt([]) -> ok;
+check_status_all_ggt([]) -> [];
 check_status_all_ggt([Client | RestClients]) ->
   ClientPID = whereis(Client),
   case ClientPID of
@@ -192,7 +189,9 @@ init_coordinator(Config) ->
   State = #{config => Config, clients => []},
   initial_state(State).
 
-start() -> start("./config/koordinator.cfg").
+start() ->
+  erlang:set_cookie(koordinator, vsp),
+  start("./config/koordinator.cfg").
 
 start(ConfigPath) ->
   Config = werkzeug:loadConfig(ConfigPath),
