@@ -38,9 +38,7 @@ ggT_process() ->
   receive
     {sendy, _Mi} -> ok;
     {setpm, _Mi} -> ok;
-    {setneighbors, LeftNeighbour, RightNeighbour} ->
-      LeftNeighbour =/= RightNeighbour,
-      ok;
+    {setneighbors, _LeftNeighbour, _RightNeighbour} -> ok;
     kill -> ok
   end.
 
@@ -70,7 +68,7 @@ simple_config() ->
     {korrigieren, 1}].
 
 simple_state(Clients) ->
-  #{config => simple_config(), clients => Clients, clientsToPID => #{}}.
+  #{config => simple_config(), clients => Clients, clientsToPID => #{}, smallestGgT => 5}.
 
 start_and_kill_test() ->
   NameService = with_redefed_name_service(foobar, #{}),
@@ -172,14 +170,15 @@ twenty_percent_clients_test() ->
   Clients = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
   ?assertEqual(2, length(koordinator:twenty_percent_of(Clients))).
 
-update_minimum_test() ->
-  ?assertEqual(koordinator:update_minimum(4, 5), 4),
-  ?assertEqual(koordinator:update_minimum(1000, 3), 3).
+%%update_minimum_test() ->
+%%  ?assertEqual(koordinator:update_minimum(4, 5), 4),
+%%  ?assertEqual(koordinator:update_minimum(1000, 3), 3).
 
 handle_briefterm_test() ->
   Client = spawn(?MODULE, ggT_process, []),
+  State = maps:update(clientsToPID, #{fake_ggt => Client}, simple_state([fake_ggt])),
   register(fake_ggt, Client),
-  koordinator:handle_briefterm(50, 5, fake_ggt, erlang:now()),
+  koordinator:handle_briefterm(State, 50, fake_ggt, erlang:now()),
   timer:sleep(100),
   ?assertEqual(undefined, erlang:process_info(Client)).
 
