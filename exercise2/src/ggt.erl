@@ -84,21 +84,28 @@ term_request(State) ->
 voting_response(GgTName, State) ->
   Threshold = round(maps:get(termtime, State) / 2),
   log(State, ["DEBUG: voting response | threshold: ", integer_to_list(Threshold)]),
-  PassedTime = round(timer:now_diff(erlang:timestamp(), maps:get(lastNumberReceived, State)) / 1000000),
-  log(State, ["DEBUG: voting response | passed time: ", integer_to_list(PassedTime)]),
+  LastNumberReceived = maps:get(lastNumberReceived, State),
   if
-    PassedTime > Threshold ->
-      maps:get(nameservice, State) ! {self(), {lookup, GgTName}},
-      receive
-        not_found ->
-          log(State, ["Warning: Could not find the ggT process '", atom_to_list(GgTName), "'"]);
-        {pin, Initiator} ->
-          log(State, ["Sending voteYes to ", atom_to_list(GgTName)]),
-          Initiator ! {voteYes, maps:get(ggtname, State)}
-      end;
-    true ->
+    LastNumberReceived =:= 0 ->
       log(State, ["Voting no for term request with ignoring"]),
-      ok
+      ok;
+    true ->
+      PassedTime = round(timer:now_diff(erlang:timestamp(), maps:get(lastNumberReceived, State)) / 1000000),
+      log(State, ["DEBUG: voting response | passed time: ", integer_to_list(PassedTime)]),
+      if
+        PassedTime > Threshold ->
+          maps:get(nameservice, State) ! {self(), {lookup, GgTName}},
+          receive
+            not_found ->
+              log(State, ["Warning: Could not find the ggT process '", atom_to_list(GgTName), "'"]);
+            {pin, Initiator} ->
+              log(State, ["Sending voteYes to ", atom_to_list(GgTName)]),
+              Initiator ! {voteYes, maps:get(ggtname, State)}
+          end;
+        true ->
+          log(State, ["Voting no for term request with ignoring"]),
+          ok
+      end
   end.
 
 maybe_send_brief_term(GgTName, State) ->
