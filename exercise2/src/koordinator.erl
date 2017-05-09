@@ -14,7 +14,9 @@ log(Message) ->
 
 calculation_state(Config, Clients, Toggled, Minimum) ->
   receive
-    toggle -> calculation_state(Config, Clients, not(Toggled), Minimum);
+    toggle ->
+      log(["Correct flag is now set to: ", not(Toggled)]),
+      calculation_state(Config, Clients, not(Toggled), Minimum);
     prompt -> promt_all_ggt(Clients);
     nudge -> check_status_all_ggt(Clients);
     {calc, WggT} -> startCalculation(WggT, Clients);
@@ -25,7 +27,7 @@ calculation_state(Config, Clients, Toggled, Minimum) ->
       calculation_state(Config, Clients, Toggled, NewMinimum);
     {From, briefterm, {Clientname, CMi, CTermZeit}} ->
       if
-        Toggled =:= 1 -> handle_briefterm(CMi, Minimum, From,  werkzeug:now2string(CTermZeit));
+        Toggled =:= true -> handle_briefterm(CMi, Minimum, From,  CTermZeit);
         true -> log([atom_to_list(Clientname) , " reports termination with ggT ", CMi, " at ", werkzeug:now2string(CTermZeit)])
       end
   end,
@@ -35,9 +37,9 @@ calculation_state(Config, Clients, Toggled, Minimum) ->
 handle_briefterm(CMi, Minimum, Clientname, CZeit) ->
   if
     CMi > Minimum ->
-      log([Clientname , " reports false termination with ggT ", CMi, " at ", werkzeug:now2string(CZeit)]),
+      log([atom_to_list(Clientname) , " reports false termination with ggT ", CMi, " at ", werkzeug:now2string(CZeit)]),
       Clientname ! {sendy, Minimum};
-    true -> log([Clientname , " reports termination with ggT ", CMi, " at ",  werkzeug:now2string(CZeit)])
+    true -> log([atom_to_list(Clientname) , " reports correct termination with ggT ", CMi, " at ",  werkzeug:now2string(CZeit)])
   end
 .
 
@@ -134,9 +136,14 @@ transition_to_calculation_state(State) ->
   log(["Done building ring"]),
   log(["Switching to calculation state"]),
   {ok, Correct} = werkzeug:get_config_value(korrigieren, Config),
-  calculation_state(Config, maps:get(clients, State), Correct, utils:max_int_value()).
+  case Correct of
+    1 ->   calculation_state(Config, maps:get(clients, State), true, utils:max_int_value());
+    _Else ->  calculation_state(Config, maps:get(clients, State), false, utils:max_int_value())
+  end
+.
 
-kill_clients([]) -> ok;
+
+kill_clients([]) -> exit(self(), normal), ok;
 kill_clients([Client | Tail]) ->
   WhereIs = whereis(Client),
   case WhereIs of
