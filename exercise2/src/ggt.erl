@@ -108,7 +108,7 @@ maybe_send_brief_term(GgTName, State) ->
   log(State, ["received yes vote from ", atom_to_list(GgTName), " with a total votes of ", integer_to_list(NewVotes), " ", werkzeug:timeMilliSecond()]),
   NewState = maps:update(yesVotes, NewVotes, State),
   if
-    NewVotes >= Quota ->
+    NewVotes == Quota ->
       Coordinator = maps:get(coordinator, State),
       Coordinator ! {self(), briefterm, {maps:get(ggtname, State), maps:get(mi, State), erlang:now()}},
       NewTermsCount = maps:get(terminatedCalculations, NewState) + 1,
