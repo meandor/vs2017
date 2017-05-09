@@ -70,7 +70,7 @@ simple_config() ->
     {korrigieren, 1}].
 
 simple_state(Clients) ->
-  #{config => simple_config(), clients => Clients}.
+  #{config => simple_config(), clients => Clients, clientsToPID => #{}}.
 
 start_and_kill_test() ->
   NameService = with_redefed_name_service(foobar, #{}),

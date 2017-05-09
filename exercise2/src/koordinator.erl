@@ -26,11 +26,6 @@ update_minimum(CMi, CurrentMinimum) ->
   min(CMi, CurrentMinimum)
 .
 
-set_initial_mis([], []) -> [];
-set_initial_mis([Mi | Tail], [Client | ClientTail]) ->
-  Client ! {setpm, Mi},
-  set_initial_mis(Tail, ClientTail).
-
 sendMisToClients([], []) -> [];
 sendMisToClients([Mi | Tail], [Client | ClientTail]) ->
   Client ! {sendy, Mi},
@@ -39,15 +34,6 @@ sendMisToClients([Mi | Tail], [Client | ClientTail]) ->
 twenty_percent_of(Clients) ->
   TwentyPercent = utils:ceiling(length(Clients) * 0.2),
   lists:nthtail(length(Clients) - TwentyPercent, werkzeug:shuffle(Clients)).
-
--spec startCalculation(integer(), list()) -> any().
-startCalculation(WggT, Clients) ->
-  log(["Start calculation for ggT: ", integer_to_list(WggT)]),
-  Mis = werkzeug:bestimme_mis(WggT, length(Clients)),
-  set_initial_mis(Mis, Clients),
-  StartingClients = twenty_percent_of(Clients),
-  StartMis = werkzeug:bestimme_mis(WggT, length(StartingClients)),
-  sendMisToClients(StartMis, StartingClients).
 
 promt_all_ggt([]) -> [];
 promt_all_ggt([Client | RestClients]) ->
@@ -70,58 +56,70 @@ check_status_all_ggt([Client | RestClients]) ->
   end,
   check_status_all_ggt(RestClients).
 
-calculation_state(Config, Clients, Toggled, Minimum) ->
+set_initial_mis([], []) -> ok;
+set_initial_mis([Mi | Tail], [Client | ClientTail]) ->
+  Client ! {setpm, Mi},
+  set_initial_mis(Tail, ClientTail).
+
+-spec startCalculation(integer(), list()) -> any().
+startCalculation(WggT, Clients) ->
+  log(["Start calculation for ggT: ", integer_to_list(WggT)]),
+  Mis = werkzeug:bestimme_mis(WggT, length(Clients)),
+  set_initial_mis(Mis, Clients),
+  StartingClients = twenty_percent_of(Clients),
+  StartMis = werkzeug:bestimme_mis(WggT, length(StartingClients)),
+  sendMisToClients(StartMis, StartingClients).
+
+calculation_state(State) ->
   receive
     {calc, WggT} ->
-      startCalculation(WggT, Clients);
-    toggle ->
-      log(["Correct flag is now set to: ", not(Toggled)]),
-      calculation_state(Config, Clients, not(Toggled), Minimum);
-    prompt -> promt_all_ggt(Clients);
-    nudge -> check_status_all_ggt(Clients);
-    kill -> shutdown(#{config => Config, clients=> Clients});
-    {briefmi, {Clientname, CMi, CZeit}} ->
-      log([Clientname, " reports new Mi ", CMi, " at ", werkzeug:now2string(CZeit)]),
-      NewMinimum = update_minimum(CMi, Minimum),
-      calculation_state(Config, Clients, Toggled, NewMinimum);
-    {From, briefterm, {Clientname, CMi, CTermZeit}} ->
-      if
-        Toggled =:= true -> handle_briefterm(CMi, Minimum, From, CTermZeit);
-        true ->
-          log([atom_to_list(Clientname), " reports termination with ggT ", CMi, " at ", werkzeug:now2string(CTermZeit)])
-      end
+      startCalculation(WggT, maps:get(clients, State));
+%%    toggle ->
+%%      log(["Correct flag is now set to: ", not(Toggled)]),
+%%      calculation_state(Config, Clients, not(Toggled), Minimum);
+%%    prompt -> promt_all_ggt(Clients);
+%%    nudge -> check_status_all_ggt(Clients);
+    kill -> shutdown(State)
+%%    {briefmi, {Clientname, CMi, CZeit}} ->
+%%      log([Clientname, " reports new Mi ", CMi, " at ", werkzeug:now2string(CZeit)]),
+%%      NewMinimum = update_minimum(CMi, Minimum),
+%%      calculation_state(Config, Clients, Toggled, NewMinimum);
+%%    {From, briefterm, {Clientname, CMi, CTermZeit}} ->
+%%      if
+%%        Toggled =:= true -> handle_briefterm(CMi, Minimum, From, CTermZeit);
+%%        true ->
+%%          log([atom_to_list(Clientname), " reports termination with ggT ", CMi, " at ", werkzeug:now2string(CTermZeit)])
+%%      end
   end,
-  calculation_state(Config, Clients, Toggled, Minimum).
+  calculation_state(State).
 
-set_neighbors(NameService, [Middle, Last], [First, Second | _Tail]) ->
-  NameService ! {self(), {lookup, Last}},
+set_neighbors(ClientsToPID, [Middle, Last], [First, Second | _Tail]) ->
+  log(["Set neighbour for ggT-process ", atom_to_list(Last), " with neighbours: ", atom_to_list(Middle), " ", atom_to_list(First)]),
+  maps:get(Last, ClientsToPID) ! {setneighbors, Middle, First},
+  log(["Set neighbour for ggT-process ", atom_to_list(First), " with neighbours: ", atom_to_list(Last), " ", atom_to_list(Second)]),
+  maps:get(First, ClientsToPID) ! {setneighbors, Last, Second};
+
+set_neighbors(ClientsToPID, [Left, Middle, Right | Tail], Clients) ->
+  log(["Set neighbour for ggT-process ", atom_to_list(Middle), " with neighbours: ", atom_to_list(Left), " ", atom_to_list(Right)]),
+  maps:get(Middle, ClientsToPID) ! {setneighbors, Left, Right},
+  set_neighbors(ClientsToPID, [Middle, Right] ++ Tail, Clients).
+
+bind_ggT(NameService, GgTName, ClientsToPID) ->
+  NameService ! {self(), {lookup, GgTName}},
   receive
     not_found ->
-      log(["Could not bind ", atom_to_list(Last)]);
-    {pin, LastPID} ->
-      log(["Bound ggT-process ", atom_to_list(Last), " with neighbours: ", atom_to_list(Middle), " ", atom_to_list(First)]),
-      LastPID ! {setneighbors, Middle, First}
-  end,
+      log(["Could not bind ", atom_to_list(GgTName)]),
+      maps:put(GgTName, undefined, ClientsToPID);
+    {pin, GgTPID} ->
+      log(["Bound ggT-process ", atom_to_list(GgTName)]),
+      maps:put(GgTName, GgTPID, ClientsToPID)
+  end.
 
-  NameService ! {self(), {lookup, First}},
-  receive
-    not_found ->
-      log(["Could not bind ", atom_to_list(First)]);
-    {pin, FirstPID} ->
-      log(["Bound ggT-process ", atom_to_list(First), " with neighbours: ", atom_to_list(Last), " ", atom_to_list(Second)]),
-      FirstPID ! {setneighbors, Last, Second}
-  end;
-
-set_neighbors(NameService, [Left, Middle, Right | Tail], Clients) ->
-  NameService ! {self(), {lookup, Middle}},
-  receive
-    not_found ->
-      log(["Could not bind ", atom_to_list(Middle)]);
-    {pin, MiddlePID} ->
-      log(["Bound ggT-process ", atom_to_list(Middle), " with neighbours: ", atom_to_list(Left), " ", atom_to_list(Right)]),
-      MiddlePID ! {setneighbors, Left, Right}
-  end,
-  set_neighbors(NameService, [Middle, Right] ++ Tail, Clients).
+bind_ggTs(State) ->
+  NameService = utils:bind_nameservice(maps:get(config, State)),
+  ClientsToPID = lists:foldr(fun(GgTName, Acc) ->
+    bind_ggT(NameService, GgTName, Acc) end, maps:get(clientsToPID, State), maps:get(clients, State)),
+  maps:update(clientsToPID, ClientsToPID, State).
 
 transition_to_calculation_state(State) ->
   Config = maps:get(config, State),
@@ -129,17 +127,13 @@ transition_to_calculation_state(State) ->
   ActualClients = length(maps:get(clients, State)),
   log(["Initial state completed. Registered ", integer_to_list(ExpectedClients), "/", integer_to_list(ActualClients), " ggT-processes"]),
   log(["Start building ring"]),
-  NameService = utils:bind_nameservice(Config),
+  BoundClientsState = bind_ggTs(State),
   % build ring
   ShuffledClients = werkzeug:shuffle(maps:get(clients, State)),
-  set_neighbors(NameService, ShuffledClients, ShuffledClients),
+  set_neighbors(maps:get(clientsToPID, BoundClientsState), ShuffledClients, ShuffledClients),
   log(["Done building ring"]),
   log(["Switching to calculation state"]),
-  {ok, Correct} = werkzeug:get_config_value(korrigieren, Config),
-  case Correct of
-    1 -> calculation_state(Config, maps:get(clients, State), true, utils:max_int_value());
-    _Else -> calculation_state(Config, maps:get(clients, State), false, utils:max_int_value())
-  end.
+  calculation_state(BoundClientsState).
 
 
 kill_clients([]) -> exit(self(), normal), ok;
@@ -192,7 +186,7 @@ init_coordinator(Config) ->
   receive
     ok -> log(["registered with nameservice..."])
   end,
-  State = #{config => Config, clients => [], smallestGgT => utils:max_int_value()},
+  State = #{config => Config, clients => [], clientsToPID => #{}, smallestGgT => utils:max_int_value()},
   initial_state(State).
 
 start() ->
