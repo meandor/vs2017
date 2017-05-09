@@ -25,12 +25,24 @@ To reload everything in the erlang shell:
 make:all([load]).
 ````
 
-Our modules and processes are dependant on a name service.
+Our modules and processes are dependent on a name service.
 To start one simply start it in your node:
 ````erlang
 nameservice:start().
 ````
 Make sure to update the config files with the nameservice node name.
+
+To start a starter:
+````erlang
+starter:start(<StarterID>).
+````
+
+To start a coordinator:
+````erlang
+koordinator:start().
+````
+
+For further usage please have a look at the sequence diagram in the documentation.
 
 ## Test
 To test a <MODULENAME> in the erl shell:
@@ -40,7 +52,7 @@ eunit:test(<MODULENAME>).
 
 For all tests:
 ````erlang
-eunit:test(koordinator_tests).
+eunit:test(koordinator),eunit:test(starter),eunit:test(ggt).
 ````
 
 ## Configuration
