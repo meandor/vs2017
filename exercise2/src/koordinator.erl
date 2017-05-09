@@ -22,13 +22,14 @@ calculation_state(Config, Clients, Toggled, Minimum) ->
     {calc, WggT} -> startCalculation(WggT, Clients);
     kill -> shutdown(#{config => Config, clients=> Clients});
     {briefmi, {Clientname, CMi, CZeit}} ->
-      log([Clientname , " reports new Mi ", CMi, " at ", werkzeug:now2string(CZeit)]),
+      log([Clientname, " reports new Mi ", CMi, " at ", werkzeug:now2string(CZeit)]),
       NewMinimum = update_minimum(CMi, Minimum),
       calculation_state(Config, Clients, Toggled, NewMinimum);
     {From, briefterm, {Clientname, CMi, CTermZeit}} ->
       if
-        Toggled =:= true -> handle_briefterm(CMi, Minimum, From,  CTermZeit);
-        true -> log([atom_to_list(Clientname) , " reports termination with ggT ", CMi, " at ", werkzeug:now2string(CTermZeit)])
+        Toggled =:= true -> handle_briefterm(CMi, Minimum, From, CTermZeit);
+        true ->
+          log([atom_to_list(Clientname), " reports termination with ggT ", CMi, " at ", werkzeug:now2string(CTermZeit)])
       end
   end,
   calculation_state(Config, Clients, Toggled, Minimum)
@@ -37,9 +38,10 @@ calculation_state(Config, Clients, Toggled, Minimum) ->
 handle_briefterm(CMi, Minimum, Clientname, CZeit) ->
   if
     CMi > Minimum ->
-      log([atom_to_list(Clientname) , " reports false termination with ggT ", CMi, " at ", werkzeug:now2string(CZeit)]),
+      log([atom_to_list(Clientname), " reports false termination with ggT ", CMi, " at ", werkzeug:now2string(CZeit)]),
       Clientname ! {sendy, Minimum};
-    true -> log([atom_to_list(Clientname) , " reports correct termination with ggT ", CMi, " at ",  werkzeug:now2string(CZeit)])
+    true ->
+      log([atom_to_list(Clientname), " reports correct termination with ggT ", CMi, " at ", werkzeug:now2string(CZeit)])
   end
 .
 
@@ -50,7 +52,7 @@ update_minimum(CMi, CurrentMinimum) ->
 startCalculation(WggT, Clients) ->
   ClientsToStart = twenty_percent_of(Clients),
   SetPMMis = werkzeug:bestimme_mis(WggT, length(Clients)),
-  StartMis =  werkzeug:bestimme_mis(WggT, length(ClientsToStart)),
+  StartMis = werkzeug:bestimme_mis(WggT, length(ClientsToStart)),
   set_initial_mis(SetPMMis, Clients),
   sendMisToClients(StartMis, ClientsToStart).
 
@@ -99,7 +101,7 @@ set_neighbors(NameService, [Middle, Last], [First, Second | _Tail]) ->
     not_found ->
       log(["Could not bind ", atom_to_list(Last)]);
     {pin, LastPID} ->
-      log(["Bound ggT-process with neighbours: ", atom_to_list(Middle), " ", atom_to_list(First)]),
+      log(["Bound ggT-process ", atom_to_list(Last), " with neighbours: ", atom_to_list(Middle), " ", atom_to_list(First)]),
       LastPID ! {setneighbors, Middle, First}
   end,
 
@@ -108,7 +110,7 @@ set_neighbors(NameService, [Middle, Last], [First, Second | _Tail]) ->
     not_found ->
       log(["Could not bind ", atom_to_list(First)]);
     {pin, FirstPID} ->
-      log(["Bound ggT-process with neighbours: ", atom_to_list(Last), " ", atom_to_list(Second)]),
+      log(["Bound ggT-process ", atom_to_list(First), " with neighbours: ", atom_to_list(Last), " ", atom_to_list(Second)]),
       FirstPID ! {setneighbors, Last, Second}
   end;
 
@@ -118,7 +120,7 @@ set_neighbors(NameService, [Left, Middle, Right | Tail], Clients) ->
     not_found ->
       log(["Could not bind ", atom_to_list(Middle)]);
     {pin, MiddlePID} ->
-      log(["Bound ggT-process with neighbours: ", atom_to_list(Left), " ", atom_to_list(Right)]),
+      log(["Bound ggT-process ", atom_to_list(Middle), " with neighbours: ", atom_to_list(Left), " ", atom_to_list(Right)]),
       MiddlePID ! {setneighbors, Left, Right}
   end,
   set_neighbors(NameService, [Middle, Right] ++ Tail, Clients).
@@ -137,8 +139,8 @@ transition_to_calculation_state(State) ->
   log(["Switching to calculation state"]),
   {ok, Correct} = werkzeug:get_config_value(korrigieren, Config),
   case Correct of
-    1 ->   calculation_state(Config, maps:get(clients, State), true, utils:max_int_value());
-    _Else ->  calculation_state(Config, maps:get(clients, State), false, utils:max_int_value())
+    1 -> calculation_state(Config, maps:get(clients, State), true, utils:max_int_value());
+    _Else -> calculation_state(Config, maps:get(clients, State), false, utils:max_int_value())
   end
 .
 

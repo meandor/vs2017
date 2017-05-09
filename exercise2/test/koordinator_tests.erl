@@ -132,6 +132,41 @@ ring_build_with_3_ggTs_test() ->
   ?assertEqual(undefined, erlang:process_info(GgT3)),
   ?assertEqual(undefined, erlang:process_info(NameService)).
 
+ring_build_with_2_ggTs_test() ->
+  State = simple_state([foobar1, foobar2]),
+  GgT1 = with_redefed_ggt(foobar1),
+  GgT2 = with_redefed_ggt(foobar2),
+  NameService = with_redefed_name_service(foobar, #{foobar1 => GgT1, foobar2=>GgT2}),
+
+  PID = spawn(koordinator, transition_to_calculation_state, [State]),
+  timer:sleep(100),
+  PID ! kill,
+  timer:sleep(100),
+
+  ?assertEqual(undefined, erlang:process_info(PID)),
+  ?assertEqual(undefined, erlang:process_info(GgT1)),
+  ?assertEqual(undefined, erlang:process_info(GgT2)),
+  ?assertEqual(undefined, erlang:process_info(NameService)).
+
+ring_build_with_4_ggTs_test() ->
+  State = simple_state([foobar1, foobar2, foobar3, foobar4]),
+  GgT1 = with_redefed_ggt(foobar1),
+  GgT2 = with_redefed_ggt(foobar2),
+  GgT3 = with_redefed_ggt(foobar3),
+  GgT4 = with_redefed_ggt(foobar4),
+  NameService = with_redefed_name_service(foobar, #{foobar1 => GgT1, foobar2=>GgT2, foobar3 => GgT3, foobar4=>GgT4}),
+
+  PID = spawn(koordinator, transition_to_calculation_state, [State]),
+  timer:sleep(100),
+  PID ! kill,
+  timer:sleep(100),
+
+  ?assertEqual(undefined, erlang:process_info(PID)),
+  ?assertEqual(undefined, erlang:process_info(GgT1)),
+  ?assertEqual(undefined, erlang:process_info(GgT2)),
+  ?assertEqual(undefined, erlang:process_info(GgT3)),
+  ?assertEqual(undefined, erlang:process_info(GgT4)),
+  ?assertEqual(undefined, erlang:process_info(NameService)).
 
 twenty_percent_clients_test() ->
   Clients = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
