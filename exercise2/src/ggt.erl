@@ -139,15 +139,14 @@ handle_messages(State) ->
     {From, tellmi} ->
       From ! {mi, maps:get(mi, State)},
       handle_messages(State);
-% Used for getting status
+  % Used for getting status
     {From, pingGGT} ->
       From ! {pongGGT, maps:get(ggtname, State)},
       handle_messages(State);
     kill ->
       exit(self(), normal),
       ok
-  end,
-  handle_messages(State).
+  end.
 
 
 %% Starts the ggT Process and registers at the coordinator, nameservice and locally at the node
