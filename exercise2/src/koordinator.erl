@@ -4,7 +4,7 @@
 %%% @end
 %%%-------------------------------------------------------------------
 -module(koordinator).
--export([start/0, init_coordinator/1, initial_state/1, twenty_percent_of/1, update_minimum/2, handle_briefterm/4, set_initial_mis/3, transition_to_calculation_state/1]).
+-export([start/0, init_coordinator/1, initial_state/1, twenty_percent_of/1, handle_briefterm/4, set_initial_mis/3, transition_to_calculation_state/1]).
 
 log(Message) ->
   Logfile = list_to_atom(lists:concat(["Koordinator@", atom_to_list(node()), ".log"])),
@@ -12,40 +12,43 @@ log(Message) ->
   werkzeug:logging(Logfile, lists:concat(FullMessage)),
   Logfile.
 
-handle_briefterm(CMi, Minimum, Clientname, CZeit) ->
+maybe_log_wrong_term(CmiReceived, MinimumCmi) when CmiReceived > MinimumCmi ->
+  log(["Error! Received terminated ggT is bigger than the smalles received ggT (", integer_to_list(CmiReceived), ",", integer_to_list(MinimumCmi), ")"]);
+maybe_log_wrong_term(_CmiReceived, _MinimumCmi) when true ->
+  ok.
+
+handle_briefterm(State, CMi, ClientName, CZeit) ->
+  Minimum = maps:get(smallestGgT, State),
   if
     CMi > Minimum ->
-      log([atom_to_list(Clientname), " reports false termination with ggT ", CMi, " at ", werkzeug:now2string(CZeit)]),
-      Clientname ! {sendy, Minimum};
+      log(["Trying to correct with sending ", integer_to_list(Minimum), " to ", atom_to_list(ClientName), " at ", werkzeug:now2string(CZeit)]),
+      maps:get(ClientName, maps:get(clientsToPID, State)) ! {sendy, Minimum};
     true ->
-      log([atom_to_list(Clientname), " reports correct termination with ggT ", CMi, " at ", werkzeug:now2string(CZeit)])
-  end
-.
+      log([atom_to_list(ClientName), " reports correct termination with ggT ", CMi, " at ", werkzeug:now2string(CZeit)])
+  end.
 
-update_minimum(CMi, CurrentMinimum) ->
-  min(CMi, CurrentMinimum)
-.
-
-promt_all_ggt([]) -> [];
-promt_all_ggt([Client | RestClients]) ->
-  Client ! {self(), tellmi},
+prompt_all_ggt(_ClientsToPID, []) -> ok;
+prompt_all_ggt(ClientsToPID, [Client | RestClients]) ->
+  maps:get(Client, ClientsToPID) ! {self(), tellmi},
   receive
     {mi, Mi} -> log(["client: ", Client, " has mi: ", Mi])
   end,
-  promt_all_ggt(RestClients)
-.
+  prompt_all_ggt(ClientsToPID, RestClients).
 
-check_status_all_ggt([]) -> [];
-check_status_all_ggt([Client | RestClients]) ->
-  ClientPID = whereis(Client),
-  case ClientPID of
-    undefined -> log(["client: ", Client, " is dead"]);
-    _Else -> Client ! {self(), pingGGT},
+check_status_all_ggt(_ClientsToPID, []) -> ok;
+check_status_all_ggt(ClientsToPID, [Client | RestClients]) ->
+  {ClientName, ClientNode} = maps:get(Client, ClientsToPID),
+  PingResponse = net_adm:ping(ClientNode),
+  if
+    PingResponse =:= pang ->
+      log(["client node of ", Client, " is dead"]);
+    true ->
+      {ClientName, ClientNode} ! {self(), pingGGT},
       receive
-        {pongGGT, ClientName} -> log(["client: ", ClientName, " is alive"])
+        {pongGGT, GgTName} -> log(["ggT-Process: ", GgTName, " is alive"])
       end
   end,
-  check_status_all_ggt(RestClients).
+  check_status_all_ggt(ClientsToPID, RestClients).
 
 send_ys_to_ggTs([], [], _ClientsToPID) -> ok;
 send_ys_to_ggTs([Mi | Tail], [Client | ClientTail], ClientsToPID) ->
@@ -72,8 +75,11 @@ start_calculation(WggT, Clients, ClientsToPID) ->
 
 calculation_state(State) ->
   receive
+  % Starts the calculation
     {calc, WggT} ->
-      start_calculation(WggT, maps:get(clients, State), maps:get(clientsToPID, State));
+      start_calculation(WggT, maps:get(clients, State), maps:get(clientsToPID, State)),
+      calculation_state(State);
+  % Toggles the correct flag
     toggle ->
       Config = maps:get(config, State),
       {ok, CorrectFlag} = werkzeug:get_config_value(korrigieren, Config),
@@ -81,21 +87,34 @@ calculation_state(State) ->
       UpdatedState = maps:update(config, lists:keyreplace(korrigieren, 1, Config, {korrigieren, NewFlag}), State),
       log(["Correct flag is now set to: ", NewFlag, " from: ", CorrectFlag]),
       calculation_state(UpdatedState);
-%%    prompt -> promt_all_ggt(Clients);
-%%    nudge -> check_status_all_ggt(Clients);
-    kill -> shutdown(State)
-%%    {briefmi, {Clientname, CMi, CZeit}} ->
-%%      log([Clientname, " reports new Mi ", CMi, " at ", werkzeug:now2string(CZeit)]),
-%%      NewMinimum = update_minimum(CMi, Minimum),
-%%      calculation_state(Config, Clients, Toggled, NewMinimum);
-%%    {From, briefterm, {Clientname, CMi, CTermZeit}} ->
-%%      if
-%%        Toggled =:= true -> handle_briefterm(CMi, Minimum, From, CTermZeit);
-%%        true ->
-%%          log([atom_to_list(Clientname), " reports termination with ggT ", CMi, " at ", werkzeug:now2string(CTermZeit)])
-%%      end
-  end,
-  calculation_state(State).
+  % Ask all ggTs current Mi
+    prompt ->
+      prompt_all_ggt(maps:get(clientsToPID, State), maps:get(clients, State)),
+      calculation_state(State);
+  % Pings all ggTs
+    nudge ->
+      check_status_all_ggt(maps:get(clientsToPID, State), maps:get(clients, State)),
+      calculation_state(State);
+    kill ->
+      shutdown(State);
+  % ggT process signals its mi
+    {briefmi, {ClientName, CMi, CZeit}} ->
+      log([atom_to_list(ClientName), " reports new Mi ", integer_to_list(CMi), " at ", werkzeug:now2string(CZeit)]),
+      UpdatedMinimumState = maps:update(smallestGgT, min(CMi, maps:get(smallestGgT, State)), State),
+      calculation_state(UpdatedMinimumState);
+  % ggT process is done
+    {From, briefterm, {ClientName, CMi, CTermZeit}} ->
+      Config = maps:get(config, State),
+      {ok, CorrectFlag} = werkzeug:get_config_value(korrigieren, Config),
+      maybe_log_wrong_term(CMi, maps:get(smallestGgT, State)),
+      if
+        CorrectFlag =:= true ->
+          handle_briefterm(State, CMi, From, CTermZeit);
+        true ->
+          log([atom_to_list(ClientName), " reports termination with ggT ", CMi, " at ", werkzeug:now2string(CTermZeit)])
+      end,
+      calculation_state(State)
+  end.
 
 set_neighbors(ClientsToPID, [Middle, Last], [First, Second | _Tail]) ->
   log(["Set neighbour for ggT-process ", atom_to_list(Last), " with neighbours: ", atom_to_list(Middle), " ", atom_to_list(First)]),
