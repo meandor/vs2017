@@ -12,29 +12,6 @@ log(Message) ->
   werkzeug:logging(Logfile, lists:concat(FullMessage)),
   Logfile.
 
-calculation_state(Config, Clients, Toggled, Minimum) ->
-  receive
-    toggle ->
-      log(["Correct flag is now set to: ", not(Toggled)]),
-      calculation_state(Config, Clients, not(Toggled), Minimum);
-    prompt -> promt_all_ggt(Clients);
-    nudge -> check_status_all_ggt(Clients);
-    {calc, WggT} -> startCalculation(WggT, Clients);
-    kill -> shutdown(#{config => Config, clients=> Clients});
-    {briefmi, {Clientname, CMi, CZeit}} ->
-      log([Clientname, " reports new Mi ", CMi, " at ", werkzeug:now2string(CZeit)]),
-      NewMinimum = update_minimum(CMi, Minimum),
-      calculation_state(Config, Clients, Toggled, NewMinimum);
-    {From, briefterm, {Clientname, CMi, CTermZeit}} ->
-      if
-        Toggled =:= true -> handle_briefterm(CMi, Minimum, From, CTermZeit);
-        true ->
-          log([atom_to_list(Clientname), " reports termination with ggT ", CMi, " at ", werkzeug:now2string(CTermZeit)])
-      end
-  end,
-  calculation_state(Config, Clients, Toggled, Minimum)
-.
-
 handle_briefterm(CMi, Minimum, Clientname, CZeit) ->
   if
     CMi > Minimum ->
@@ -49,29 +26,28 @@ update_minimum(CMi, CurrentMinimum) ->
   min(CMi, CurrentMinimum)
 .
 
-startCalculation(WggT, Clients) ->
-  ClientsToStart = twenty_percent_of(Clients),
-  SetPMMis = werkzeug:bestimme_mis(WggT, length(Clients)),
-  StartMis = werkzeug:bestimme_mis(WggT, length(ClientsToStart)),
-  set_initial_mis(SetPMMis, Clients),
-  sendMisToClients(StartMis, ClientsToStart).
-
 set_initial_mis([], []) -> [];
 set_initial_mis([Mi | Tail], [Client | ClientTail]) ->
   Client ! {setpm, Mi},
-  set_initial_mis(Tail, ClientTail)
-.
-
+  set_initial_mis(Tail, ClientTail).
 
 sendMisToClients([], []) -> [];
 sendMisToClients([Mi | Tail], [Client | ClientTail]) ->
   Client ! {sendy, Mi},
-  sendMisToClients(Tail, ClientTail)
-.
+  sendMisToClients(Tail, ClientTail).
 
 twenty_percent_of(Clients) ->
   TwentyPercent = utils:ceiling(length(Clients) * 0.2),
   lists:nthtail(length(Clients) - TwentyPercent, werkzeug:shuffle(Clients)).
+
+-spec startCalculation(integer(), list()) -> any().
+startCalculation(WggT, Clients) ->
+  log(["Start calculation for ggT: ", integer_to_list(WggT)]),
+  Mis = werkzeug:bestimme_mis(WggT, length(Clients)),
+  set_initial_mis(Mis, Clients),
+  StartingClients = twenty_percent_of(Clients),
+  StartMis = werkzeug:bestimme_mis(WggT, length(StartingClients)),
+  sendMisToClients(StartMis, StartingClients).
 
 promt_all_ggt([]) -> [];
 promt_all_ggt([Client | RestClients]) ->
@@ -92,8 +68,30 @@ check_status_all_ggt([Client | RestClients]) ->
         {pongGGT, ClientName} -> log(["client: ", ClientName, " is alive"])
       end
   end,
-  check_status_all_ggt(RestClients)
-.
+  check_status_all_ggt(RestClients).
+
+calculation_state(Config, Clients, Toggled, Minimum) ->
+  receive
+    {calc, WggT} ->
+      startCalculation(WggT, Clients);
+    toggle ->
+      log(["Correct flag is now set to: ", not(Toggled)]),
+      calculation_state(Config, Clients, not(Toggled), Minimum);
+    prompt -> promt_all_ggt(Clients);
+    nudge -> check_status_all_ggt(Clients);
+    kill -> shutdown(#{config => Config, clients=> Clients});
+    {briefmi, {Clientname, CMi, CZeit}} ->
+      log([Clientname, " reports new Mi ", CMi, " at ", werkzeug:now2string(CZeit)]),
+      NewMinimum = update_minimum(CMi, Minimum),
+      calculation_state(Config, Clients, Toggled, NewMinimum);
+    {From, briefterm, {Clientname, CMi, CTermZeit}} ->
+      if
+        Toggled =:= true -> handle_briefterm(CMi, Minimum, From, CTermZeit);
+        true ->
+          log([atom_to_list(Clientname), " reports termination with ggT ", CMi, " at ", werkzeug:now2string(CTermZeit)])
+      end
+  end,
+  calculation_state(Config, Clients, Toggled, Minimum).
 
 set_neighbors(NameService, [Middle, Last], [First, Second | _Tail]) ->
   NameService ! {self(), {lookup, Last}},
@@ -141,8 +139,7 @@ transition_to_calculation_state(State) ->
   case Correct of
     1 -> calculation_state(Config, maps:get(clients, State), true, utils:max_int_value());
     _Else -> calculation_state(Config, maps:get(clients, State), false, utils:max_int_value())
-  end
-.
+  end.
 
 
 kill_clients([]) -> exit(self(), normal), ok;
@@ -195,7 +192,7 @@ init_coordinator(Config) ->
   receive
     ok -> log(["registered with nameservice..."])
   end,
-  State = #{config => Config, clients => []},
+  State = #{config => Config, clients => [], smallestGgT => utils:max_int_value()},
   initial_state(State).
 
 start() ->
