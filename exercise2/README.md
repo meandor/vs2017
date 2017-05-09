@@ -14,9 +14,9 @@ To start with compiled files:
 erl -pa ebin/
 ````
 
-To start with compiled files and given name@host:
+To start with compiled files, given name@host and cookie:
 ````bash
-erl -pa ebin/ -sname name@host
+erl -pa ebin/ -sname name@host -setcookie cookie
 ````
 
 ## Usage

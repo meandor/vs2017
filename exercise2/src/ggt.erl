@@ -1,6 +1,7 @@
 %%%-------------------------------------------------------------------
 %%% @doc
-%%%
+%%% Handles all ggT related calculations of the algorithm.
+%%% For more infos have a look at the documentation section 3.2
 %%% @end
 %%%-------------------------------------------------------------------
 -module(ggt).

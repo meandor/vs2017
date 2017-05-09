@@ -1,11 +1,10 @@
 %%%-------------------------------------------------------------------
 %%% @doc
-%%%
+%%% Used for utils functions
 %%% @end
 %%%-------------------------------------------------------------------
 -module(utils).
 
-%% API
 -export([bind_nameservice/1, ceiling/1, max_int_value/0]).
 
 bind_nameservice(Config) ->

@@ -1,6 +1,7 @@
 %%%-------------------------------------------------------------------
 %%% @doc
-%%%
+%%% Coordinates the ggT-Processes.
+%%% For more infos have a look at the documentation section 3.3
 %%% @end
 %%%-------------------------------------------------------------------
 -module(koordinator).
