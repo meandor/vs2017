@@ -166,16 +166,14 @@ send_vote_response_test() ->
 
 maybe_send_brief_term_test() ->
   Coordinator = with_redefed_coordinator(testggT),
-  State = maps:update(isTerminating, true, simple_state(Coordinator, undefined, undefined, undefined, 0)),
+  State = simple_state(Coordinator, undefined, undefined, undefined, 0),
 
   OneVoteState = ggt:maybe_send_brief_term(foobar1, State),
-  ?assertEqual(true, maps:get(isTerminating, OneVoteState)),
   ?assertEqual(1, maps:get(yesVotes, OneVoteState)),
   ?assertEqual(0, maps:get(terminatedCalculations, OneVoteState)),
 
   TwoVoteState = ggt:maybe_send_brief_term(foobar2, OneVoteState),
-  ?assertEqual(-1, maps:get(isTerminating, TwoVoteState)),
-  ?assertEqual(0, maps:get(yesVotes, TwoVoteState)),
+  ?assertEqual(2, maps:get(yesVotes, TwoVoteState)),
   ?assertEqual(1, maps:get(terminatedCalculations, TwoVoteState)),
   timer:sleep(100),
   ?assert(undefined =:= erlang:process_info(Coordinator)).
