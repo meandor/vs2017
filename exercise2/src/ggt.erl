@@ -167,6 +167,7 @@ handle_messages(State) ->
       From ! {pongGGT, maps:get(ggtname, State)},
       handle_messages(State);
     kill ->
+      log(State, ["shutting down ggt"]),
       exit(self(), normal),
       ok
   end.

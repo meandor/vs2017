@@ -1,0 +1,1577 @@
+starttime: 10.05 13:39:49,484| with PID <0.43.0>
+opening config...
+loaded config...
+starttime: 10.05 13:39:51,850| with PID <0.70.0>
+opening config...
+loaded config...
+Nameservice '<7393.42.0>' bound...
+registered locally...
+registered with nameservice...
+getsteeringval: <7557.52.0>
+hello: 11101 #ofclients: 1
+hello: 1191 #ofclients: 2
+hello: 1181 #ofclients: 3
+hello: 1171 #ofclients: 4
+hello: 1161 #ofclients: 5
+hello: 1131 #ofclients: 6
+hello: 1151 #ofclients: 7
+hello: 1111 #ofclients: 8
+hello: 1141 #ofclients: 9
+hello: 1121 #ofclients: 10
+getsteeringval: <7568.52.0>
+hello: 11102 #ofclients: 11
+hello: 1192 #ofclients: 12
+hello: 1182 #ofclients: 13
+hello: 1172 #ofclients: 14
+hello: 1152 #ofclients: 15
+hello: 1142 #ofclients: 16
+hello: 1112 #ofclients: 17
+hello: 1162 #ofclients: 18
+hello: 1132 #ofclients: 19
+hello: 1122 #ofclients: 20
+getsteeringval: <7528.40.0>
+hello: 488101 #ofclients: 21
+hello: 48891 #ofclients: 22
+hello: 48881 #ofclients: 23
+hello: 48861 #ofclients: 24
+hello: 48871 #ofclients: 25
+hello: 48851 #ofclients: 26
+hello: 48841 #ofclients: 27
+hello: 48821 #ofclients: 28
+hello: 48831 #ofclients: 29
+hello: 48811 #ofclients: 30
+getsteeringval: <7528.40.0>
+hello: 488102 #ofclients: 31
+hello: 48892 #ofclients: 32
+hello: 48852 #ofclients: 33
+hello: 48862 #ofclients: 34
+hello: 48882 #ofclients: 35
+hello: 48872 #ofclients: 36
+hello: 48842 #ofclients: 37
+hello: 48812 #ofclients: 38
+hello: 48832 #ofclients: 39
+hello: 48822 #ofclients: 40
+getsteeringval: <7528.40.0>
+hello: 48893 #ofclients: 41
+hello: 48883 #ofclients: 42
+hello: 488103 #ofclients: 43
+hello: 48873 #ofclients: 44
+hello: 48863 #ofclients: 45
+hello: 48853 #ofclients: 46
+hello: 48843 #ofclients: 47
+hello: 48833 #ofclients: 48
+hello: 48813 #ofclients: 49
+hello: 48823 #ofclients: 50
+getsteeringval: <7527.40.0>
+hello: 15010 #ofclients: 51
+hello: 1508 #ofclients: 52
+hello: 1507 #ofclients: 53
+hello: 1509 #ofclients: 54
+hello: 1501 #ofclients: 55
+hello: 1506 #ofclients: 56
+hello: 1505 #ofclients: 57
+hello: 1504 #ofclients: 58
+hello: 1503 #ofclients: 59
+hello: 1502 #ofclients: 60
+getsteeringval: <7620.40.0>
+hello: 15210 #ofclients: 61
+hello: 1529 #ofclients: 62
+hello: 1528 #ofclients: 63
+hello: 1526 #ofclients: 64
+hello: 1527 #ofclients: 65
+hello: 1525 #ofclients: 66
+hello: 1523 #ofclients: 67
+hello: 1524 #ofclients: 68
+hello: 1521 #ofclients: 69
+hello: 1522 #ofclients: 70
+Initial state completed. Registered 10/70 ggT-processes
+Start building ring
+Bound ggT-process 1522
+Bound ggT-process 1521
+Bound ggT-process 1524
+Bound ggT-process 1523
+Bound ggT-process 1525
+Bound ggT-process 1527
+Bound ggT-process 1526
+Bound ggT-process 1528
+Bound ggT-process 1529
+Bound ggT-process 15210
+Bound ggT-process 1502
+Bound ggT-process 1503
+Bound ggT-process 1504
+Bound ggT-process 1505
+Bound ggT-process 1506
+Bound ggT-process 1501
+Bound ggT-process 1509
+Bound ggT-process 1507
+Bound ggT-process 1508
+Bound ggT-process 15010
+Bound ggT-process 48823
+Bound ggT-process 48813
+Bound ggT-process 48833
+Bound ggT-process 48843
+Bound ggT-process 48853
+Bound ggT-process 48863
+Bound ggT-process 48873
+Bound ggT-process 488103
+Bound ggT-process 48883
+Bound ggT-process 48893
+Bound ggT-process 48822
+Bound ggT-process 48832
+Bound ggT-process 48812
+Bound ggT-process 48842
+Bound ggT-process 48872
+Bound ggT-process 48882
+Bound ggT-process 48862
+Bound ggT-process 48852
+Bound ggT-process 48892
+Bound ggT-process 488102
+Bound ggT-process 48811
+Bound ggT-process 48831
+Bound ggT-process 48821
+Bound ggT-process 48841
+Bound ggT-process 48851
+Bound ggT-process 48871
+Bound ggT-process 48861
+Bound ggT-process 48881
+Bound ggT-process 48891
+Bound ggT-process 488101
+Bound ggT-process 1122
+Bound ggT-process 1132
+Bound ggT-process 1162
+Bound ggT-process 1112
+Bound ggT-process 1142
+Bound ggT-process 1152
+Bound ggT-process 1172
+Bound ggT-process 1182
+Bound ggT-process 1192
+Bound ggT-process 11102
+Bound ggT-process 1121
+Bound ggT-process 1141
+Bound ggT-process 1111
+Bound ggT-process 1151
+Bound ggT-process 1131
+Bound ggT-process 1161
+Bound ggT-process 1171
+Bound ggT-process 1181
+Bound ggT-process 1191
+Bound ggT-process 11101
+Set neighbour for ggT-process 1503 with neighbours: 1509 1141
+Set neighbour for ggT-process 1141 with neighbours: 1503 48853
+Set neighbour for ggT-process 48853 with neighbours: 1141 48863
+Set neighbour for ggT-process 48863 with neighbours: 48853 1161
+Set neighbour for ggT-process 1161 with neighbours: 48863 48831
+Set neighbour for ggT-process 48831 with neighbours: 1161 48862
+Set neighbour for ggT-process 48862 with neighbours: 48831 1182
+Set neighbour for ggT-process 1182 with neighbours: 48862 1132
+Set neighbour for ggT-process 1132 with neighbours: 1182 48852
+Set neighbour for ggT-process 48852 with neighbours: 1132 1142
+Set neighbour for ggT-process 1142 with neighbours: 48852 1528
+Set neighbour for ggT-process 1528 with neighbours: 1142 1506
+Set neighbour for ggT-process 1506 with neighbours: 1528 48873
+Set neighbour for ggT-process 48873 with neighbours: 1506 15210
+Set neighbour for ggT-process 15210 with neighbours: 48873 1152
+Set neighbour for ggT-process 1152 with neighbours: 15210 1111
+Set neighbour for ggT-process 1111 with neighbours: 1152 1151
+Set neighbour for ggT-process 1151 with neighbours: 1111 48822
+Set neighbour for ggT-process 48822 with neighbours: 1151 1508
+Set neighbour for ggT-process 1508 with neighbours: 48822 1192
+Set neighbour for ggT-process 1192 with neighbours: 1508 488102
+Set neighbour for ggT-process 488102 with neighbours: 1192 1131
+Set neighbour for ggT-process 1131 with neighbours: 488102 1504
+Set neighbour for ggT-process 1504 with neighbours: 1131 1162
+Set neighbour for ggT-process 1162 with neighbours: 1504 48841
+Set neighbour for ggT-process 48841 with neighbours: 1162 1502
+Set neighbour for ggT-process 1502 with neighbours: 48841 1525
+Set neighbour for ggT-process 1525 with neighbours: 1502 48883
+Set neighbour for ggT-process 48883 with neighbours: 1525 48823
+Set neighbour for ggT-process 48823 with neighbours: 48883 1507
+Set neighbour for ggT-process 1507 with neighbours: 48823 15010
+Set neighbour for ggT-process 15010 with neighbours: 1507 48893
+Set neighbour for ggT-process 48893 with neighbours: 15010 1523
+Set neighbour for ggT-process 1523 with neighbours: 48893 1522
+Set neighbour for ggT-process 1522 with neighbours: 1523 1181
+Set neighbour for ggT-process 1181 with neighbours: 1522 48892
+Set neighbour for ggT-process 48892 with neighbours: 1181 1172
+Set neighbour for ggT-process 1172 with neighbours: 48892 1112
+Set neighbour for ggT-process 1112 with neighbours: 1172 48872
+Set neighbour for ggT-process 48872 with neighbours: 1112 48861
+Set neighbour for ggT-process 48861 with neighbours: 48872 1526
+Set neighbour for ggT-process 1526 with neighbours: 48861 11101
+Set neighbour for ggT-process 11101 with neighbours: 1526 1529
+Set neighbour for ggT-process 1529 with neighbours: 11101 48832
+Set neighbour for ggT-process 48832 with neighbours: 1529 48842
+Set neighbour for ggT-process 48842 with neighbours: 48832 488101
+Set neighbour for ggT-process 488101 with neighbours: 48842 1501
+Set neighbour for ggT-process 1501 with neighbours: 488101 1191
+Set neighbour for ggT-process 1191 with neighbours: 1501 1122
+Set neighbour for ggT-process 1122 with neighbours: 1191 1521
+Set neighbour for ggT-process 1521 with neighbours: 1122 48833
+Set neighbour for ggT-process 48833 with neighbours: 1521 48891
+Set neighbour for ggT-process 48891 with neighbours: 48833 48851
+Set neighbour for ggT-process 48851 with neighbours: 48891 48871
+Set neighbour for ggT-process 48871 with neighbours: 48851 1527
+Set neighbour for ggT-process 1527 with neighbours: 48871 1524
+Set neighbour for ggT-process 1524 with neighbours: 1527 48811
+Set neighbour for ggT-process 48811 with neighbours: 1524 11102
+Set neighbour for ggT-process 11102 with neighbours: 48811 48882
+Set neighbour for ggT-process 48882 with neighbours: 11102 1505
+Set neighbour for ggT-process 1505 with neighbours: 48882 48881
+Set neighbour for ggT-process 48881 with neighbours: 1505 1171
+Set neighbour for ggT-process 1171 with neighbours: 48881 48843
+Set neighbour for ggT-process 48843 with neighbours: 1171 48813
+Set neighbour for ggT-process 48813 with neighbours: 48843 48812
+Set neighbour for ggT-process 48812 with neighbours: 48813 488103
+Set neighbour for ggT-process 488103 with neighbours: 48812 48821
+Set neighbour for ggT-process 48821 with neighbours: 488103 1121
+Set neighbour for ggT-process 1121 with neighbours: 48821 1509
+Set neighbour for ggT-process 1509 with neighbours: 1121 1503
+Done building ring
+Switching to calculation state
+Start calculation for ggT: 13
+1162 reports new Mi 5429970 at 10.05 13:43:28,941|
+1121 reports new Mi 19773 at 10.05 13:43:28,941|
+1509 reports new Mi 1521 at 10.05 13:43:30,941|
+48821 reports new Mi 585 at 00.00 00:00:00,000|
+488103 reports new Mi 390 at 00.00 00:00:00,000|
+1503 reports new Mi 1521 at 10.05 13:43:32,943|
+1121 reports new Mi 468 at 10.05 13:43:32,945|
+48812 reports new Mi 195 at 00.00 00:00:00,000|
+48821 reports new Mi 195 at 00.00 00:00:00,000|
+1141 reports new Mi 676 at 10.05 13:43:34,946|
+48813 reports new Mi 52 at 00.00 00:00:00,000|
+488103 reports new Mi 195 at 00.00 00:00:00,000|
+1509 reports new Mi 117 at 10.05 13:43:36,946|
+1503 reports new Mi 169 at 10.05 13:43:36,946|
+1121 reports new Mi 78 at 10.05 13:43:36,947|
+48853 reports new Mi 338 at 00.00 00:00:00,000|
+48843 reports new Mi 26 at 00.00 00:00:00,000|
+48812 reports new Mi 39 at 00.00 00:00:00,000|
+1141 reports new Mi 338 at 10.05 13:43:38,948|
+48863 reports new Mi 312 at 00.00 00:00:00,000|
+48821 reports new Mi 39 at 00.00 00:00:00,000|
+1509 reports new Mi 39 at 10.05 13:43:38,949|
+1503 reports new Mi 52 at 10.05 13:43:38,949|
+48813 reports new Mi 13 at 00.00 00:00:00,000|
+488103 reports new Mi 39 at 00.00 00:00:00,000|
+1171 reports new Mi 13 at 10.05 13:43:40,948|
+1161 reports new Mi 195 at 10.05 13:43:40,949|
+1141 reports new Mi 169 at 10.05 13:43:40,949|
+1121 reports new Mi 39 at 10.05 13:43:40,949|
+48853 reports new Mi 26 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (1203345,13)
+48871 reports termination with ggT 1203345 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (2312310,13)
+48822 reports termination with ggT 2312310 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (15730,13)
+48852 reports termination with ggT 15730 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (34188700,13)
+48832 reports termination with ggT 34188700 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (650650,13)
+48862 reports termination with ggT 650650 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (768268930,13)
+48851 reports termination with ggT 768268930 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (234234,13)
+48811 reports termination with ggT 234234 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (2372595225,13)
+48861 reports termination with ggT 2372595225 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (40000779,13)
+48891 reports termination with ggT 40000779 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (43436743350,13)
+488101 reports termination with ggT 43436743350 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (149396,13)
+48883 reports termination with ggT 149396 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (25050025,13)
+488102 reports termination with ggT 25050025 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (71896825,13)
+48882 reports termination with ggT 71896825 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (28078050,13)
+48892 reports termination with ggT 28078050 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (5923192275,13)
+48872 reports termination with ggT 5923192275 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (1466695230,13)
+48842 reports termination with ggT 1466695230 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (1431430,13)
+48823 reports termination with ggT 1431430 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (11966045,13)
+48873 reports termination with ggT 11966045 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (3174665,13)
+1192 reports termination with ggT 3174665 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (1638,13)
+1122 reports termination with ggT 1638 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (14196,13)
+1152 reports termination with ggT 14196 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (1128227100,13)
+1142 reports termination with ggT 1128227100 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (1638,13)
+1122 reports termination with ggT 1638 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (10765300,13)
+1182 reports termination with ggT 10765300 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (3174665,13)
+1192 reports termination with ggT 3174665 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (234468234,13)
+1112 reports termination with ggT 234468234 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (14196,13)
+1152 reports termination with ggT 14196 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (10765300,13)
+1182 reports termination with ggT 10765300 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (234468234,13)
+1112 reports termination with ggT 234468234 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (438017580,13)
+1132 reports termination with ggT 438017580 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (169169,13)
+11102 reports termination with ggT 169169 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (169169,13)
+11102 reports termination with ggT 169169 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (438017580,13)
+1132 reports termination with ggT 438017580 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (35490,13)
+1151 reports termination with ggT 35490 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (41083900,13)
+1181 reports termination with ggT 41083900 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (35490,13)
+1151 reports termination with ggT 35490 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (41083900,13)
+1181 reports termination with ggT 41083900 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (35490,13)
+1151 reports termination with ggT 35490 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (35490,13)
+1151 reports termination with ggT 35490 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (41083900,13)
+1181 reports termination with ggT 41083900 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (35490,13)
+1151 reports termination with ggT 35490 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (35490,13)
+1151 reports termination with ggT 35490 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (35490,13)
+1151 reports termination with ggT 35490 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (813461220,13)
+1172 reports termination with ggT 813461220 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (41083900,13)
+1181 reports termination with ggT 41083900 at 10.05 13:43:41,984|
+Error! Received terminated ggT is bigger than the smalles received ggT (35490,13)
+1151 reports termination with ggT 35490 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (41083900,13)
+1181 reports termination with ggT 41083900 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (9202050,13)
+11101 reports termination with ggT 9202050 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (41083900,13)
+1181 reports termination with ggT 41083900 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (9202050,13)
+11101 reports termination with ggT 9202050 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (41083900,13)
+1181 reports termination with ggT 41083900 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (9202050,13)
+11101 reports termination with ggT 9202050 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (41083900,13)
+1181 reports termination with ggT 41083900 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (813461220,13)
+1172 reports termination with ggT 813461220 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (2212210,13)
+1111 reports termination with ggT 2212210 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (9202050,13)
+11101 reports termination with ggT 9202050 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (2212210,13)
+1111 reports termination with ggT 2212210 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (2212210,13)
+1111 reports termination with ggT 2212210 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (37217180,13)
+1191 reports termination with ggT 37217180 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (9202050,13)
+11101 reports termination with ggT 9202050 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (2212210,13)
+1111 reports termination with ggT 2212210 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (2212210,13)
+1111 reports termination with ggT 2212210 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (2212210,13)
+1111 reports termination with ggT 2212210 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (37217180,13)
+1191 reports termination with ggT 37217180 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (9202050,13)
+11101 reports termination with ggT 9202050 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (2212210,13)
+1111 reports termination with ggT 2212210 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (9202050,13)
+11101 reports termination with ggT 9202050 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (2212210,13)
+1111 reports termination with ggT 2212210 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (37217180,13)
+1191 reports termination with ggT 37217180 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (9202050,13)
+11101 reports termination with ggT 9202050 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (1128227100,13)
+1142 reports termination with ggT 1128227100 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (37217180,13)
+1191 reports termination with ggT 37217180 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (37217180,13)
+1191 reports termination with ggT 37217180 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (37217180,13)
+1191 reports termination with ggT 37217180 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (376451775700,13)
+1131 reports termination with ggT 376451775700 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (37217180,13)
+1191 reports termination with ggT 37217180 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (376451775700,13)
+1131 reports termination with ggT 376451775700 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (37217180,13)
+1191 reports termination with ggT 37217180 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (376451775700,13)
+1131 reports termination with ggT 376451775700 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (376451775700,13)
+1131 reports termination with ggT 376451775700 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (564677663550,13)
+48833 reports termination with ggT 564677663550 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (376451775700,13)
+1131 reports termination with ggT 376451775700 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (376451775700,13)
+1131 reports termination with ggT 376451775700 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (376451775700,13)
+1131 reports termination with ggT 376451775700 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (376451775700,13)
+1131 reports termination with ggT 376451775700 at 10.05 13:43:41,985|
+Error! Received terminated ggT is bigger than the smalles received ggT (44550506,13)
+48893 reports termination with ggT 44550506 at 00.00 00:00:00,000|
+48812 reports new Mi 13 at 00.00 00:00:00,000|
+48843 reports new Mi 13 at 00.00 00:00:00,000|
+48881 reports new Mi 13 at 00.00 00:00:00,000|
+48881 reports termination with ggT 13 at 00.00 00:00:00,000|
+1141 reports new Mi 13 at 10.05 13:43:42,950|
+48831 reports new Mi 117 at 00.00 00:00:00,000|
+48863 reports new Mi 117 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (117,13)
+48831 reports termination with ggT 117 at 00.00 00:00:00,000|
+1503 reports new Mi 13 at 10.05 13:43:42,952|
+Error! Received terminated ggT is bigger than the smalles received ggT (975975,13)
+48841 reports termination with ggT 975975 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (5429970,13)
+1162 reports termination with ggT 5429970 at 10.05 13:43:43,943|
+Error! Received terminated ggT is bigger than the smalles received ggT (5429970,13)
+1162 reports termination with ggT 5429970 at 10.05 13:43:43,944|
+488103 reports new Mi 13 at 00.00 00:00:00,000|
+1505 reports new Mi 13 at 10.05 13:43:44,949|
+48853 reports new Mi 13 at 00.00 00:00:00,000|
+48862 reports new Mi 13 at 00.00 00:00:00,000|
+48863 reports new Mi 13 at 00.00 00:00:00,000|
+1161 reports new Mi 78 at 10.05 13:43:44,952|
+48821 reports new Mi 13 at 00.00 00:00:00,000|
+48882 reports new Mi 13 at 00.00 00:00:00,000|
+48831 reports new Mi 13 at 00.00 00:00:00,000|
+1182 reports new Mi 13 at 10.05 13:43:46,953|
+1161 reports new Mi 13 at 10.05 13:43:46,953|
+1509 reports new Mi 13 at 10.05 13:43:46,954|
+1121 reports new Mi 13 at 10.05 13:43:48,952|
+11102 reports new Mi 13 at 10.05 13:43:48,952|
+1132 reports new Mi 13 at 10.05 13:43:48,954|
+48811 reports new Mi 13 at 00.00 00:00:00,000|
+48852 reports new Mi 13 at 00.00 00:00:00,000|
+1524 reports new Mi 13 at 10.05 13:43:52,953|
+1142 reports new Mi 13 at 10.05 13:43:52,956|
+1527 reports new Mi 13 at 10.05 13:43:54,955|
+1528 reports new Mi 13 at 10.05 13:43:54,956|
+48871 reports new Mi 13 at 00.00 00:00:00,000|
+1506 reports new Mi 13 at 10.05 13:43:56,958|
+48813 reports termination with ggT 13 at 00.00 00:00:00,000|
+48843 reports termination with ggT 13 at 00.00 00:00:00,000|
+1171 reports termination with ggT 13 at 10.05 13:43:57,956|
+1171 reports termination with ggT 13 at 10.05 13:43:57,956|
+1171 reports termination with ggT 13 at 10.05 13:43:57,956|
+1171 reports termination with ggT 13 at 10.05 13:43:57,956|
+1171 reports termination with ggT 13 at 10.05 13:43:57,956|
+1171 reports termination with ggT 13 at 10.05 13:43:57,956|
+1171 reports termination with ggT 13 at 10.05 13:43:57,956|
+1171 reports termination with ggT 13 at 10.05 13:43:57,956|
+48851 reports new Mi 13 at 00.00 00:00:00,000|
+48873 reports new Mi 13 at 00.00 00:00:00,000|
+48812 reports termination with ggT 13 at 00.00 00:00:00,000|
+48881 reports termination with ggT 13 at 00.00 00:00:00,000|
+48853 reports termination with ggT 13 at 00.00 00:00:00,000|
+1141 reports termination with ggT 13 at 10.05 13:43:59,954|
+1141 reports termination with ggT 13 at 10.05 13:43:59,954|
+1141 reports termination with ggT 13 at 10.05 13:43:59,954|
+1141 reports termination with ggT 13 at 10.05 13:43:59,954|
+1141 reports termination with ggT 13 at 10.05 13:43:59,954|
+1141 reports termination with ggT 13 at 10.05 13:43:59,954|
+1141 reports termination with ggT 13 at 10.05 13:43:59,954|
+1141 reports termination with ggT 13 at 10.05 13:43:59,954|
+1141 reports termination with ggT 13 at 10.05 13:43:59,954|
+48891 reports new Mi 13 at 00.00 00:00:00,000|
+15210 reports new Mi 13 at 10.05 13:44:00,962|
+488103 reports termination with ggT 13 at 00.00 00:00:00,000|
+48862 reports termination with ggT 13 at 00.00 00:00:00,000|
+48831 reports termination with ggT 13 at 00.00 00:00:00,000|
+48863 reports termination with ggT 13 at 00.00 00:00:00,000|
+1161 reports termination with ggT 13 at 10.05 13:44:01,956|
+1161 reports termination with ggT 13 at 10.05 13:44:01,956|
+1161 reports termination with ggT 13 at 10.05 13:44:01,956|
+1161 reports termination with ggT 13 at 10.05 13:44:01,956|
+1161 reports termination with ggT 13 at 10.05 13:44:01,956|
+1161 reports termination with ggT 13 at 10.05 13:44:01,956|
+1161 reports termination with ggT 13 at 10.05 13:44:01,956|
+1161 reports termination with ggT 13 at 10.05 13:44:01,956|
+1161 reports termination with ggT 13 at 10.05 13:44:01,956|
+48833 reports new Mi 13 at 00.00 00:00:00,000|
+1152 reports new Mi 13 at 10.05 13:44:02,965|
+48821 reports termination with ggT 13 at 00.00 00:00:00,000|
+48882 reports termination with ggT 13 at 00.00 00:00:00,000|
+1121 reports termination with ggT 13 at 10.05 13:44:03,956|
+1121 reports termination with ggT 13 at 10.05 13:44:03,956|
+1121 reports termination with ggT 13 at 10.05 13:44:03,956|
+1121 reports termination with ggT 13 at 10.05 13:44:03,956|
+1121 reports termination with ggT 13 at 10.05 13:44:03,956|
+1121 reports termination with ggT 13 at 10.05 13:44:03,956|
+1121 reports termination with ggT 13 at 10.05 13:44:03,956|
+1121 reports termination with ggT 13 at 10.05 13:44:03,956|
+1121 reports termination with ggT 13 at 10.05 13:44:03,957|
+1182 reports termination with ggT 13 at 10.05 13:44:03,957|
+1182 reports termination with ggT 13 at 10.05 13:44:03,957|
+1503 reports termination with ggT 13 at 10.05 13:44:03,958|
+1521 reports new Mi 13 at 10.05 13:44:04,961|
+1111 reports new Mi 13 at 10.05 13:44:04,965|
+11102 reports termination with ggT 13 at 10.05 13:44:05,955|
+11102 reports termination with ggT 13 at 10.05 13:44:05,955|
+1509 reports termination with ggT 13 at 10.05 13:44:05,956|
+1132 reports termination with ggT 13 at 10.05 13:44:05,957|
+1132 reports termination with ggT 13 at 10.05 13:44:05,957|
+1122 reports new Mi 13 at 10.05 13:44:06,963|
+1151 reports new Mi 13 at 10.05 13:44:06,966|
+client: 11101 has mi: 9202050
+client: 1191 has mi: 13
+client: 1181 has mi: 41083900
+client: 1171 has mi: 13
+client: 1161 has mi: 13
+client: 1131 has mi: 376451775700
+client: 1151 has mi: 13
+client: 1111 has mi: 13
+client: 1141 has mi: 13
+client: 1121 has mi: 13
+client: 11102 has mi: 13
+client: 1192 has mi: 3174665
+client: 1182 has mi: 13
+client: 1172 has mi: 813461220
+client: 1152 has mi: 13
+client: 1142 has mi: 13
+client: 1112 has mi: 234468234
+client: 1162 has mi: 5429970
+client: 1132 has mi: 13
+client: 1122 has mi: 13
+client: 488101 has mi: 43436743350
+client: 48891 has mi: 13
+client: 48881 has mi: 13
+client: 48861 has mi: 2372595225
+client: 48871 has mi: 13
+client: 48851 has mi: 13
+client: 48841 has mi: 975975
+client: 48821 has mi: 13
+client: 48831 has mi: 13
+client: 48811 has mi: 13
+client: 488102 has mi: 25050025
+client: 48892 has mi: 28078050
+client: 48852 has mi: 13
+client: 48862 has mi: 13
+client: 48882 has mi: 13
+client: 48872 has mi: 5923192275
+client: 48842 has mi: 1466695230
+client: 48812 has mi: 13
+client: 48832 has mi: 34188700
+client: 48822 has mi: 13
+client: 48893 has mi: 44550506
+client: 48883 has mi: 149396
+client: 488103 has mi: 13
+client: 48873 has mi: 13
+client: 48863 has mi: 13
+client: 48853 has mi: 13
+client: 48843 has mi: 13
+client: 48833 has mi: 13
+client: 48813 has mi: 13
+client: 48823 has mi: 1431430
+client: 15010 has mi: 4679675
+client: 1508 has mi: 13
+client: 1507 has mi: 189618
+client: 1509 has mi: 13
+client: 1501 has mi: 13
+client: 1506 has mi: 13
+client: 1505 has mi: 13
+client: 1504 has mi: 780
+client: 1503 has mi: 13
+client: 1502 has mi: 6952660
+client: 15210 has mi: 13
+client: 1529 has mi: 129948
+client: 1528 has mi: 13
+client: 1526 has mi: 38713675
+client: 1527 has mi: 13
+client: 1525 has mi: 27115374
+client: 1523 has mi: 164775
+client: 1524 has mi: 13
+client: 1521 has mi: 13
+client: 1522 has mi: 4400085690
+48811 reports termination with ggT 13 at 00.00 00:00:00,000|
+48852 reports termination with ggT 13 at 00.00 00:00:00,000|
+1191 reports new Mi 13 at 10.05 13:44:08,963|
+48822 reports new Mi 13 at 00.00 00:00:00,000|
+1142 reports termination with ggT 13 at 10.05 13:44:09,961|
+1501 reports new Mi 13 at 10.05 13:44:10,963|
+1508 reports new Mi 13 at 10.05 13:44:10,968|
+1524 reports termination with ggT 13 at 10.05 13:44:11,960|
+488101 reports new Mi 13 at 00.00 00:00:00,000|
+1192 reports new Mi 13 at 10.05 13:44:12,971|
+48871 reports termination with ggT 13 at 00.00 00:00:00,000|
+1527 reports termination with ggT 13 at 10.05 13:44:13,961|
+1528 reports termination with ggT 13 at 10.05 13:44:13,963|
+48842 reports new Mi 13 at 00.00 00:00:00,000|
+488102 reports new Mi 13 at 00.00 00:00:00,000|
+48851 reports termination with ggT 13 at 00.00 00:00:00,000|
+48873 reports termination with ggT 13 at 00.00 00:00:00,000|
+48832 reports new Mi 13 at 00.00 00:00:00,000|
+1131 reports new Mi 13 at 10.05 13:44:16,973|
+48891 reports termination with ggT 13 at 00.00 00:00:00,000|
+1529 reports new Mi 13 at 10.05 13:44:18,969|
+1504 reports new Mi 13 at 10.05 13:44:18,973|
+48833 reports termination with ggT 13 at 00.00 00:00:00,000|
+1152 reports termination with ggT 13 at 10.05 13:44:19,968|
+1152 reports termination with ggT 13 at 10.05 13:44:19,968|
+11101 reports new Mi 13 at 10.05 13:44:20,971|
+1162 reports new Mi 13 at 10.05 13:44:20,976|
+1111 reports termination with ggT 13 at 10.05 13:44:21,971|
+1111 reports termination with ggT 13 at 10.05 13:44:21,971|
+1111 reports termination with ggT 13 at 10.05 13:44:21,971|
+1111 reports termination with ggT 13 at 10.05 13:44:21,971|
+1111 reports termination with ggT 13 at 10.05 13:44:21,971|
+1111 reports termination with ggT 13 at 10.05 13:44:21,971|
+1111 reports termination with ggT 13 at 10.05 13:44:21,971|
+1111 reports termination with ggT 13 at 10.05 13:44:21,971|
+1526 reports new Mi 13 at 10.05 13:44:22,972|
+48841 reports new Mi 13 at 00.00 00:00:00,000|
+1122 reports termination with ggT 13 at 10.05 13:44:23,969|
+1122 reports termination with ggT 13 at 10.05 13:44:23,969|
+1151 reports termination with ggT 13 at 10.05 13:44:23,971|
+1151 reports termination with ggT 13 at 10.05 13:44:23,971|
+1151 reports termination with ggT 13 at 10.05 13:44:23,971|
+1151 reports termination with ggT 13 at 10.05 13:44:23,971|
+1151 reports termination with ggT 13 at 10.05 13:44:23,971|
+1151 reports termination with ggT 13 at 10.05 13:44:23,972|
+1151 reports termination with ggT 13 at 10.05 13:44:23,972|
+1151 reports termination with ggT 13 at 10.05 13:44:23,972|
+48861 reports new Mi 13 at 00.00 00:00:00,000|
+1502 reports new Mi 13 at 10.05 13:44:24,978|
+1191 reports termination with ggT 13 at 10.05 13:44:25,968|
+1191 reports termination with ggT 13 at 10.05 13:44:25,969|
+1191 reports termination with ggT 13 at 10.05 13:44:25,969|
+1191 reports termination with ggT 13 at 10.05 13:44:25,969|
+1191 reports termination with ggT 13 at 10.05 13:44:25,969|
+1191 reports termination with ggT 13 at 10.05 13:44:25,969|
+1191 reports termination with ggT 13 at 10.05 13:44:25,969|
+1191 reports termination with ggT 13 at 10.05 13:44:25,969|
+48822 reports termination with ggT 13 at 00.00 00:00:00,000|
+48872 reports new Mi 13 at 00.00 00:00:00,000|
+1525 reports new Mi 13 at 10.05 13:44:26,980|
+1112 reports new Mi 13 at 10.05 13:44:28,979|
+48883 reports new Mi 13 at 00.00 00:00:00,000|
+488101 reports termination with ggT 13 at 00.00 00:00:00,000|
+1501 reports termination with ggT 13 at 10.05 13:44:29,971|
+1192 reports termination with ggT 13 at 10.05 13:44:29,975|
+1192 reports termination with ggT 13 at 10.05 13:44:29,975|
+1508 reports termination with ggT 13 at 10.05 13:44:29,976|
+1172 reports new Mi 13 at 10.05 13:44:30,980|
+48823 reports new Mi 13 at 00.00 00:00:00,000|
+48842 reports termination with ggT 13 at 00.00 00:00:00,000|
+488102 reports termination with ggT 13 at 00.00 00:00:00,000|
+client: 11101 has mi: 13
+client: 1191 has mi: 13
+client: 1181 has mi: 41083900
+client: 1171 has mi: 13
+client: 1161 has mi: 13
+client: 1131 has mi: 13
+client: 1151 has mi: 13
+client: 1111 has mi: 13
+client: 1141 has mi: 13
+client: 1121 has mi: 13
+client: 11102 has mi: 13
+client: 1192 has mi: 13
+client: 1182 has mi: 13
+client: 1172 has mi: 13
+client: 1152 has mi: 13
+client: 1142 has mi: 13
+client: 1112 has mi: 13
+client: 1162 has mi: 13
+client: 1132 has mi: 13
+client: 1122 has mi: 13
+client: 488101 has mi: 13
+client: 48891 has mi: 13
+client: 48881 has mi: 13
+client: 48861 has mi: 13
+client: 48871 has mi: 13
+client: 48851 has mi: 13
+client: 48841 has mi: 13
+client: 48821 has mi: 13
+client: 48831 has mi: 13
+client: 48811 has mi: 13
+client: 488102 has mi: 13
+client: 48892 has mi: 13
+client: 48852 has mi: 13
+client: 48862 has mi: 13
+client: 48882 has mi: 13
+client: 48872 has mi: 13
+client: 48842 has mi: 13
+client: 48812 has mi: 13
+client: 48832 has mi: 13
+client: 48822 has mi: 13
+client: 48893 has mi: 44550506
+client: 48883 has mi: 13
+client: 488103 has mi: 13
+client: 48873 has mi: 13
+client: 48863 has mi: 13
+client: 48853 has mi: 13
+client: 48843 has mi: 13
+client: 48833 has mi: 13
+client: 48813 has mi: 13
+client: 48823 has mi: 13
+client: 15010 has mi: 4679675
+client: 1508 has mi: 13
+client: 1507 has mi: 13
+client: 1509 has mi: 13
+client: 1501 has mi: 13
+client: 1506 has mi: 13
+client: 1505 has mi: 13
+client: 1504 has mi: 13
+client: 1503 has mi: 13
+client: 1502 has mi: 13
+client: 15210 has mi: 13
+client: 1529 has mi: 13
+client: 1528 has mi: 13
+client: 1526 has mi: 13
+client: 1527 has mi: 13
+client: 1525 has mi: 13
+client: 1523 has mi: 164775
+client: 1524 has mi: 13
+client: 1521 has mi: 13
+client: 1522 has mi: 4400085690
+48892 reports new Mi 13 at 00.00 00:00:00,000|
+1507 reports new Mi 13 at 10.05 13:44:32,985|
+48832 reports termination with ggT 13 at 00.00 00:00:00,000|
+1131 reports termination with ggT 13 at 10.05 13:44:33,977|
+1131 reports termination with ggT 13 at 10.05 13:44:33,977|
+1131 reports termination with ggT 13 at 10.05 13:44:33,977|
+1131 reports termination with ggT 13 at 10.05 13:44:33,977|
+1131 reports termination with ggT 13 at 10.05 13:44:33,977|
+1131 reports termination with ggT 13 at 10.05 13:44:33,977|
+1131 reports termination with ggT 13 at 10.05 13:44:33,977|
+1131 reports termination with ggT 13 at 10.05 13:44:33,977|
+1181 reports new Mi 13 at 10.05 13:44:34,981|
+15010 reports new Mi 13 at 10.05 13:44:34,986|
+1522 reports new Mi 13 at 10.05 13:44:36,982|
+48893 reports new Mi 13 at 00.00 00:00:00,000|
+1529 reports termination with ggT 13 at 10.05 13:44:37,976|
+11101 reports termination with ggT 13 at 10.05 13:44:37,978|
+11101 reports termination with ggT 13 at 10.05 13:44:37,978|
+11101 reports termination with ggT 13 at 10.05 13:44:37,978|
+11101 reports termination with ggT 13 at 10.05 13:44:37,978|
+11101 reports termination with ggT 13 at 10.05 13:44:37,978|
+11101 reports termination with ggT 13 at 10.05 13:44:37,978|
+11101 reports termination with ggT 13 at 10.05 13:44:37,978|
+11101 reports termination with ggT 13 at 10.05 13:44:37,978|
+1504 reports termination with ggT 13 at 10.05 13:44:37,980|
+1162 reports termination with ggT 13 at 10.05 13:44:37,981|
+1162 reports termination with ggT 13 at 10.05 13:44:37,981|
+1523 reports new Mi 13 at 10.05 13:44:38,985|
+48841 reports termination with ggT 13 at 00.00 00:00:00,000|
+48861 reports termination with ggT 13 at 00.00 00:00:00,000|
+1526 reports termination with ggT 13 at 10.05 13:44:41,979|
+48872 reports termination with ggT 13 at 00.00 00:00:00,000|
+1502 reports termination with ggT 13 at 10.05 13:44:43,984|
+1112 reports termination with ggT 13 at 10.05 13:44:45,984|
+1112 reports termination with ggT 13 at 10.05 13:44:45,984|
+48883 reports termination with ggT 13 at 00.00 00:00:00,000|
+1172 reports termination with ggT 13 at 10.05 13:44:47,987|
+1172 reports termination with ggT 13 at 10.05 13:44:47,987|
+48823 reports termination with ggT 13 at 00.00 00:00:00,000|
+client: 11101 has mi: 13
+client: 1191 has mi: 13
+client: 1181 has mi: 13
+client: 1171 has mi: 13
+client: 1161 has mi: 13
+client: 1131 has mi: 13
+client: 1151 has mi: 13
+client: 1111 has mi: 13
+client: 1141 has mi: 13
+client: 1121 has mi: 13
+client: 11102 has mi: 13
+client: 1192 has mi: 13
+client: 1182 has mi: 13
+client: 1172 has mi: 13
+client: 1152 has mi: 13
+client: 1142 has mi: 13
+client: 1112 has mi: 13
+client: 1162 has mi: 13
+client: 1132 has mi: 13
+client: 1122 has mi: 13
+client: 488101 has mi: 13
+client: 48891 has mi: 13
+client: 48881 has mi: 13
+client: 48861 has mi: 13
+client: 48871 has mi: 13
+client: 48851 has mi: 13
+client: 48841 has mi: 13
+client: 48821 has mi: 13
+client: 48831 has mi: 13
+client: 48811 has mi: 13
+client: 488102 has mi: 13
+client: 48892 has mi: 13
+client: 48852 has mi: 13
+client: 48862 has mi: 13
+client: 48882 has mi: 13
+client: 48872 has mi: 13
+client: 48842 has mi: 13
+client: 48812 has mi: 13
+client: 48832 has mi: 13
+client: 48822 has mi: 13
+client: 48893 has mi: 13
+client: 48883 has mi: 13
+client: 488103 has mi: 13
+client: 48873 has mi: 13
+client: 48863 has mi: 13
+client: 48853 has mi: 13
+client: 48843 has mi: 13
+client: 48833 has mi: 13
+client: 48813 has mi: 13
+client: 48823 has mi: 13
+client: 15010 has mi: 13
+client: 1508 has mi: 13
+client: 1507 has mi: 13
+client: 1509 has mi: 13
+client: 1501 has mi: 13
+client: 1506 has mi: 13
+client: 1505 has mi: 13
+client: 1504 has mi: 13
+client: 1503 has mi: 13
+client: 1502 has mi: 13
+client: 15210 has mi: 13
+client: 1529 has mi: 13
+client: 1528 has mi: 13
+client: 1526 has mi: 13
+client: 1527 has mi: 13
+client: 1525 has mi: 13
+client: 1523 has mi: 13
+client: 1524 has mi: 13
+client: 1521 has mi: 13
+client: 1522 has mi: 13
+48892 reports termination with ggT 13 at 00.00 00:00:00,000|
+1181 reports termination with ggT 13 at 10.05 13:44:51,988|
+1181 reports termination with ggT 13 at 10.05 13:44:51,988|
+1181 reports termination with ggT 13 at 10.05 13:44:51,988|
+1181 reports termination with ggT 13 at 10.05 13:44:51,988|
+1181 reports termination with ggT 13 at 10.05 13:44:51,988|
+1181 reports termination with ggT 13 at 10.05 13:44:51,988|
+1181 reports termination with ggT 13 at 10.05 13:44:51,988|
+1181 reports termination with ggT 13 at 10.05 13:44:51,988|
+1181 reports termination with ggT 13 at 10.05 13:44:51,988|
+1181 reports termination with ggT 13 at 10.05 13:44:51,988|
+1507 reports termination with ggT 13 at 10.05 13:44:51,991|
+48893 reports termination with ggT 13 at 00.00 00:00:00,000|
+15010 reports termination with ggT 13 at 10.05 13:44:53,992|
+1523 reports termination with ggT 13 at 10.05 13:44:55,993|
+1522 reports termination with ggT 13 at 10.05 13:44:55,993|
+client: 11101 has mi: 13
+client: 1191 has mi: 13
+client: 1181 has mi: 13
+client: 1171 has mi: 13
+client: 1161 has mi: 13
+client: 1131 has mi: 13
+client: 1151 has mi: 13
+client: 1111 has mi: 13
+client: 1141 has mi: 13
+client: 1121 has mi: 13
+client: 11102 has mi: 13
+client: 1192 has mi: 13
+client: 1182 has mi: 13
+client: 1172 has mi: 13
+client: 1152 has mi: 13
+client: 1142 has mi: 13
+client: 1112 has mi: 13
+client: 1162 has mi: 13
+client: 1132 has mi: 13
+client: 1122 has mi: 13
+client: 488101 has mi: 13
+client: 48891 has mi: 13
+client: 48881 has mi: 13
+client: 48861 has mi: 13
+client: 48871 has mi: 13
+client: 48851 has mi: 13
+client: 48841 has mi: 13
+client: 48821 has mi: 13
+client: 48831 has mi: 13
+client: 48811 has mi: 13
+client: 488102 has mi: 13
+client: 48892 has mi: 13
+client: 48852 has mi: 13
+client: 48862 has mi: 13
+client: 48882 has mi: 13
+client: 48872 has mi: 13
+client: 48842 has mi: 13
+client: 48812 has mi: 13
+client: 48832 has mi: 13
+client: 48822 has mi: 13
+client: 48893 has mi: 13
+client: 48883 has mi: 13
+client: 488103 has mi: 13
+client: 48873 has mi: 13
+client: 48863 has mi: 13
+client: 48853 has mi: 13
+client: 48843 has mi: 13
+client: 48833 has mi: 13
+client: 48813 has mi: 13
+client: 48823 has mi: 13
+client: 15010 has mi: 13
+client: 1508 has mi: 13
+client: 1507 has mi: 13
+client: 1509 has mi: 13
+client: 1501 has mi: 13
+client: 1506 has mi: 13
+client: 1505 has mi: 13
+client: 1504 has mi: 13
+client: 1503 has mi: 13
+client: 1502 has mi: 13
+client: 15210 has mi: 13
+client: 1529 has mi: 13
+client: 1528 has mi: 13
+client: 1526 has mi: 13
+client: 1527 has mi: 13
+client: 1525 has mi: 13
+client: 1523 has mi: 13
+client: 1524 has mi: 13
+client: 1521 has mi: 13
+client: 1522 has mi: 13
+ggT-Process: 11101 is alive
+ggT-Process: 1191 is alive
+ggT-Process: 1181 is alive
+ggT-Process: 1171 is alive
+ggT-Process: 1161 is alive
+ggT-Process: 1131 is alive
+ggT-Process: 1151 is alive
+ggT-Process: 1111 is alive
+ggT-Process: 1141 is alive
+ggT-Process: 1121 is alive
+ggT-Process: 11102 is alive
+ggT-Process: 1192 is alive
+ggT-Process: 1182 is alive
+ggT-Process: 1172 is alive
+ggT-Process: 1152 is alive
+ggT-Process: 1142 is alive
+ggT-Process: 1112 is alive
+ggT-Process: 1162 is alive
+ggT-Process: 1132 is alive
+ggT-Process: 1122 is alive
+ggT-Process: 488101 is alive
+ggT-Process: 48891 is alive
+ggT-Process: 48881 is alive
+ggT-Process: 48861 is alive
+ggT-Process: 48871 is alive
+ggT-Process: 48851 is alive
+ggT-Process: 48841 is alive
+ggT-Process: 48821 is alive
+ggT-Process: 48831 is alive
+ggT-Process: 48811 is alive
+ggT-Process: 488102 is alive
+ggT-Process: 48892 is alive
+ggT-Process: 48852 is alive
+ggT-Process: 48862 is alive
+ggT-Process: 48882 is alive
+ggT-Process: 48872 is alive
+ggT-Process: 48842 is alive
+ggT-Process: 48812 is alive
+ggT-Process: 48832 is alive
+ggT-Process: 48822 is alive
+ggT-Process: 48893 is alive
+ggT-Process: 48883 is alive
+ggT-Process: 488103 is alive
+ggT-Process: 48873 is alive
+ggT-Process: 48863 is alive
+ggT-Process: 48853 is alive
+ggT-Process: 48843 is alive
+ggT-Process: 48833 is alive
+ggT-Process: 48813 is alive
+ggT-Process: 48823 is alive
+ggT-Process: 15010 is alive
+ggT-Process: 1508 is alive
+ggT-Process: 1507 is alive
+ggT-Process: 1509 is alive
+ggT-Process: 1501 is alive
+ggT-Process: 1506 is alive
+ggT-Process: 1505 is alive
+ggT-Process: 1504 is alive
+ggT-Process: 1503 is alive
+ggT-Process: 1502 is alive
+ggT-Process: 15210 is alive
+ggT-Process: 1529 is alive
+ggT-Process: 1528 is alive
+ggT-Process: 1526 is alive
+ggT-Process: 1527 is alive
+ggT-Process: 1525 is alive
+ggT-Process: 1523 is alive
+ggT-Process: 1524 is alive
+ggT-Process: 1521 is alive
+ggT-Process: 1522 is alive
+Start calculation for ggT: 3
+1162 reports new Mi 50490 at 10.05 13:46:23,814|
+1112 reports new Mi 1604358 at 10.05 13:46:23,814|
+1528 reports new Mi 3490410 at 10.05 13:46:23,813|
+1502 reports new Mi 1465230 at 10.05 13:46:23,813|
+1161 reports new Mi 1260 at 10.05 13:46:23,814|
+1131 reports new Mi 80223 at 10.05 13:46:23,814|
+48841 reports new Mi 31977 at 00.00 00:00:00,000|
+1504 reports new Mi 33660 at 10.05 13:46:25,814|
+48863 reports new Mi 630 at 00.00 00:00:00,000|
+48831 reports new Mi 1260 at 00.00 00:00:00,000|
+488102 reports new Mi 1734 at 00.00 00:00:00,000|
+1506 reports new Mi 958419 at 10.05 13:46:25,815|
+1525 reports new Mi 732615 at 10.05 13:46:25,816|
+1502 reports new Mi 26265 at 10.05 13:46:27,815|
+48862 reports new Mi 675 at 00.00 00:00:00,000|
+1162 reports new Mi 18513 at 10.05 13:46:27,817|
+1192 reports new Mi 1734 at 10.05 13:46:27,817|
+1528 reports new Mi 615153 at 10.05 13:46:27,817|
+48873 reports new Mi 42147 at 00.00 00:00:00,000|
+1161 reports new Mi 630 at 10.05 13:46:27,818|
+1131 reports new Mi 459 at 10.05 13:46:27,818|
+48831 reports new Mi 585 at 00.00 00:00:00,000|
+1182 reports new Mi 225 at 10.05 13:46:29,818|
+48841 reports new Mi 5712 at 00.00 00:00:00,000|
+1525 reports new Mi 23460 at 10.05 13:46:29,818|
+1504 reports new Mi 15147 at 10.05 13:46:29,818|
+1508 reports new Mi 924 at 10.05 13:46:29,818|
+1506 reports new Mi 31185 at 10.05 13:46:29,818|
+488102 reports new Mi 357 at 00.00 00:00:00,000|
+15210 reports new Mi 29367 at 10.05 13:46:29,819|
+48862 reports new Mi 90 at 00.00 00:00:00,000|
+1132 reports new Mi 210 at 10.05 13:46:31,819|
+1161 reports new Mi 45 at 10.05 13:46:31,819|
+1162 reports new Mi 1377 at 10.05 13:46:31,820|
+1502 reports new Mi 3417 at 10.05 13:46:31,819|
+1131 reports new Mi 102 at 10.05 13:46:31,820|
+48822 reports new Mi 462 at 00.00 00:00:00,000|
+1528 reports new Mi 22638 at 10.05 13:46:31,820|
+1192 reports new Mi 306 at 10.05 13:46:31,821|
+1504 reports new Mi 459 at 10.05 13:46:31,820|
+1152 reports new Mi 25641 at 10.05 13:46:31,822|
+48873 reports new Mi 12780 at 00.00 00:00:00,000|
+48831 reports new Mi 45 at 00.00 00:00:00,000|
+1182 reports new Mi 45 at 10.05 13:46:33,820|
+48841 reports new Mi 204 at 00.00 00:00:00,000|
+48852 reports new Mi 105 at 00.00 00:00:00,000|
+48863 reports new Mi 45 at 00.00 00:00:00,000|
+1508 reports new Mi 462 at 10.05 13:46:33,820|
+1151 reports new Mi 462 at 10.05 13:46:33,821|
+488102 reports new Mi 51 at 00.00 00:00:00,000|
+1111 reports new Mi 7371 at 10.05 13:46:33,822|
+15210 reports new Mi 3807 at 10.05 13:46:33,822|
+1525 reports new Mi 2958 at 10.05 13:46:33,822|
+1162 reports new Mi 459 at 10.05 13:46:33,823|
+1506 reports new Mi 5625 at 10.05 13:46:33,822|
+Correct flag is now set to: 0 from: 1
+48862 reports new Mi 45 at 00.00 00:00:00,000|
+1132 reports new Mi 30 at 10.05 13:46:35,821|
+1142 reports new Mi 57 at 10.05 13:46:35,821|
+48853 reports new Mi 12 at 00.00 00:00:00,000|
+1192 reports new Mi 51 at 10.05 13:46:35,822|
+1131 reports new Mi 51 at 10.05 13:46:35,822|
+1152 reports new Mi 3528 at 10.05 13:46:35,823|
+1502 reports new Mi 153 at 10.05 13:46:35,822|
+1508 reports new Mi 156 at 10.05 13:46:35,822|
+1111 reports new Mi 441 at 10.05 13:46:35,823|
+1528 reports new Mi 138 at 10.05 13:46:35,823|
+1162 reports new Mi 51 at 10.05 13:46:35,824|
+1504 reports new Mi 51 at 10.05 13:46:35,823|
+48883 reports new Mi 2868 at 00.00 00:00:00,000|
+48873 reports new Mi 1359 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (1533675,12)
+488101 reports termination with ggT 1533675 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (55692,12)
+48851 reports termination with ggT 55692 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (69615,12)
+48891 reports termination with ggT 69615 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (656370,12)
+48842 reports termination with ggT 656370 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (11271,12)
+48812 reports termination with ggT 11271 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (111540,12)
+48881 reports termination with ggT 111540 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (22030470,12)
+48861 reports termination with ggT 22030470 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (68189550,12)
+48871 reports termination with ggT 68189550 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (646425,12)
+48821 reports termination with ggT 646425 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (103950,12)
+48811 reports termination with ggT 103950 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (265939245,12)
+48833 reports termination with ggT 265939245 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (151725,12)
+48813 reports termination with ggT 151725 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (96705180,12)
+48892 reports termination with ggT 96705180 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (10143900,12)
+48882 reports termination with ggT 10143900 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (3944850,12)
+48832 reports termination with ggT 3944850 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (306852975,12)
+1121 reports termination with ggT 306852975 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (306852975,12)
+1121 reports termination with ggT 306852975 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (274890,12)
+11102 reports termination with ggT 274890 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (306852975,12)
+1121 reports termination with ggT 306852975 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (2509650,12)
+1191 reports termination with ggT 2509650 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (2509650,12)
+1191 reports termination with ggT 2509650 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (306852975,12)
+1121 reports termination with ggT 306852975 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (2509650,12)
+1191 reports termination with ggT 2509650 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (2509650,12)
+1191 reports termination with ggT 2509650 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (2509650,12)
+1191 reports termination with ggT 2509650 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (16081065,12)
+1171 reports termination with ggT 16081065 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (16081065,12)
+1171 reports termination with ggT 16081065 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (3147210,12)
+11101 reports termination with ggT 3147210 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (16081065,12)
+1171 reports termination with ggT 16081065 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (3147210,12)
+11101 reports termination with ggT 3147210 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (3147210,12)
+11101 reports termination with ggT 3147210 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (16081065,12)
+1171 reports termination with ggT 16081065 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (3147210,12)
+11101 reports termination with ggT 3147210 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (54054,12)
+1181 reports termination with ggT 54054 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (16081065,12)
+1171 reports termination with ggT 16081065 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (54054,12)
+1181 reports termination with ggT 54054 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (54054,12)
+1181 reports termination with ggT 54054 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (58023108,12)
+1122 reports termination with ggT 58023108 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (54054,12)
+1181 reports termination with ggT 54054 at 10.05 13:46:36,831|
+Error! Received terminated ggT is bigger than the smalles received ggT (3147210,12)
+11101 reports termination with ggT 3147210 at 10.05 13:46:36,831|
+48852 reports new Mi 15 at 00.00 00:00:00,000|
+1182 reports new Mi 15 at 10.05 13:46:37,822|
+1141 reports new Mi 12 at 10.05 13:46:37,822|
+48863 reports new Mi 9 at 00.00 00:00:00,000|
+Error! Received terminated ggT is bigger than the smalles received ggT (12,9)
+1141 reports termination with ggT 12 at 10.05 13:46:37,823|
+Error! Received terminated ggT is bigger than the smalles received ggT (12,9)
+1141 reports termination with ggT 12 at 10.05 13:46:37,823|
+Error! Received terminated ggT is bigger than the smalles received ggT (12,9)
+1141 reports termination with ggT 12 at 10.05 13:46:37,823|
+Error! Received terminated ggT is bigger than the smalles received ggT (12,9)
+1141 reports termination with ggT 12 at 10.05 13:46:37,823|
+Error! Received terminated ggT is bigger than the smalles received ggT (12,9)
+1141 reports termination with ggT 12 at 10.05 13:46:37,823|
+1152 reports new Mi 441 at 10.05 13:46:37,824|
+1151 reports new Mi 21 at 10.05 13:46:37,824|
+48841 reports new Mi 51 at 00.00 00:00:00,000|
+48822 reports new Mi 150 at 00.00 00:00:00,000|
+1525 reports new Mi 51 at 10.05 13:46:37,824|
+1508 reports new Mi 3 at 10.05 13:46:37,824|
+48823 reports new Mi 2499 at 00.00 00:00:00,000|
+1528 reports new Mi 24 at 10.05 13:46:37,825|
+15210 reports new Mi 279 at 10.05 13:46:37,825|
+1506 reports new Mi 189 at 10.05 13:46:37,825|
+Error! Received terminated ggT is bigger than the smalles received ggT (1604358,3)
+1112 reports termination with ggT 1604358 at 10.05 13:46:38,817|
+Error! Received terminated ggT is bigger than the smalles received ggT (9450,3)
+1172 reports termination with ggT 9450 at 10.05 13:46:38,817|
+Error! Received terminated ggT is bigger than the smalles received ggT (187425,3)
+48872 reports termination with ggT 187425 at 00.00 00:00:00,000|
+48862 reports new Mi 15 at 00.00 00:00:00,000|
+1132 reports new Mi 15 at 10.05 13:46:39,823|
+1142 reports new Mi 12 at 10.05 13:46:39,823|
+1503 reports new Mi 12 at 10.05 13:46:39,822|
+1161 reports new Mi 9 at 10.05 13:46:39,823|
+48853 reports new Mi 3 at 00.00 00:00:00,000|
+1111 reports new Mi 21 at 10.05 13:46:39,825|
+48822 reports new Mi 3 at 00.00 00:00:00,000|
+1192 reports new Mi 3 at 10.05 13:46:39,826|
+1507 reports new Mi 2142 at 10.05 13:46:39,825|
+1502 reports new Mi 51 at 10.05 13:46:39,825|
+48883 reports new Mi 12 at 00.00 00:00:00,000|
+48873 reports new Mi 243 at 00.00 00:00:00,000|
+1506 reports new Mi 51 at 10.05 13:46:39,826|
+1152 reports new Mi 162 at 10.05 13:46:39,827|
+48852 reports new Mi 3 at 00.00 00:00:00,000|
+48831 reports new Mi 15 at 00.00 00:00:00,000|
+1509 reports new Mi 3 at 10.05 13:46:41,823|
+1141 reports new Mi 3 at 10.05 13:46:41,824|
+48863 reports new Mi 3 at 00.00 00:00:00,000|
+1151 reports new Mi 3 at 10.05 13:46:41,826|
+488102 reports new Mi 3 at 00.00 00:00:00,000|
+15010 reports new Mi 153 at 10.05 13:46:41,826|
+48873 reports new Mi 54 at 00.00 00:00:00,000|
+48823 reports new Mi 3 at 00.00 00:00:00,000|
+1525 reports new Mi 3 at 10.05 13:46:41,827|
+1152 reports new Mi 15 at 10.05 13:46:41,828|
+1528 reports new Mi 12 at 10.05 13:46:41,828|
+1506 reports new Mi 3 at 10.05 13:46:41,828|
+48831 reports new Mi 6 at 00.00 00:00:00,000|
+1503 reports new Mi 3 at 10.05 13:46:43,824|
+1161 reports new Mi 3 at 10.05 13:46:43,825|
+1121 reports new Mi 3 at 10.05 13:46:43,825|
+1132 reports new Mi 3 at 10.05 13:46:43,827|
+1142 reports new Mi 3 at 10.05 13:46:43,827|
+1111 reports new Mi 3 at 10.05 13:46:43,827|
+1131 reports new Mi 3 at 10.05 13:46:43,827|
+1507 reports new Mi 153 at 10.05 13:46:43,827|
+48893 reports new Mi 102 at 00.00 00:00:00,000|
+48883 reports new Mi 3 at 00.00 00:00:00,000|
+48873 reports new Mi 3 at 00.00 00:00:00,000|
+1502 reports new Mi 3 at 10.05 13:46:43,828|
+15210 reports new Mi 36 at 10.05 13:46:43,829|
+48821 reports new Mi 3 at 00.00 00:00:00,000|
+48831 reports new Mi 3 at 00.00 00:00:00,000|
+48862 reports new Mi 3 at 00.00 00:00:00,000|
+1504 reports new Mi 3 at 10.05 13:46:45,827|
+1152 reports new Mi 3 at 10.05 13:46:45,828|
+1182 reports new Mi 3 at 10.05 13:46:45,828|
+1507 reports new Mi 3 at 10.05 13:46:45,828|
+1523 reports new Mi 102 at 10.05 13:46:45,829|
+48841 reports new Mi 3 at 00.00 00:00:00,000|
+1528 reports new Mi 3 at 10.05 13:46:45,830|
+488103 reports new Mi 3 at 00.00 00:00:00,000|
+1162 reports new Mi 3 at 10.05 13:46:47,830|
+15010 reports new Mi 51 at 10.05 13:46:47,829|
+1522 reports new Mi 24 at 10.05 13:46:47,830|
+48812 reports new Mi 3 at 00.00 00:00:00,000|
+48893 reports new Mi 51 at 00.00 00:00:00,000|
+1523 reports new Mi 6 at 10.05 13:46:49,831|
+15010 reports new Mi 3 at 10.05 13:46:49,831|
+15210 reports new Mi 6 at 10.05 13:46:49,832|
+1181 reports new Mi 6 at 10.05 13:46:49,834|
+48813 reports new Mi 3 at 00.00 00:00:00,000|
+48893 reports new Mi 3 at 00.00 00:00:00,000|
+1522 reports new Mi 6 at 10.05 13:46:51,833|
+15210 reports new Mi 3 at 10.05 13:46:51,834|
+48892 reports new Mi 6 at 00.00 00:00:00,000|
+client: 11101 has mi: 3147210
+client: 1191 has mi: 2509650
+client: 1181 has mi: 6
+client: 1171 has mi: 16081065
+client: 1161 has mi: 3
+client: 1131 has mi: 3
+client: 1151 has mi: 3
+client: 1111 has mi: 3
+client: 1141 has mi: 3
+client: 1121 has mi: 3
+client: 11102 has mi: 274890
+client: 1192 has mi: 3
+client: 1182 has mi: 3
+client: 1172 has mi: 6
+client: 1152 has mi: 3
+client: 1142 has mi: 3
+client: 1112 has mi: 6
+client: 1162 has mi: 3
+client: 1132 has mi: 3
+client: 1122 has mi: 58023108
+client: 488101 has mi: 1533675
+client: 48891 has mi: 69615
+client: 48881 has mi: 3
+client: 48861 has mi: 22030470
+client: 48871 has mi: 68189550
+client: 48851 has mi: 55692
+client: 48841 has mi: 3
+client: 48821 has mi: 3
+client: 48831 has mi: 3
+client: 48811 has mi: 103950
+client: 488102 has mi: 3
+client: 48892 has mi: 6
+client: 48852 has mi: 3
+client: 48862 has mi: 3
+client: 48882 has mi: 10143900
+client: 48872 has mi: 3
+client: 48842 has mi: 656370
+client: 48812 has mi: 3
+client: 48832 has mi: 3944850
+client: 48822 has mi: 3
+client: 48893 has mi: 3
+client: 48883 has mi: 3
+client: 488103 has mi: 3
+client: 48873 has mi: 3
+client: 48863 has mi: 3
+client: 48853 has mi: 3
+client: 48843 has mi: 3
+client: 48833 has mi: 265939245
+client: 48813 has mi: 3
+client: 48823 has mi: 3
+client: 15010 has mi: 3
+client: 1508 has mi: 3
+client: 1507 has mi: 3
+client: 1509 has mi: 3
+client: 1501 has mi: 114345
+client: 1506 has mi: 3
+client: 1505 has mi: 3
+client: 1504 has mi: 3
+client: 1503 has mi: 3
+client: 1502 has mi: 3
+client: 15210 has mi: 3
+client: 1529 has mi: 547521975
+client: 1528 has mi: 3
+client: 1526 has mi: 1689324
+client: 1527 has mi: 258570
+client: 1525 has mi: 3
+client: 1523 has mi: 3
+client: 1524 has mi: 86873486700
+client: 1521 has mi: 127449
+client: 1522 has mi: 3
+48843 reports new Mi 3 at 00.00 00:00:00,000|
+1523 reports new Mi 3 at 10.05 13:46:53,834|
+1172 reports new Mi 6 at 10.05 13:46:53,837|
+1171 reports new Mi 3 at 10.05 13:46:55,833|
+1522 reports new Mi 3 at 10.05 13:46:55,837|
+1112 reports new Mi 6 at 10.05 13:46:55,838|
+48853 reports termination with ggT 3 at 00.00 00:00:00,000|
+48822 reports termination with ggT 3 at 00.00 00:00:00,000|
+1192 reports termination with ggT 3 at 10.05 13:46:56,831|
+48881 reports new Mi 3 at 00.00 00:00:00,000|
+48872 reports new Mi 3 at 00.00 00:00:00,000|
+1181 reports new Mi 3 at 10.05 13:46:57,840|
+48852 reports termination with ggT 3 at 00.00 00:00:00,000|
+48863 reports termination with ggT 3 at 00.00 00:00:00,000|
+1141 reports termination with ggT 3 at 10.05 13:46:58,829|
+488102 reports termination with ggT 3 at 00.00 00:00:00,000|
+1141 reports termination with ggT 3 at 10.05 13:46:58,830|
+48883 reports termination with ggT 3 at 00.00 00:00:00,000|
+1141 reports termination with ggT 3 at 10.05 13:46:58,832|
+1151 reports termination with ggT 3 at 10.05 13:46:58,832|
+1141 reports termination with ggT 3 at 10.05 13:46:58,832|
+1151 reports termination with ggT 3 at 10.05 13:46:58,832|
+1141 reports termination with ggT 3 at 10.05 13:46:58,832|
+1151 reports termination with ggT 3 at 10.05 13:46:58,832|
+1141 reports termination with ggT 3 at 10.05 13:46:58,832|
+1141 reports termination with ggT 3 at 10.05 13:46:58,832|
+1151 reports termination with ggT 3 at 10.05 13:46:58,832|
+1151 reports termination with ggT 3 at 10.05 13:46:58,833|
+1151 reports termination with ggT 3 at 10.05 13:46:58,834|
+1151 reports termination with ggT 3 at 10.05 13:46:58,834|
+1151 reports termination with ggT 3 at 10.05 13:46:58,834|
+1505 reports new Mi 3 at 10.05 13:46:59,835|
+48861 reports new Mi 3 at 00.00 00:00:00,000|
+1112 reports new Mi 3 at 10.05 13:46:59,840|
+48892 reports new Mi 3 at 00.00 00:00:00,000|
+48831 reports termination with ggT 3 at 00.00 00:00:00,000|
+48862 reports termination with ggT 3 at 00.00 00:00:00,000|
+48823 reports termination with ggT 3 at 00.00 00:00:00,000|
+1161 reports termination with ggT 3 at 10.05 13:47:00,834|
+1121 reports termination with ggT 3 at 10.05 13:47:00,834|
+1161 reports termination with ggT 3 at 10.05 13:47:00,834|
+1131 reports termination with ggT 3 at 10.05 13:47:00,834|
+1161 reports termination with ggT 3 at 10.05 13:47:00,834|
+1131 reports termination with ggT 3 at 10.05 13:47:00,834|
+1161 reports termination with ggT 3 at 10.05 13:47:00,834|
+1121 reports termination with ggT 3 at 10.05 13:47:00,834|
+1161 reports termination with ggT 3 at 10.05 13:47:00,834|
+1131 reports termination with ggT 3 at 10.05 13:47:00,834|
+1161 reports termination with ggT 3 at 10.05 13:47:00,834|
+1121 reports termination with ggT 3 at 10.05 13:47:00,834|
+1161 reports termination with ggT 3 at 10.05 13:47:00,834|
+1111 reports termination with ggT 3 at 10.05 13:47:00,834|
+1131 reports termination with ggT 3 at 10.05 13:47:00,834|
+1161 reports termination with ggT 3 at 10.05 13:47:00,834|
+1121 reports termination with ggT 3 at 10.05 13:47:00,834|
+1111 reports termination with ggT 3 at 10.05 13:47:00,834|
+1121 reports termination with ggT 3 at 10.05 13:47:00,835|
+1111 reports termination with ggT 3 at 10.05 13:47:00,835|
+1131 reports termination with ggT 3 at 10.05 13:47:00,835|
+1121 reports termination with ggT 3 at 10.05 13:47:00,835|
+1111 reports termination with ggT 3 at 10.05 13:47:00,835|
+1121 reports termination with ggT 3 at 10.05 13:47:00,835|
+1111 reports termination with ggT 3 at 10.05 13:47:00,835|
+1121 reports termination with ggT 3 at 10.05 13:47:00,835|
+1111 reports termination with ggT 3 at 10.05 13:47:00,835|
+1111 reports termination with ggT 3 at 10.05 13:47:00,835|
+1131 reports termination with ggT 3 at 10.05 13:47:00,835|
+1111 reports termination with ggT 3 at 10.05 13:47:00,835|
+1131 reports termination with ggT 3 at 10.05 13:47:00,835|
+1131 reports termination with ggT 3 at 10.05 13:47:00,835|
+1132 reports termination with ggT 3 at 10.05 13:47:00,835|
+1142 reports termination with ggT 3 at 10.05 13:47:00,835|
+1182 reports termination with ggT 3 at 10.05 13:47:00,835|
+1142 reports termination with ggT 3 at 10.05 13:47:00,835|
+1182 reports termination with ggT 3 at 10.05 13:47:00,836|
+1132 reports termination with ggT 3 at 10.05 13:47:00,836|
+48882 reports new Mi 3 at 00.00 00:00:00,000|
+1526 reports new Mi 3 at 10.05 13:47:01,840|
+1172 reports new Mi 3 at 10.05 13:47:01,841|
+48821 reports termination with ggT 3 at 00.00 00:00:00,000|
+48841 reports termination with ggT 3 at 00.00 00:00:00,000|
+1162 reports termination with ggT 3 at 10.05 13:47:02,832|
+11102 reports new Mi 3 at 10.05 13:47:03,839|
+11101 reports new Mi 3 at 10.05 13:47:03,842|
+488103 reports termination with ggT 3 at 00.00 00:00:00,000|
+1504 reports termination with ggT 3 at 10.05 13:47:04,833|
+48811 reports new Mi 3 at 00.00 00:00:00,000|
+1529 reports new Mi 3 at 10.05 13:47:05,842|
+48812 reports termination with ggT 3 at 00.00 00:00:00,000|
+48873 reports termination with ggT 3 at 00.00 00:00:00,000|
+1152 reports termination with ggT 3 at 10.05 13:47:06,838|
+1524 reports new Mi 3 at 10.05 13:47:07,840|
+48832 reports new Mi 3 at 00.00 00:00:00,000|
+48813 reports termination with ggT 3 at 00.00 00:00:00,000|
+48893 reports termination with ggT 3 at 00.00 00:00:00,000|
+15010 reports termination with ggT 3 at 10.05 13:47:08,839|
+15210 reports termination with ggT 3 at 10.05 13:47:08,841|
+1527 reports new Mi 3 at 10.05 13:47:09,842|
+48842 reports new Mi 3 at 00.00 00:00:00,000|
+48843 reports termination with ggT 3 at 00.00 00:00:00,000|
+48871 reports new Mi 3 at 00.00 00:00:00,000|
+488101 reports new Mi 3 at 00.00 00:00:00,000|
+1171 reports termination with ggT 3 at 10.05 13:47:12,838|
+1171 reports termination with ggT 3 at 10.05 13:47:12,838|
+1171 reports termination with ggT 3 at 10.05 13:47:12,838|
+1171 reports termination with ggT 3 at 10.05 13:47:12,838|
+1171 reports termination with ggT 3 at 10.05 13:47:12,838|
+1171 reports termination with ggT 3 at 10.05 13:47:12,839|
+1171 reports termination with ggT 3 at 10.05 13:47:12,839|
+1171 reports termination with ggT 3 at 10.05 13:47:12,839|
+1171 reports termination with ggT 3 at 10.05 13:47:12,839|
+1523 reports termination with ggT 3 at 10.05 13:47:12,841|
+48851 reports new Mi 3 at 00.00 00:00:00,000|
+1501 reports new Mi 3 at 10.05 13:47:13,845|
+48881 reports termination with ggT 3 at 00.00 00:00:00,000|
+48872 reports termination with ggT 3 at 00.00 00:00:00,000|
+1181 reports termination with ggT 3 at 10.05 13:47:14,844|
+1181 reports termination with ggT 3 at 10.05 13:47:14,844|
+1181 reports termination with ggT 3 at 10.05 13:47:14,845|
+1181 reports termination with ggT 3 at 10.05 13:47:14,845|
+1181 reports termination with ggT 3 at 10.05 13:47:14,845|
+1181 reports termination with ggT 3 at 10.05 13:47:14,845|
+1181 reports termination with ggT 3 at 10.05 13:47:14,845|
+1181 reports termination with ggT 3 at 10.05 13:47:14,845|
+1181 reports termination with ggT 3 at 10.05 13:47:14,845|
+1181 reports termination with ggT 3 at 10.05 13:47:14,845|
+48891 reports new Mi 3 at 00.00 00:00:00,000|
+1191 reports new Mi 3 at 10.05 13:47:15,848|
+48861 reports termination with ggT 3 at 00.00 00:00:00,000|
+48892 reports termination with ggT 3 at 00.00 00:00:00,000|
+1112 reports termination with ggT 3 at 10.05 13:47:16,845|
+1112 reports termination with ggT 3 at 10.05 13:47:16,845|
+1172 reports termination with ggT 3 at 10.05 13:47:16,845|
+1172 reports termination with ggT 3 at 10.05 13:47:16,845|
+48833 reports new Mi 3 at 00.00 00:00:00,000|
+1122 reports new Mi 3 at 10.05 13:47:17,849|
+48882 reports termination with ggT 3 at 00.00 00:00:00,000|
+1521 reports new Mi 3 at 10.05 13:47:19,848|
+11102 reports termination with ggT 3 at 10.05 13:47:20,843|
+11102 reports termination with ggT 3 at 10.05 13:47:20,843|
+1526 reports termination with ggT 3 at 10.05 13:47:20,846|
+11101 reports termination with ggT 3 at 10.05 13:47:20,847|
+11101 reports termination with ggT 3 at 10.05 13:47:20,847|
+11101 reports termination with ggT 3 at 10.05 13:47:20,848|
+11101 reports termination with ggT 3 at 10.05 13:47:20,848|
+11101 reports termination with ggT 3 at 10.05 13:47:20,848|
+11101 reports termination with ggT 3 at 10.05 13:47:20,848|
+11101 reports termination with ggT 3 at 10.05 13:47:20,848|
+11101 reports termination with ggT 3 at 10.05 13:47:20,848|
+11101 reports termination with ggT 3 at 10.05 13:47:20,848|
+48811 reports termination with ggT 3 at 00.00 00:00:00,000|
+48832 reports termination with ggT 3 at 00.00 00:00:00,000|
+1529 reports termination with ggT 3 at 10.05 13:47:24,849|
+48842 reports termination with ggT 3 at 00.00 00:00:00,000|
+48871 reports termination with ggT 3 at 00.00 00:00:00,000|
+488101 reports termination with ggT 3 at 00.00 00:00:00,000|
+1527 reports termination with ggT 3 at 10.05 13:47:28,849|
+client: 11101 has mi: 3
+client: 1191 has mi: 3
+client: 1181 has mi: 3
+client: 1171 has mi: 3
+client: 1161 has mi: 3
+client: 1131 has mi: 3
+client: 1151 has mi: 3
+client: 1111 has mi: 3
+client: 1141 has mi: 3
+client: 1121 has mi: 3
+client: 11102 has mi: 3
+client: 1192 has mi: 3
+client: 1182 has mi: 3
+client: 1172 has mi: 3
+client: 1152 has mi: 3
+client: 1142 has mi: 3
+client: 1112 has mi: 3
+client: 1162 has mi: 3
+client: 1132 has mi: 3
+client: 1122 has mi: 3
+client: 488101 has mi: 3
+client: 48891 has mi: 3
+client: 48881 has mi: 3
+client: 48861 has mi: 3
+client: 48871 has mi: 3
+client: 48851 has mi: 3
+client: 48841 has mi: 3
+client: 48821 has mi: 3
+client: 48831 has mi: 3
+client: 48811 has mi: 3
+client: 488102 has mi: 3
+client: 48892 has mi: 3
+client: 48852 has mi: 3
+client: 48862 has mi: 3
+client: 48882 has mi: 3
+client: 48872 has mi: 3
+client: 48842 has mi: 3
+client: 48812 has mi: 3
+client: 48832 has mi: 3
+client: 48822 has mi: 3
+client: 48893 has mi: 3
+client: 48883 has mi: 3
+client: 488103 has mi: 3
+client: 48873 has mi: 3
+client: 48863 has mi: 3
+client: 48853 has mi: 3
+client: 48843 has mi: 3
+client: 48833 has mi: 3
+client: 48813 has mi: 3
+client: 48823 has mi: 3
+client: 15010 has mi: 3
+client: 1508 has mi: 3
+client: 1507 has mi: 3
+client: 1509 has mi: 3
+client: 1501 has mi: 3
+client: 1506 has mi: 3
+client: 1505 has mi: 3
+client: 1504 has mi: 3
+client: 1503 has mi: 3
+client: 1502 has mi: 3
+client: 15210 has mi: 3
+client: 1529 has mi: 3
+client: 1528 has mi: 3
+client: 1526 has mi: 3
+client: 1527 has mi: 3
+client: 1525 has mi: 3
+client: 1523 has mi: 3
+client: 1524 has mi: 3
+client: 1521 has mi: 3
+client: 1522 has mi: 3
+48851 reports termination with ggT 3 at 00.00 00:00:00,000|
+48891 reports termination with ggT 3 at 00.00 00:00:00,000|
+1191 reports termination with ggT 3 at 10.05 13:47:32,851|
+1191 reports termination with ggT 3 at 10.05 13:47:32,851|
+1191 reports termination with ggT 3 at 10.05 13:47:32,851|
+1191 reports termination with ggT 3 at 10.05 13:47:32,851|
+1191 reports termination with ggT 3 at 10.05 13:47:32,851|
+1191 reports termination with ggT 3 at 10.05 13:47:32,851|
+1191 reports termination with ggT 3 at 10.05 13:47:32,851|
+1191 reports termination with ggT 3 at 10.05 13:47:32,851|
+1191 reports termination with ggT 3 at 10.05 13:47:32,851|
+1191 reports termination with ggT 3 at 10.05 13:47:32,851|
+1501 reports termination with ggT 3 at 10.05 13:47:32,852|
+48833 reports termination with ggT 3 at 00.00 00:00:00,000|
+1122 reports termination with ggT 3 at 10.05 13:47:34,854|
+1122 reports termination with ggT 3 at 10.05 13:47:34,855|
+1521 reports termination with ggT 3 at 10.05 13:47:36,854|
+Shutting down 70 ggT-processes

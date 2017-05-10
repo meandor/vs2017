@@ -1,0 +1,922 @@
+11102 starttime: 10.05 13:30:03,946| with PID <0.92.0> on starter2@lab25.cpt.haw-hamburg.de
+registered locally
+registered at nameservice
+registered at coordinator
+Start termination voting 10.05 13:30:09,948|
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+left neighbour registered: 1112
+left neighbour bound
+right neighbour registered: 15010
+right neighbour bound
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+Voting no for term request with ignoring
+setpm: 294819525
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1142
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Start termination voting 10.05 13:30:37,103|
+Sending voteYes to 1192
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48891
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48871
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48842
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1191
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1151
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1121
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1566
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48861
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48822
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48811
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48841
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 488101
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1564
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1509
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1502
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1162
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1111
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1132
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1112
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 11102
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1565
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1501
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 15010
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48821
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1568
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1131
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1161
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1141
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48831
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 488102
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1569
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1172
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1171
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 11101
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1122
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48852
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1504
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1182
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48882
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48892
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48812
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48881
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48832
+received yes vote from 1132 with a total votes of 1 10.05 13:30:37,140|
+received yes vote from 1121 with a total votes of 2 10.05 13:30:37,140|
+received yes vote from 1162 with a total votes of 3 10.05 13:30:37,140|
+received yes vote from 1112 with a total votes of 4 10.05 13:30:37,140|
+received yes vote from 1191 with a total votes of 5 10.05 13:30:37,140|
+received yes vote from 1172 with a total votes of 6 10.05 13:30:37,140|
+received yes vote from 1131 with a total votes of 7 10.05 13:30:37,140|
+received yes vote from 1141 with a total votes of 8 10.05 13:30:37,140|
+received yes vote from 1151 with a total votes of 9 10.05 13:30:37,140|
+received yes vote from 1111 with a total votes of 10 10.05 13:30:37,140|
+received yes vote from 1192 with a total votes of 11 10.05 13:30:37,140|
+received yes vote from 1142 with a total votes of 12 10.05 13:30:37,140|
+received yes vote from 1182 with a total votes of 13 10.05 13:30:37,140|
+received yes vote from 11102 with a total votes of 14 10.05 13:30:37,140|
+received yes vote from 11101 with a total votes of 15 10.05 13:30:37,140|
+received yes vote from 1171 with a total votes of 16 10.05 13:30:37,140|
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 48862
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 15610
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 1505
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 1561
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 1567
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 48851
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 1161
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 48861
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 15
+Sending voteYes to 1181
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 15
+Sending voteYes to 48862
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 15
+Sending voteYes to 48842
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 15
+Sending voteYes to 1152
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 15
+Sending voteYes to 1121
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 15
+Sending voteYes to 48881
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 18
+Sending voteYes to 48831
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 18
+Sending voteYes to 48872
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 21
+Sending voteYes to 48832
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 21
+Sending voteYes to 1122
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 21
+Sending voteYes to 1181
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 21
+Sending voteYes to 48851
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 21
+Sending voteYes to 48861
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 21
+Sending voteYes to 48862
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 21
+Sending voteYes to 1506
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 21
+Sending voteYes to 1141
+sendy: 13 (294819525); new mi: 13 10.05 13:30:55,143|
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+sendy: 13 (13); no new mi
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48882
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48852
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48831
+Start termination voting 10.05 13:31:04,145|
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 11102
+received yes vote from 1111 with a total votes of 17 10.05 13:31:04,146|
+received yes vote from 1152 with a total votes of 18 10.05 13:31:04,146|
+received yes vote from 1131 with a total votes of 19 10.05 13:31:04,146|
+received yes vote from 1161 with a total votes of 20 10.05 13:31:04,146|
+received yes vote from 1121 with a total votes of 21 10.05 13:31:04,146|
+received yes vote from 1141 with a total votes of 22 10.05 13:31:04,146|
+received yes vote from 11101 with a total votes of 23 10.05 13:31:04,146|
+received yes vote from 1181 with a total votes of 24 10.05 13:31:04,146|
+received yes vote from 1162 with a total votes of 25 10.05 13:31:04,146|
+received yes vote from 1142 with a total votes of 26 10.05 13:31:04,146|
+received yes vote from 1172 with a total votes of 27 10.05 13:31:04,146|
+received yes vote from 1182 with a total votes of 28 10.05 13:31:04,146|
+received yes vote from 11102 with a total votes of 29 10.05 13:31:04,146|
+received yes vote from 1192 with a total votes of 30 10.05 13:31:04,146|
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 15010
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 1191
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 48862
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 48891
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 1112
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 488102
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 1566
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 1504
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 48832
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 1151
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 1132
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 15
+Sending voteYes to 1171
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 15
+Sending voteYes to 48871
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 18
+Sending voteYes to 48831
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 18
+Sending voteYes to 1569
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 18
+Sending voteYes to 1121
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 18
+Sending voteYes to 1565
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 21
+Sending voteYes to 48862
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 21
+Sending voteYes to 1122
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 21
+Sending voteYes to 48842
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 21
+Sending voteYes to 1505
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 24
+Sending voteYes to 1563
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 24
+Sending voteYes to 48881
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 24
+Sending voteYes to 1502
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 27
+Sending voteYes to 1111
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 27
+Sending voteYes to 1501
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 30
+Sending voteYes to 1162
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 30
+Sending voteYes to 1503
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 33
+Sending voteYes to 488101
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 33
+Sending voteYes to 48861
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 33
+Sending voteYes to 1506
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 36
+Sending voteYes to 48822
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 39
+Sending voteYes to 48841
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 39
+Sending voteYes to 1564
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 42
+Sending voteYes to 1561
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 42
+Sending voteYes to 48811
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 45
+Sending voteYes to 1509
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 45
+Sending voteYes to 1567
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 45
+Sending voteYes to 15610
+setpm: 745290
+sendy: 23660 (745290); new mi: 11830 10.05 13:33:20,756|
+sendy: 10465 (11830); new mi: 1365 10.05 13:33:23,757|
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+sendy: 455 (1365); new mi: 455 10.05 13:33:29,757|
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+sendy: 49 (455); new mi: 14 10.05 13:33:32,760|
+sendy: 7 (14); new mi: 7 10.05 13:33:35,761|
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+sendy: 7 (7); no new mi
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 0
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 3
+Voting no for term request with ignoring
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48891
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48871
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1151
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1121
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1503
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1506
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48861
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48822
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48811
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1191
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1172
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 488101
+Start termination voting 10.05 13:33:41,763|
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1112
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 11102
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48831
+received yes vote from 11102 with a total votes of 31 10.05 13:33:41,765|
+received yes vote from 1172 with a total votes of 32 10.05 13:33:41,765|
+received yes vote from 1162 with a total votes of 33 10.05 13:33:41,765|
+received yes vote from 1181 with a total votes of 34 10.05 13:33:41,765|
+received yes vote from 11101 with a total votes of 35 10.05 13:33:41,765|
+received yes vote from 1151 with a total votes of 36 10.05 13:33:41,765|
+received yes vote from 1121 with a total votes of 37 10.05 13:33:41,765|
+received yes vote from 1112 with a total votes of 38 10.05 13:33:41,765|
+received yes vote from 1171 with a total votes of 39 10.05 13:33:41,765|
+received yes vote from 1182 with a total votes of 40 10.05 13:33:41,765|
+Send #1 terminated brief to coordinator
+received yes vote from 1152 with a total votes of 1 10.05 13:33:41,765|
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1181
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1504
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1171
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 11101
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 48852
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1182
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1152
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 6
+Sending voteYes to 1162
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 48892
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 1509
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 1192
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 1142
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 1131
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 15610
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 48812
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 1161
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 1564
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 48832
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 1132
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 9
+Sending voteYes to 48862
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 48882
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 1508
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 48891
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 1111
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 1191
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 1567
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 1561
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 1141
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 48821
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 15010
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 48831
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 12
+Sending voteYes to 1122
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 15
+Sending voteYes to 1566
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 15
+Sending voteYes to 1569
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 15
+Sending voteYes to 1563
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 18
+Sending voteYes to 1172
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 18
+Sending voteYes to 1131
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 18
+Sending voteYes to 1562
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 18
+Sending voteYes to 48812
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 18
+Sending voteYes to 48872
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 18
+Sending voteYes to 1565
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 18
+Sending voteYes to 1568
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 21
+Sending voteYes to 1502
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 24
+Sending voteYes to 1501
+DEBUG: voting response | threshold: 3
+DEBUG: voting response | passed time: 24
+Sending voteYes to 1505
