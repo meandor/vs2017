@@ -67,7 +67,7 @@ set_pm(Mi, State) ->
 
 maybe_update_mi(Y, State) ->
   Mi = maps:get(mi, State),
-  L = maps:get(leftneigborPID, State),
+  L = maps:get(leftneighborPID, State),
   R = maps:get(rightneigborPID, State),
   Coordinator = maps:get(coordinator, State),
   GgTName = maps:get(ggtname, State),
