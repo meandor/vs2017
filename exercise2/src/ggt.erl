@@ -42,7 +42,9 @@ reset_terminate_timer(State) ->
 
 update_neighbours(Left, Right, State) ->
   log(State, ["left neighbour registered: ", atom_to_list(Left)]),
+  % TODO: bind left neighbour
   log(State, ["right neighbour registered: ", atom_to_list(Right)]),
+  % TODO: bind right neighbour
   maps:update(rightneigbor, Right, maps:update(leftneighbor, Left, State)).
 
 set_pm(Mi, State) ->
@@ -168,6 +170,8 @@ start(WorkingTime, TerminationTime, Quota, GgTName, Coordinator, NameService) ->
     nameservice => NameService,
     leftneighbor => undefined,
     rightneigbor => undefined,
+    leftneighborPID => undefined,
+    rightneigborPID => undefined,
     mi => undefined,
     yesVotes => 0,
     terminateTimer => undefined,
