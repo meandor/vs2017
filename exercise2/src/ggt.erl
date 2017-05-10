@@ -58,7 +58,7 @@ update_neighbours(Left, Right, State) ->
   RightPID = bind_ggt(Right, State),
   log(State, ["right neighbour bound"]),
   UpdatedNeighbourNamesState = maps:update(rightneigbor, Right, maps:update(leftneighbor, Left, State)),
-  maps:update(leftneighborPID, LeftPID, maps:update(rightneigborPID, RightPID, UpdatedNeighbourNamesState)).
+  maps:update(leftneighborPID, LeftPID, maps:update(rightneighborPID, RightPID, UpdatedNeighbourNamesState)).
 
 set_pm(Mi, State) ->
   log(State, ["setpm: ", integer_to_list(Mi)]),
@@ -68,7 +68,7 @@ set_pm(Mi, State) ->
 maybe_update_mi(Y, State) ->
   Mi = maps:get(mi, State),
   L = maps:get(leftneighborPID, State),
-  R = maps:get(rightneigborPID, State),
+  R = maps:get(rightneighborPID, State),
   Coordinator = maps:get(coordinator, State),
   GgTName = maps:get(ggtname, State),
   if
@@ -184,7 +184,7 @@ start(WorkingTime, TerminationTime, Quota, GgTName, Coordinator, NameService) ->
     leftneighbor => undefined,
     rightneigbor => undefined,
     leftneighborPID => undefined,
-    rightneigborPID => undefined,
+    rightneighborPID => undefined,
     mi => undefined,
     yesVotes => 0,
     terminateTimer => undefined,
