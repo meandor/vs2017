@@ -73,9 +73,11 @@ maybe_update_mi(Y, State) ->
 term_request(State) ->
   IsTerminating = maps:get(isTerminating, State),
   if
-    IsTerminating ->
+    IsTerminating =:= true ->
       ok;
-    true ->
+    IsTerminating =:= -1 ->
+      ok;
+    IsTerminating =:= false ->
       log(State, ["Start termination voting ", werkzeug:timeMilliSecond()]),
       maps:get(nameservice, State) ! {self(), {multicast, vote, maps:get(ggtname, State)}}
   end.
@@ -110,19 +112,27 @@ voting_response(GgTName, State) ->
 
 maybe_send_brief_term(GgTName, State) ->
   CurrentVotes = maps:get(yesVotes, State),
-  Quota = maps:get(quota, State),
-  NewVotes = CurrentVotes + 1,
-  log(State, ["received yes vote from ", atom_to_list(GgTName), " with a total votes of ", integer_to_list(NewVotes), " ", werkzeug:timeMilliSecond()]),
-  NewState = maps:update(yesVotes, NewVotes, State),
+  IsTerminating = maps:get(isTerminating, State),
   if
-    NewVotes == Quota ->
-      Coordinator = maps:get(coordinator, State),
-      Coordinator ! {self(), briefterm, {maps:get(ggtname, State), maps:get(mi, State), erlang:now()}},
-      NewTermsCount = maps:get(terminatedCalculations, NewState) + 1,
-      log(State, ["Send #", integer_to_list(NewTermsCount), " terminated brief to coordinator"]),
-      maps:update(terminatedCalculations, NewTermsCount, maps:update(yesVotes, 0, NewState));
+    IsTerminating =:= true ->
+      Quota = maps:get(quota, State),
+      NewVotes = CurrentVotes + 1,
+      log(State, ["received yes vote from ", atom_to_list(GgTName), " with a total votes of ", integer_to_list(NewVotes), " ", werkzeug:timeMilliSecond()]),
+      NewState = maps:update(yesVotes, NewVotes, State),
+      if
+        NewVotes == Quota ->
+          Coordinator = maps:get(coordinator, State),
+          Coordinator ! {self(), briefterm, {maps:get(ggtname, State), maps:get(mi, State), erlang:now()}},
+          NewTermsCount = maps:get(terminatedCalculations, NewState) + 1,
+          log(State, ["Send #", integer_to_list(NewTermsCount), " terminated brief to coordinator"]),
+          UpdatedYesVotes = maps:update(yesVotes, 0, NewState),
+          UpdatedTermFlag = maps:update(isTerminating, -1, UpdatedYesVotes),
+          maps:update(terminatedCalculations, NewTermsCount, UpdatedTermFlag);
+        true ->
+          NewState
+      end;
     true ->
-      NewState
+      State
   end.
 
 handle_messages(State) ->
