@@ -40,11 +40,23 @@ reset_terminate_timer(State) ->
   UpdatedTimestamp = maps:update(lastNumberReceived, erlang:timestamp(), UpdatedTerm),
   maps:update(terminateTimer, TRef, UpdatedTimestamp).
 
+
+bind_ggt(GgTName, State) ->
+  maps:get(nameservice, State) ! {self(), {lookup, GgTName}},
+  receive
+    not_found ->
+      log(State, ["Warning: Could not find the ggT process '", atom_to_list(GgTName), "'"]);
+    {pin, GgTPID} ->
+      GgTPID
+  end
+.
+
 update_neighbours(Left, Right, State) ->
+  RightPID = bind_ggt(Right, State),
+  LeftPID = bind_ggt(Left, State),
+  maps:update(rightneigborPID, RightPID, maps:update(leftneighborPID, LeftPID, State)),
   log(State, ["left neighbour registered: ", atom_to_list(Left)]),
-  % TODO: bind left neighbour
   log(State, ["right neighbour registered: ", atom_to_list(Right)]),
-  % TODO: bind right neighbour
   maps:update(rightneigbor, Right, maps:update(leftneighbor, Left, State)).
 
 set_pm(Mi, State) ->
