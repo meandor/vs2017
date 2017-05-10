@@ -48,16 +48,17 @@ bind_ggt(GgTName, State) ->
       log(State, ["Warning: Could not find the ggT process '", atom_to_list(GgTName), "'"]);
     {pin, GgTPID} ->
       GgTPID
-  end
-.
+  end.
 
 update_neighbours(Left, Right, State) ->
-  RightPID = bind_ggt(Right, State),
-  LeftPID = bind_ggt(Left, State),
-  maps:update(rightneigborPID, RightPID, maps:update(leftneighborPID, LeftPID, State)),
   log(State, ["left neighbour registered: ", atom_to_list(Left)]),
+  LeftPID = bind_ggt(Left, State),
+  log(State, ["left neighbour bound"]),
   log(State, ["right neighbour registered: ", atom_to_list(Right)]),
-  maps:update(rightneigbor, Right, maps:update(leftneighbor, Left, State)).
+  RightPID = bind_ggt(Right, State),
+  log(State, ["right neighbour bound"]),
+  UpdatedNeighbourNamesState = maps:update(rightneigbor, Right, maps:update(leftneighbor, Left, State)),
+  maps:update(leftneighborPID, LeftPID, maps:update(rightneigborPID, RightPID, UpdatedNeighbourNamesState)).
 
 set_pm(Mi, State) ->
   log(State, ["setpm: ", integer_to_list(Mi)]),
@@ -66,8 +67,8 @@ set_pm(Mi, State) ->
 
 maybe_update_mi(Y, State) ->
   Mi = maps:get(mi, State),
-  L = maps:get(leftneighbor, State),
-  R = maps:get(rightneigbor, State),
+  L = maps:get(leftneigborPID, State),
+  R = maps:get(rightneigborPID, State),
   Coordinator = maps:get(coordinator, State),
   GgTName = maps:get(ggtname, State),
   if
