@@ -1,10 +1,9 @@
 # exercise3
 
-FIXME: description
-
-## Installation
-
-Download from http://example.com/FIXME.
+A `clojure-microservice` receiving and sending messages via multicast sockets.
+ 
+This microservice represents a sending and receiving station on one medium (socket).
+The network traffic is organized on that medium by STDMA.
 
 ## Usage
 
@@ -18,19 +17,9 @@ FIXME: listing of options this app accepts.
 
 ## Examples
 
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
-
 ## License
 
-Copyright © 2017 FIXME
+Copyright © 2017 Daniel Schruhl
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
