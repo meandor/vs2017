@@ -1,0 +1,8 @@
+{:app-shortname     "exercise3"
+ :wait-ms-on-stop   "6000"
+
+ :server-port       #ts/env [:port "8080"]
+
+ :status-url        "/status"
+
+ :metering-reporter ""}
