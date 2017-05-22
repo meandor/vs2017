@@ -30,14 +30,15 @@
   (apply str (map char (filter #(not= 0x0 %) raw))))
 
 (defn datagram->message [^bytes datagram]
-  {:station-class (byte->station (first datagram))
-   :payload       (bytes->payload (Arrays/copyOfRange datagram 1 25))
-   :slot          (nth datagram 25)
-   :send-time     (bytes->timestamp (Arrays/copyOfRange datagram 26 34))
-   })
+  {:station-class   (byte->station (first datagram))
+   :station-name    (bytes->payload (Arrays/copyOfRange datagram 1 11))
+   :payload-content (bytes->payload (Arrays/copyOfRange datagram 11 25))
+   :payload         (bytes->payload (Arrays/copyOfRange datagram 1 25))
+   :slot            (nth datagram 25)
+   :send-time       (bytes->timestamp (Arrays/copyOfRange datagram 26 34))})
 
 (defn message->datagram [message]
   (concat [(station->byte (:station-class message))]
-          (payload->bytes (:payload message))
+          (payload->bytes (str (:station-name message) (:payload-content message)))
           [(byte (:slot message))]
           (timestamp->bytes (:send-time message))))
