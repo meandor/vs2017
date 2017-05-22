@@ -1,7 +1,7 @@
 (ns de.haw.vs.data-access.connector-test
   (:require [clojure.test :refer :all]
             [de.otto.tesla.util.test-utils :refer :all]
-            [de.haw.vs.station.core :as core]
+            [de.haw.vs.core :as core]
             [clj-http.client :as http]
             [clojure.data.json :as json]
             [de.haw.vs.data-access.connector :as con]))

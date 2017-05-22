@@ -1,4 +1,4 @@
-(ns de.haw.vs.station.core
+(ns de.haw.vs.core
   (:require [metrics.jvm.core :as jvm]
             [clojure.tools.logging :as log]
             [de.otto.tesla.system :as system]

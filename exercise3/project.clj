@@ -11,7 +11,7 @@
                  [de.otto/tesla-microservice "0.9.2"]
                  [de.otto/tesla-httpkit "1.0.1"]
                  [de.otto/tesla-basic-logging "0.1.5"]]
-  :main ^:skip-aot de.haw.vs.station.core
+  :main ^:skip-aot de.haw.vs.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}
              :dev     {:dependencies [[org.clojure/test.check "0.9.0"]]}})
