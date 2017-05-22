@@ -5,7 +5,17 @@
             [de.otto.status :as stat])
   (:import (java.net MulticastSocket InetAddress DatagramPacket)))
 
+(defn send-datagram [^bytes datagram-bytes socket-connection-atom]
+  (log/info "sending datagram:" (into [] datagram-bytes))
+  (->> (DatagramPacket.
+         datagram-bytes
+         (alength datagram-bytes)
+         (InetAddress/getByName (:address @socket-connection-atom))
+         (:port @socket-connection-atom))
+       (.send (:socket @socket-connection-atom))))
+
 (defn leave [self]
+  (log/info "leaving multicast group")
   (.leaveGroup (:socket @(:socket-connection self))
                (InetAddress/getByName (:address @(:socket-connection self)))))
 
