@@ -1,7 +1,17 @@
-(ns de.haw.vs.data-access.datagram)
+(ns de.haw.vs.data-access.datagram
+  (:import (java.util Arrays)))
+
+(defn left-fill [size ^bytes array]
+  (let [padding (- size (alength array))]
+    (if (>= padding 0)
+      (concat (byte-array padding) array)
+      (drop (- padding) array))))
 
 (defn timestamp->bytes [n]
-  (byte-array 8 (.toByteArray (biginteger n))))
+  (left-fill 8 (.toByteArray (biginteger n))))
+
+(defn bytes->timestamp [^bytes raw]
+  (biginteger raw))
 
 (defn payload->bytes [s]
   (byte-array 24 (map byte s)))
@@ -11,7 +21,20 @@
     (byte 0x0)
     (byte 0x1)))
 
-(defn datagram->message [datagram])
+(defn byte->station [raw]
+  (if (= (byte 0x0) raw)
+    "A"
+    "B"))
+
+(defn bytes->payload [^bytes raw]
+  (apply str (map char (filter #(not= 0x0 %) raw))))
+
+(defn datagram->message [^bytes datagram]
+  {:station-class (byte->station (first datagram))
+   :payload       (bytes->payload (Arrays/copyOfRange datagram 1 25))
+   :slot          (nth datagram 25)
+   :send-time     (bytes->timestamp (Arrays/copyOfRange datagram 26 34))
+   })
 
 (defn message->datagram [message]
   (concat [(station->byte (:station-class message))]
