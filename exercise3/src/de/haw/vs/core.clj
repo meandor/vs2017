@@ -13,11 +13,19 @@
         :connector (c/using (con/new-connector) [:config :app-status]))
       (httpkit/add-server)))
 
+(defn display-help []
+  (println "Execute: java -jar exercise3.jar INTERFACENAME MULTICASTADDRESS PORT STATIONCLASS UTCOFFSET\n"))
+
 (defn -main [& args]
   (jvm/instrument-jvm)
-  (prn args)
   (Thread/setDefaultUncaughtExceptionHandler
     (reify Thread$UncaughtExceptionHandler
       (uncaughtException [_ thread ex]
         (log/error ex "Uncaught exception on " (.getName thread)))))
-  (system/start (station-system {})))
+  (if (= 5 (count args))
+    (system/start (station-system {:interface-name    (first args)
+                                   :multicast-address (second args)
+                                   :socket-port       (nth args 3)
+                                   :station-class     (nth args 4)
+                                   :utc-offset        (nth args 5)}))
+    (display-help)))

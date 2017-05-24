@@ -3,15 +3,15 @@
             [clojure.tools.logging :as log]
             [de.otto.tesla.stateful.app-status :as appstat]
             [de.otto.status :as stat])
-  (:import (java.net MulticastSocket InetAddress DatagramPacket)))
+  (:import (java.net MulticastSocket InetAddress DatagramPacket NetworkInterface)))
 
 (defn send-datagram [^bytes datagram-bytes socket-connection-atom]
   (log/info "sending datagram:" (into [] datagram-bytes))
-  (->> (DatagramPacket.
-         datagram-bytes
-         (alength datagram-bytes)
-         (InetAddress/getByName (:address @socket-connection-atom))
-         (:port @socket-connection-atom))
+  (->> (new DatagramPacket
+            datagram-bytes
+            (alength datagram-bytes)
+            (InetAddress/getByName (:address @socket-connection-atom))
+            (:port @socket-connection-atom))
        (.send (:socket @socket-connection-atom))))
 
 (defn leave [self]
@@ -19,15 +19,17 @@
   (.leaveGroup (:socket @(:socket-connection self))
                (InetAddress/getByName (:address @(:socket-connection self)))))
 
-(defn join [config socket-atom]
-  (let [multicast-socket (new MulticastSocket (:socket-port config 15001))]
-    (.setTimeToLive multicast-socket (:socket-ttl config 1))
-    (.joinGroup multicast-socket (InetAddress/getByName (:socket-address config "225.10.1.2")))
-    (log/info "joined socket at " (:socket-address config "225.10.1.2") ":" (:socket-port config 15001))
+(defn join [interface-name multicast-address socket-port socket-atom]
+  (log/info (format "joined socket at %s:%s" multicast-address socket-port))
+  (let [multicast-socket (new MulticastSocket socket-port)]
+    (.setTimeToLive multicast-socket 1)
+    (.setNetworkInterface multicast-socket (NetworkInterface/getByName interface-name))
+    (.joinGroup multicast-socket (InetAddress/getByName multicast-address))
     (swap! socket-atom assoc
            :socket multicast-socket
-           :address (:socket-address config "225.10.1.2")
-           :port (:socket-port config 15001))))
+           :address multicast-address
+           :network-interface interface-name
+           :port socket-port)))
 
 (defn status [socket-atom]
   (if (nil? (:socket @socket-atom))
@@ -39,8 +41,9 @@
   (start [self]
     (log/info "-> starting Connector Component")
     (let [socket (atom {:socket nil :send-messages 0 :received-messages 0})
+          config-params (:config config)
           new-self (assoc self :socket-connection socket)]
-      (join (:config config) socket)
+      (join (:interface-name config-params) (:multicast-address config-params) (:socket-port config-params) socket)
       (appstat/register-status-fun app-status #(status socket))
       new-self))
 
