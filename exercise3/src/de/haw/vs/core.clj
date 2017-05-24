@@ -4,13 +4,15 @@
             [de.otto.tesla.system :as system]
             [de.otto.tesla.serving-with-httpkit :as httpkit]
             [com.stuartsierra.component :as c]
-            [de.haw.vs.data-access.connector :as con])
+            [de.haw.vs.data-access.connector :as con]
+            [de.haw.vs.business-logic.station :as stat])
   (:gen-class))
 
 (defn station-system [runtime-config]
   (-> (system/base-system (merge {:name "exercise3"} runtime-config))
       (assoc
-        :connector (c/using (con/new-connector) [:config :app-status]))
+        :connector (c/using (con/new-connector) [:config :app-status])
+        :station (c/using (stat/new-station) [:config :app-status :connector]))
       (httpkit/add-server)))
 
 (defn display-help []
