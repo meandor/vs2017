@@ -25,6 +25,10 @@
     (stat/status-detail :station :error "No slot assigned")
     (stat/status-detail :station :ok @slot-atom)))
 
+(defn send-message [state-atom config-params connector]
+  ;TODO
+  )
+
 (defrecord Station [config app-status connector]
   c/Lifecycle
   (start [self]
@@ -35,6 +39,7 @@
                             :utc-offset    (:utc-offset config-params)})
           new-self (assoc self :slot state-atom)]
       (select-free-slot! state-atom (:frame-size config-params) (:slots-count config-params) connector)
+      (send-message state-atom config-params connector)
       (appstat/register-status-fun app-status #(status state-atom))
       new-self))
 
