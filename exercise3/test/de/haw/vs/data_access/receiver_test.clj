@@ -6,10 +6,16 @@
             [clojure.data.json :as json]
             [de.haw.vs.data-access.receiver :as r]))
 
+(def test-system
+  (-> (core/station-system {:interface-name    "eth0"
+                            :multicast-address "239.255.255.255"
+                            :socket-port       15001})
+      (dissoc
+        :sender
+        :station)))
+
 (deftest start-receiver-test
-  (with-started [system (core/station-system {:interface-name    "eth0"
-                                              :multicast-address "239.255.255.255"
-                                              :socket-port       15001})]
+  (with-started [system test-system]
                 (testing "should startup the connector and establish the socket multicast connection"
                   (let [status-page (http/get "http://localhost:8080/status")
                         status-map (json/read-str (:body status-page) :key-fn keyword)]

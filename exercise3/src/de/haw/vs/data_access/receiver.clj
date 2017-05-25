@@ -15,7 +15,8 @@
 (defn leave [self]
   (log/info "leaving multicast group")
   (.leaveGroup (:socket @(:socket-connection self))
-               (InetAddress/getByName (:address @(:socket-connection self)))))
+               (InetAddress/getByName (:address @(:socket-connection self))))
+  (.close (:socket @(:socket-connection self))))
 
 (defn join [interface-name multicast-address socket-port socket-atom]
   (log/info (format "joined socket at %s:%s" multicast-address socket-port))
