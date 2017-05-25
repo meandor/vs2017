@@ -69,3 +69,31 @@
                 :send-messages     1}
                (dissoc @socket-atom :socket)))
         (con/disconnect-socket connector)))))
+
+(deftest receive-message-test
+  (testing "receive a message through the socket"
+    (with-redefs [con/read-bytes-from-socket (fn [socket ^DatagramPacket datagram]
+                                               (is (not= nil socket))
+                                               (is (= 2000 (.getSoTimeout socket)))
+                                               (is (= (into [] (byte-array 34)) (into [] (.getData datagram))))
+                                               (.setData datagram (byte-array 34 [1 0x21 0x23])))]
+      (let [socket-atom (con/socket-atom "eth0" "239.255.255.255" 15001)
+            connector {:socket-connection socket-atom
+                       :config            {:config {:datagram-bytes 34}}}]
+        (con/attach-client-socket connector)
+
+        (is (= {:payload         "!#"
+                :payload-content ""
+                :send-time       0
+                :slot            0
+                :station-class   "B"
+                :station-name    "!#"}
+               (con/read-message connector 2000)))
+
+        (is (= {:address           "239.255.255.255"
+                :interface         "eth0"
+                :port              15001
+                :received-messages 1
+                :send-messages     0}
+               (dissoc @socket-atom :socket)))
+        (con/disconnect-socket connector)))))

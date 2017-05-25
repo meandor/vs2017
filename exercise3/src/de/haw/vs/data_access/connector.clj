@@ -13,9 +13,12 @@
   (.receive socket packet))
 
 (defn read-message [{:keys [socket-connection config]} timeout]
-  (let [buffer (byte-array (get-in [:config :datagram-bytes] config))
+  (.setSoTimeout (:socket @socket-connection) timeout)
+  (let [buffer (byte-array (get-in config [:config :datagram-bytes]))
         packet (new DatagramPacket buffer (count buffer))]
     (read-bytes-from-socket (:socket @socket-connection) packet)
+    (when (dg/datagram->message (.getData packet))
+      (swap! socket-connection update-in [:received-messages] inc))
     (dg/datagram->message (.getData packet))))
 
 (defn send-bytes-datagram-socket [^DatagramSocket socket ^DatagramPacket datagram]
