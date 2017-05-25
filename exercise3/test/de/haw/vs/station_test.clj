@@ -1,7 +1,9 @@
 (ns de.haw.vs.station-test
   (:require [clojure.test :refer :all]
             [de.haw.vs.station :as stat]
-            [de.haw.vs.networking.connector :as con]))
+            [de.haw.vs.networking.connector :as con]
+            [clojure.core.async :as async]
+            [de.otto.tesla.util.test-utils :refer :all]))
 
 (deftest find-free-slots-test
   (testing "Should find one free slot"
@@ -79,21 +81,23 @@
                  :send-time       2}]
                (stat/read-messages nil 80 2)))))))
 
-(deftest select-free-slot!-test
+(deftest read-phase!-test
   (let [state-atom (atom {:slot nil})
-        message-slot (atom 0)]
+        message-slot (atom 0)
+        output-chan (async/chan 10)]
     (testing "Should select a free slot in the state atom"
-      (with-redefs [con/read-message (fn [connector timeout]
+      (with-redefs [stat/put-message-on-channel! (fn [_ messages] messages)
+                    con/read-message (fn [connector timeout]
                                        (swap! message-slot inc)
                                        (is (= nil connector))
                                        (is (= 40 timeout))
                                        (when (not= 1 @message-slot)
                                          (test-message @message-slot)))]
-        (stat/select-free-slot! state-atom 120 3 nil)
+        (stat/read-phase! state-atom 120 3 nil nil)
         (is (= {:slot 1}
                @state-atom))))
 
-    (testing "Should keep slot empty if no free slot is found"
+    (testing "Should keep slot empty if no free slot is found and send messages on the channel"
       (reset! state-atom {:slot nil})
       (reset! message-slot 0)
       (with-redefs [con/read-message (fn [connector timeout]
@@ -101,16 +105,18 @@
                                        (is (= nil connector))
                                        (is (= 40 timeout))
                                        (test-message @message-slot))]
-        (stat/select-free-slot! state-atom 120 3 nil)
+        (stat/read-phase! state-atom 120 3 output-chan nil)
         (is (= {:slot nil}
-               @state-atom))))
+               @state-atom))
+        (eventually (is (= 3 (.count (.buf output-chan)))))))
 
     (testing "Should assign slot one if no messages are received"
       (reset! state-atom {:slot nil})
-      (with-redefs [con/read-message (fn [connector timeout]
+      (with-redefs [stat/put-message-on-channel! (fn [_ messages] messages)
+                    con/read-message (fn [connector timeout]
                                        (is (= nil connector))
                                        (is (= 40 timeout))
                                        nil)]
-        (stat/select-free-slot! state-atom 120 3 nil)
+        (stat/read-phase! state-atom 120 3 nil nil)
         (is (= {:slot 1}
                @state-atom))))))

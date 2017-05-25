@@ -15,7 +15,7 @@
       (assoc
         :connector (c/using (connector/new-connector) [:config :app-status])
         :message-writer (c/using (message-writer/new-message-writer (async/chan 10)) [:config :app-status])
-        :station (c/using (station/new-station) [:config :app-status :connector]))
+        :station (c/using (station/new-station) [:config :app-status :connector :message-writer]))
       (httpkit/add-server)))
 
 (defn display-help []

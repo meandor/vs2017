@@ -3,7 +3,8 @@
             [clojure.tools.logging :as log]
             [de.haw.vs.networking.connector :as con]
             [de.otto.tesla.stateful.app-status :as appstat]
-            [de.otto.status :as stat])
+            [de.otto.status :as stat]
+            [clojure.core.async :as async])
   (:import (java.net MulticastSocket)))
 
 (defn find-free-slots [slots messages]
@@ -14,8 +15,17 @@
        (map (fn [& _] (con/read-message connector (/ duration slots))))
        (filter #(not (nil? %)))))
 
-(defn select-free-slot! [state-atom duration slots connector]
+(defn put-message-on-channel! [channel messages]
+  (doseq [message messages]
+    (async/go (async/>! channel message)))
+  messages)
+
+(defn read-phase!
+  "Reads messages from the socket and tries to find an empty slot to send on.
+   The read messages are put on the writer channel."
+  [state-atom duration slots output-channel connector]
   (->> (read-messages connector duration slots)
+       (put-message-on-channel! output-channel)
        (find-free-slots slots)
        (first)
        (swap! state-atom assoc :slot)))
@@ -29,7 +39,7 @@
   ;TODO
   )
 
-(defrecord Station [config app-status connector]
+(defrecord Station [config app-status connector message-writer]
   c/Lifecycle
   (start [self]
     (log/info "-> starting Station Component")
@@ -38,7 +48,7 @@
                             :station-class (:station-class config-params)
                             :utc-offset    (:utc-offset config-params)})
           new-self (assoc self :slot state-atom)]
-      (select-free-slot! state-atom (:frame-size config-params) (:slots-count config-params) connector)
+      (read-phase! state-atom (:frame-size config-params) (:slots-count config-params) (:in-channel message-writer) connector)
       (send-message state-atom config-params connector)
       (appstat/register-status-fun app-status #(status state-atom))
       new-self))
