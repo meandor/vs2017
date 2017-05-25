@@ -1,7 +1,7 @@
-(ns de.haw.vs.business-logic.station
+(ns de.haw.vs.station
   (:require [com.stuartsierra.component :as c]
             [clojure.tools.logging :as log]
-            [de.haw.vs.data-access.connector :as con]
+            [de.haw.vs.networking.connector :as con]
             [de.otto.tesla.stateful.app-status :as appstat]
             [de.otto.status :as stat])
   (:import (java.net MulticastSocket)))

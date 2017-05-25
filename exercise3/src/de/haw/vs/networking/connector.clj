@@ -1,9 +1,9 @@
-(ns de.haw.vs.data-access.connector
+(ns de.haw.vs.networking.connector
   (:require [clojure.tools.logging :as log]
             [com.stuartsierra.component :as c]
             [de.otto.tesla.stateful.app-status :as appstat]
             [de.otto.status :as stat]
-            [de.haw.vs.data-access.datagram :as dg])
+            [de.haw.vs.networking.datagram :as dg])
   (:import (java.net InetAddress NetworkInterface MulticastSocket DatagramPacket DatagramSocket SocketTimeoutException)))
 
 (defn socket-atom [interface-name address port]

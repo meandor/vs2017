@@ -1,4 +1,4 @@
-(ns de.haw.vs.data-access.specs
+(ns de.haw.vs.networking.specs
   (:require [clojure.spec.alpha :as s]))
 
 (s/def ::datagram #(and (bytes? %) (= 34 (alength %))))

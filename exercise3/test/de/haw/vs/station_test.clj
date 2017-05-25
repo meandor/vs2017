@@ -1,7 +1,7 @@
-(ns de.haw.vs.business-logic.station-test
+(ns de.haw.vs.station-test
   (:require [clojure.test :refer :all]
-            [de.haw.vs.business-logic.station :as stat]
-            [de.haw.vs.data-access.connector :as con]))
+            [de.haw.vs.station :as stat]
+            [de.haw.vs.networking.connector :as con]))
 
 (deftest find-free-slots-test
   (testing "Should find one free slot"

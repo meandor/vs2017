@@ -1,10 +1,10 @@
-(ns de.haw.vs.data-access.connector-test
+(ns de.haw.vs.networking.connector-test
   (:require [clojure.test :refer :all]
             [de.otto.tesla.util.test-utils :refer :all]
             [de.haw.vs.core :as core]
             [clj-http.client :as http]
             [clojure.data.json :as json]
-            [de.haw.vs.data-access.connector :as con])
+            [de.haw.vs.networking.connector :as con])
   (:import (java.net DatagramSocket DatagramPacket)))
 
 (defn test-system [runtime-config]

@@ -1,8 +1,6 @@
-(ns de.haw.vs.data-access.datagram-test
+(ns de.haw.vs.networking.datagram-test
   (:require [clojure.test :refer :all]
-            [clojure.spec.gen.alpha :as gen]
-            [de.haw.vs.data-access.datagram :as d]
-            [clojure.spec.alpha :as s]))
+            [de.haw.vs.networking.datagram :as d]))
 
 (def now 1495394082495)
 

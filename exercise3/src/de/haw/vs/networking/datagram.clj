@@ -1,4 +1,4 @@
-(ns de.haw.vs.data-access.datagram
+(ns de.haw.vs.networking.datagram
   (:import (java.util Arrays)))
 
 (defn left-fill [size ^bytes array]

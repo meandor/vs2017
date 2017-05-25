@@ -4,8 +4,8 @@
             [de.otto.tesla.system :as system]
             [de.otto.tesla.serving-with-httpkit :as httpkit]
             [com.stuartsierra.component :as c]
-            [de.haw.vs.data-access.connector :as con]
-            [de.haw.vs.business-logic.station :as stat])
+            [de.haw.vs.networking.connector :as con]
+            [de.haw.vs.station :as stat])
   (:gen-class))
 
 (defn station-system [runtime-config]
