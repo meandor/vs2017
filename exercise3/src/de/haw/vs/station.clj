@@ -20,10 +20,10 @@
        (first)
        (swap! state-atom assoc :slot)))
 
-(defn status [slot-atom]
-  (if (nil? @slot-atom)
+(defn status [state-atom]
+  (if (nil? (:slot @state-atom))
     (stat/status-detail :station :error "No slot assigned")
-    (stat/status-detail :station :ok @slot-atom)))
+    (stat/status-detail :station :ok @state-atom)))
 
 (defn send-message [state-atom config-params connector]
   ;TODO
