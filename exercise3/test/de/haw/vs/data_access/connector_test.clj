@@ -4,7 +4,8 @@
             [de.haw.vs.core :as core]
             [clj-http.client :as http]
             [clojure.data.json :as json]
-            [de.haw.vs.data-access.connector :as con]))
+            [de.haw.vs.data-access.connector :as con])
+  (:import (java.net DatagramSocket DatagramPacket)))
 
 (defn test-system [runtime-config]
   (-> (core/station-system runtime-config)
@@ -39,7 +40,7 @@
                             :status  "OK"}
                            (get-in status-map [:application :statusDetails :connector])))))
 
-                (testing "should swith the socket back to multicast socket"
+                (testing "should switch the socket back to multicast socket"
                   (con/attach-client-socket (:connector system))
                   (let [status-page (http/get "http://localhost:8080/status")
                         status-map (json/read-str (:body status-page) :key-fn keyword)]
@@ -52,8 +53,19 @@
                             :status  "OK"}
                            (get-in status-map [:application :statusDetails :connector])))))))
 
-#_(testing "send a message through the socket"
-    (is (not= nil
-              (:socket @(get-in system [:connector :socket-connection]))))
-    (con/send-datagram (byte-array 3 [1 2 3])
-                       (get-in system [:connector :socket-connection])))
+(deftest send-message-test
+  (testing "send a message through the socket"
+    (with-redefs [con/send-bytes-datagram-socket (fn [socket ^DatagramPacket datagram]
+                                                   (is (not= nil socket))
+                                                   (is (= [1 2 3] (into [] (.getData datagram)))))]
+      (let [socket-atom (con/socket-atom "eth0" "239.255.255.255" 15001)
+            connector {:socket-connection socket-atom}]
+        (con/attach-server-socket connector)
+        (con/send-datagram connector (byte-array 3 [1 2 3]))
+        (is (= {:address           "239.255.255.255"
+                :interface         "eth0"
+                :port              15001
+                :received-messages 0
+                :send-messages     1}
+               (dissoc @socket-atom :socket)))
+        (con/disconnect-socket connector)))))

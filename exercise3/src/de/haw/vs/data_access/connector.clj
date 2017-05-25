@@ -9,11 +9,17 @@
 (defn socket-atom [interface-name address port]
   (atom {:socket nil :received-messages 0 :send-messages 0 :address address :interface interface-name :port port}))
 
-(defn read-message [{:keys [socket-connection config]}]
+(defn read-bytes-from-socket [^MulticastSocket socket ^DatagramPacket packet]
+  (.receive socket packet))
+
+(defn read-message [{:keys [socket-connection config]} timeout]
   (let [buffer (byte-array (get-in [:config :datagram-bytes] config))
         packet (new DatagramPacket buffer (count buffer))]
-    (.receive (:socket @socket-connection) packet)
+    (read-bytes-from-socket (:socket @socket-connection) packet)
     (dg/datagram->message (.getData packet))))
+
+(defn send-bytes-datagram-socket [^DatagramSocket socket ^DatagramPacket datagram]
+  (.send socket datagram))
 
 (defn send-datagram [{:keys [socket-connection]} ^bytes datagram-bytes]
   (log/info "sending datagram:" (into [] datagram-bytes))
@@ -22,7 +28,8 @@
             (alength datagram-bytes)
             (InetAddress/getByName (:address @socket-connection))
             (:port @socket-connection))
-       (.send (:socket @socket-connection))))
+       (send-bytes-datagram-socket (:socket @socket-connection)))
+  (swap! socket-connection update-in [:send-messages] inc))
 
 (defn disconnect-socket [{:keys [socket-connection]}]
   (try
@@ -33,7 +40,7 @@
     (log/info "closing socket")
     (.close (:socket @socket-connection))
     (catch Exception e
-      (log/warn e))))
+      (.printStackTrace e))))
 
 (defn attach-server-socket [{:keys [socket-connection] :as self}]
   (disconnect-socket self)
