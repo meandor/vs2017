@@ -5,4 +5,5 @@
  :metering-reporter ""
  :slots-count       25
  :frame-size        1000
- :datagram-bytes    34}
+ :datagram-bytes    34
+ :output-file       "./output.log"}
