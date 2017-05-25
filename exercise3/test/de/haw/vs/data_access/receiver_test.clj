@@ -1,12 +1,12 @@
-(ns de.haw.vs.data-access.connector-test
+(ns de.haw.vs.data-access.receiver-test
   (:require [clojure.test :refer :all]
             [de.otto.tesla.util.test-utils :refer :all]
             [de.haw.vs.core :as core]
             [clj-http.client :as http]
             [clojure.data.json :as json]
-            [de.haw.vs.data-access.connector :as con]))
+            [de.haw.vs.data-access.receiver :as r]))
 
-(deftest start-connector-test
+(deftest start-receiver-test
   (with-started [system (core/station-system {:interface-name    "eth0"
                                               :multicast-address "239.255.255.255"
                                               :socket-port       15001})]
@@ -16,13 +16,6 @@
                     (is (= {:message {:address           "239.255.255.255"
                                       :port              15001
                                       :network-interface "eth0"
-                                      :received-messages 0
-                                      :send-messages     0}
+                                      :received-messages 0}
                             :status  "OK"}
-                           (get-in status-map [:application :statusDetails :connector])))))
-
-                (testing "send a message through the socket"
-                  (is (not= nil
-                            (:socket @(get-in system [:connector :socket-connection]))))
-                  (con/send-datagram (byte-array 3 [1 2 3])
-                                     (get-in system [:connector :socket-connection])))))
+                           (get-in status-map [:application :statusDetails :receiver])))))))

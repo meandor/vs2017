@@ -1,8 +1,16 @@
 (ns de.haw.vs.business-logic.station
   (:require [com.stuartsierra.component :as c]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [de.haw.vs.data-access.receiver :as r])
+  (:import (java.net MulticastSocket)))
 
-(defrecord Station [config app-status connector]
+(defn read [duration slots receiver]
+  (.setSoTimeout (:socket @(:socket-connection receiver)) (/ duration slots))
+  (->> (range slots)
+       (map #(r/read-message receiver))
+       (filter #(not (nil? %)))))
+
+(defrecord Station [config app-status receiver]
   c/Lifecycle
   (start [self]
     (log/info "-> starting Station Component")

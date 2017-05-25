@@ -1,8 +1,8 @@
 {:app-shortname     "exercise3"
  :wait-ms-on-stop   "6000"
-
  :server-port       #ts/env [:port "8080"]
-
  :status-url        "/status"
-
- :metering-reporter ""}
+ :metering-reporter ""
+ :slots-count       25
+ :frame-size        1
+ :datagram-bytes    34}

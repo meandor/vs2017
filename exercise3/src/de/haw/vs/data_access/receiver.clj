@@ -1,18 +1,16 @@
-(ns de.haw.vs.data-access.connector
+(ns de.haw.vs.data-access.receiver
   (:require [com.stuartsierra.component :as c]
             [clojure.tools.logging :as log]
             [de.otto.tesla.stateful.app-status :as appstat]
-            [de.otto.status :as stat])
+            [de.otto.status :as stat]
+            [de.haw.vs.data-access.datagram :as dg])
   (:import (java.net MulticastSocket InetAddress DatagramPacket NetworkInterface)))
 
-(defn send-datagram [^bytes datagram-bytes socket-connection-atom]
-  (log/info "sending datagram:" (into [] datagram-bytes))
-  (->> (new DatagramPacket
-            datagram-bytes
-            (alength datagram-bytes)
-            (InetAddress/getByName (:address @socket-connection-atom))
-            (:port @socket-connection-atom))
-       (.send (:socket @socket-connection-atom))))
+(defn read-message [self]
+  (let [buffer (byte-array (get-in [:config :config :datagram-bytes] self))
+        packet (new DatagramPacket buffer (count buffer))]
+    (.receive (:socket @(:socket-connection self)) packet)
+    (dg/datagram->message (.getData packet))))
 
 (defn leave [self]
   (log/info "leaving multicast group")
@@ -33,14 +31,14 @@
 
 (defn status [socket-atom]
   (if (nil? (:socket @socket-atom))
-    (stat/status-detail :connector :error "No socket attached")
-    (stat/status-detail :connector :ok (dissoc @socket-atom :socket))))
+    (stat/status-detail :receiver :error "No socket attached")
+    (stat/status-detail :receiver :ok (dissoc @socket-atom :socket))))
 
-(defrecord Connector [config app-status]
+(defrecord Receiver [config app-status]
   c/Lifecycle
   (start [self]
-    (log/info "-> starting Connector Component")
-    (let [socket (atom {:socket nil :send-messages 0 :received-messages 0})
+    (log/info "-> starting Receiver Component")
+    (let [socket (atom {:socket nil :received-messages 0})
           config-params (:config config)
           new-self (assoc self :socket-connection socket)]
       (join (:interface-name config-params) (:multicast-address config-params) (:socket-port config-params) socket)
@@ -48,9 +46,9 @@
       new-self))
 
   (stop [self]
-    (log/info "<- stopping Connector Component")
+    (log/info "<- stopping Receiver Component")
     (leave self)
     self))
 
-(defn new-connector []
-  (map->Connector {}))
+(defn new-receiver []
+  (map->Receiver {}))
