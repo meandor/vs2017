@@ -4,5 +4,5 @@
  :status-url        "/status"
  :metering-reporter ""
  :slots-count       25
- :frame-size        1
+ :frame-size        1000
  :datagram-bytes    34}
