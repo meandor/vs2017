@@ -29,13 +29,19 @@
 (defn bytes->payload [^bytes raw]
   (apply str (map char (filter #(not= 0x0 %) raw))))
 
+(defn byte-array-empty? [^bytes bytes]
+  (if (not (nil? bytes))
+    (= (byte 0x0) (reduce bit-or bytes))
+    true))
+
 (defn datagram->message [^bytes datagram]
-  {:station-class   (byte->station (first datagram))
-   :station-name    (bytes->payload (Arrays/copyOfRange datagram 1 11))
-   :payload-content (bytes->payload (Arrays/copyOfRange datagram 11 25))
-   :payload         (bytes->payload (Arrays/copyOfRange datagram 1 25))
-   :slot            (nth datagram 25)
-   :send-time       (bytes->timestamp (Arrays/copyOfRange datagram 26 34))})
+  (when (not (byte-array-empty? datagram))
+    {:station-class   (byte->station (first datagram))
+     :station-name    (bytes->payload (Arrays/copyOfRange datagram 1 11))
+     :payload-content (bytes->payload (Arrays/copyOfRange datagram 11 25))
+     :payload         (bytes->payload (Arrays/copyOfRange datagram 1 25))
+     :slot            (nth datagram 25)
+     :send-time       (bytes->timestamp (Arrays/copyOfRange datagram 26 34))}))
 
 (defn message->datagram [message]
   (concat [(station->byte (:station-class message))]

@@ -61,7 +61,21 @@
                                           :slot            3
                                           :send-time       now}))))))
 
+(deftest byte-array-empty?-test
+  (testing "should test the given byte array"
+    (is (= true
+           (d/byte-array-empty? nil)))
+    (is (= true
+           (d/byte-array-empty? (byte-array 5))))
+    (is (= false
+           (d/byte-array-empty? (byte-array 5 [1 2 3 4 5]))))))
+
 (deftest transform-datagram-to-message-test
+  (testing "only convert non-empty datagrams"
+    (is (= nil
+           (d/datagram->message nil)))
+    (is (= nil
+           (d/datagram->message (byte-array 34)))))
   (testing "should convert a datagram of size 34 into a message"
     (is (= {:station-class   "B"
             :station-name    "team 01-01"
