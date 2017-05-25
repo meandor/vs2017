@@ -22,8 +22,8 @@
 
 (defn status [slot-atom]
   (if (nil? @slot-atom)
-    (stat/status-detail :connector :error "No slot assigned")
-    (stat/status-detail :connector :ok @slot-atom)))
+    (stat/status-detail :station :error "No slot assigned")
+    (stat/status-detail :station :ok @slot-atom)))
 
 (defrecord Station [config app-status connector]
   c/Lifecycle

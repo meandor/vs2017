@@ -4,13 +4,16 @@
             [de.otto.tesla.stateful.app-status :as appstat]
             [de.otto.status :as stat]
             [de.haw.vs.data-access.datagram :as dg])
-  (:import (java.net InetAddress NetworkInterface MulticastSocket DatagramPacket DatagramSocket)))
+  (:import (java.net InetAddress NetworkInterface MulticastSocket DatagramPacket DatagramSocket SocketTimeoutException)))
 
 (defn socket-atom [interface-name address port]
   (atom {:socket nil :received-messages 0 :send-messages 0 :address address :interface interface-name :port port}))
 
 (defn read-bytes-from-socket [^MulticastSocket socket ^DatagramPacket packet]
-  (.receive socket packet))
+  (try
+    (.receive socket packet)
+    (catch SocketTimeoutException e
+      (log/warn "Did not get any message yet"))))
 
 (defn read-message [{:keys [socket-connection config]} timeout]
   (.setSoTimeout (:socket @socket-connection) timeout)
@@ -43,7 +46,7 @@
     (log/info "closing socket")
     (.close (:socket @socket-connection))
     (catch Exception e
-      (.printStackTrace e))))
+      (log/warn "Socket could not be disconnected, maybe none present"))))
 
 (defn attach-server-socket [{:keys [socket-connection] :as self}]
   (disconnect-socket self)

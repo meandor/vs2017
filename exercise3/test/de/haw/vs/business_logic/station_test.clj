@@ -103,4 +103,14 @@
                                        (test-message @message-slot))]
         (stat/select-free-slot! state-atom 120 3 nil)
         (is (= {:slot nil}
+               @state-atom))))
+
+    (testing "Should assign slot one if no messages are received"
+      (reset! state-atom {:slot nil})
+      (with-redefs [con/read-message (fn [connector timeout]
+                                       (is (= nil connector))
+                                       (is (= 40 timeout))
+                                       nil)]
+        (stat/select-free-slot! state-atom 120 3 nil)
+        (is (= {:slot 1}
                @state-atom))))))
