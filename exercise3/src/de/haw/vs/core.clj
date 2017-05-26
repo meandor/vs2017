@@ -7,7 +7,8 @@
             [com.stuartsierra.component :as c]
             [de.haw.vs.networking.connector :as connector]
             [de.haw.vs.station :as station]
-            [de.haw.vs.data-links.message-writer :as message-writer])
+            [de.haw.vs.data-links.message-writer :as message-writer]
+            [de.haw.vs.data-links.payload-source :as payload-source])
   (:gen-class))
 
 (defn station-system [runtime-config]
@@ -16,9 +17,11 @@
 
     (-> (system/base-system (merge {:name "exercise3"} runtime-config))
         (assoc
-          :connector (c/using (connector/new-connector) [:config :app-status])
+          :payload-source (c/using (payload-source/new-payload-source payload-source->station) [:config])
           :message-writer (c/using (message-writer/new-message-writer station->message-writer) [:config])
-          :station (c/using (station/new-station payload-source->station station->message-writer) [:config :app-status :connector]))
+          :connector (c/using (connector/new-connector) [:config :app-status])
+          :station (c/using (station/new-station payload-source->station station->message-writer) [:config :app-status :connector])
+          )
         (httpkit/add-server))))
 
 (defn display-help []
