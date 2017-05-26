@@ -27,15 +27,17 @@
 (defn send-bytes-datagram-socket [^DatagramSocket socket ^DatagramPacket datagram]
   (.send socket datagram))
 
-(defn send-datagram [{:keys [socket-connection]} ^bytes datagram-bytes]
-  (log/info "sending datagram:" (into [] datagram-bytes))
-  (->> (new DatagramPacket
-            datagram-bytes
-            (alength datagram-bytes)
-            (InetAddress/getByName (:address @socket-connection))
-            (:port @socket-connection))
-       (send-bytes-datagram-socket (:socket @socket-connection)))
-  (swap! socket-connection update-in [:send-messages] inc))
+(defn send-message [{:keys [socket-connection]} message]
+  (log/info "sending message:" message)
+  (let [^bytes datagram-bytes (dg/message->datagram message)]
+    (log/debug "sending datagram:" (into [] datagram-bytes))
+    (->> (new DatagramPacket
+              datagram-bytes
+              (alength datagram-bytes)
+              (InetAddress/getByName (:address @socket-connection))
+              (:port @socket-connection))
+         (send-bytes-datagram-socket (:socket @socket-connection)))
+    (swap! socket-connection update-in [:send-messages] inc)))
 
 (defn disconnect-socket [{:keys [socket-connection]}]
   (try

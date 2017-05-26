@@ -4,12 +4,15 @@
             [de.haw.vs.core :as core]
             [clj-http.client :as http]
             [clojure.data.json :as json]
-            [de.haw.vs.networking.connector :as con])
+            [de.haw.vs.networking.connector :as con]
+            [de.haw.vs.networking.datagram :as dg])
   (:import (java.net DatagramSocket DatagramPacket)))
 
 (defn test-system [runtime-config]
   (-> (core/station-system runtime-config)
-      (dissoc :station)))
+      (dissoc :station
+              :payload-source
+              :message-writer)))
 
 (deftest connector-socket-tests
   (with-started [system (test-system {:interface-name    "eth0"
@@ -53,15 +56,27 @@
                             :status  "OK"}
                            (get-in status-map [:application :statusDetails :connector])))))))
 
+(def test-message
+  {:payload         "!#"
+   :payload-content ""
+   :send-time       0
+   :slot            0
+   :station-class   "B"
+   :station-name    "!#"})
+
+(def test-message-datagram-bytes
+  (byte-array 34 [1 0x21 0x23]))
+
 (deftest send-message-test
   (testing "send a message through the socket"
     (with-redefs [con/send-bytes-datagram-socket (fn [socket ^DatagramPacket datagram]
                                                    (is (not= nil socket))
-                                                   (is (= [1 2 3] (into [] (.getData datagram)))))]
+                                                   (is (= (into [] test-message-datagram-bytes) (into [] (.getData datagram)))))]
       (let [socket-atom (con/socket-atom "eth0" "239.255.255.255" 15001)
             connector {:socket-connection socket-atom}]
         (con/attach-server-socket connector)
-        (con/send-datagram connector (byte-array 3 [1 2 3]))
+        (con/send-message connector test-message)
+
         (is (= {:address           "239.255.255.255"
                 :interface         "eth0"
                 :port              15001
@@ -76,18 +91,13 @@
                                                (is (not= nil socket))
                                                (is (= 2000 (.getSoTimeout socket)))
                                                (is (= (into [] (byte-array 34)) (into [] (.getData datagram))))
-                                               (.setData datagram (byte-array 34 [1 0x21 0x23])))]
+                                               (.setData datagram test-message-datagram-bytes))]
       (let [socket-atom (con/socket-atom "eth0" "239.255.255.255" 15001)
             connector {:socket-connection socket-atom
                        :config            {:config {:datagram-bytes 34}}}]
         (con/attach-client-socket connector)
 
-        (is (= {:payload         "!#"
-                :payload-content ""
-                :send-time       0
-                :slot            0
-                :station-class   "B"
-                :station-name    "!#"}
+        (is (= test-message
                (con/read-message connector 2000)))
 
         (is (= {:address           "239.255.255.255"
