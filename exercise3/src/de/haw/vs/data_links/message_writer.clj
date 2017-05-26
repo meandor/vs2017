@@ -21,7 +21,7 @@
   c/Lifecycle
   (start [self]
     (log/info "-> starting MessageWriter Component")
-    (append-messages-to-file (get-in [:config :output-file] config) in-chan)
+    (append-messages-to-file (get-in config [:config :output-file]) in-chan)
     self)
 
   (stop [self]
