@@ -11,12 +11,15 @@
   (:gen-class))
 
 (defn station-system [runtime-config]
-  (-> (system/base-system (merge {:name "exercise3"} runtime-config))
-      (assoc
-        :connector (c/using (connector/new-connector) [:config :app-status])
-        :message-writer (c/using (message-writer/new-message-writer (async/chan 10)) [:config :app-status])
-        :station (c/using (station/new-station) [:config :app-status :connector :message-writer]))
-      (httpkit/add-server)))
+  (let [station->message-writer (async/chan)
+        payload-source->station (async/chan)]
+
+    (-> (system/base-system (merge {:name "exercise3"} runtime-config))
+        (assoc
+          :connector (c/using (connector/new-connector) [:config :app-status])
+          :message-writer (c/using (message-writer/new-message-writer station->message-writer) [:config])
+          :station (c/using (station/new-station payload-source->station station->message-writer) [:config :app-status :connector]))
+        (httpkit/add-server))))
 
 (defn display-help []
   (println "Execute: java -jar exercise3.jar INTERFACENAME MULTICASTADDRESS PORT STATIONCLASS UTCOFFSET\n"))

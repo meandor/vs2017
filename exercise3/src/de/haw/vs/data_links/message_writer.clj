@@ -17,11 +17,11 @@
     (while true
       (append-to-file file (async/<! channel)))))
 
-(defrecord MessageWriter [config app-status]
+(defrecord MessageWriter [config in-chan]
   c/Lifecycle
   (start [self]
     (log/info "-> starting MessageWriter Component")
-    (append-messages-to-file (get-in [:config :output-file] config) (:in-channel self))
+    (append-messages-to-file (get-in [:config :output-file] config) in-chan)
     self)
 
   (stop [self]
@@ -29,4 +29,4 @@
     self))
 
 (defn new-message-writer [in-chan]
-  (map->MessageWriter {:in-channel in-chan}))
+  (map->MessageWriter {:in-chan in-chan}))

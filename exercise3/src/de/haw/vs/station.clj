@@ -57,5 +57,6 @@
     (log/info "<- stopping Station Component")
     self))
 
-(defn new-station []
-  (map->Station {}))
+(defn new-station [in-chan out-chan]
+  (map->Station {:in-chan  in-chan
+                 :out-chan out-chan}))
