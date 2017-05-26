@@ -75,19 +75,19 @@
     (is (= nil
            (d/datagram->message (byte-array 34)))))
   (testing "should convert a datagram of size 34 into a message"
-    (is (= {:station-class   "B"
-            :station-name    "team 01-01"
-            :payload-content "payload!"
-            :payload         "team 01-01payload!"
+    (is (= {:payload         "team 01-01payload!PPPPPP"
+            :payload-content "payload!PPPPPP"
+            :send-time       1495394082495
             :slot            4
-            :send-time       now}
+            :station-class   "B"
+            :station-name    "team 01-01"}
            (d/datagram->message (byte-array 34 [(byte 0x1)
                                                 (byte 0x74) (byte 0x65) (byte 0x61) (byte 0x6D)
                                                 (byte 0x20) (byte 0x30) (byte 0x31) (byte 0x2D)
                                                 (byte 0x30) (byte 0x31) (byte 0x70) (byte 0x61)
                                                 (byte 0x79) (byte 0x6C) (byte 0x6F) (byte 0x61)
-                                                (byte 0x64) (byte 0x21) (byte 0x00) (byte 0x00)
-                                                (byte 0x00) (byte 0x00) (byte 0x00) (byte 0x00)
+                                                (byte 0x64) (byte 0x21) (byte 0x50) (byte 0x50)
+                                                (byte 0x50) (byte 0x50) (byte 0x50) (byte 0x50)
                                                 (byte 0x04)
                                                 (byte 0x00) (byte 0x00) (byte 0x01) (byte 0x5C)
                                                 (byte 0x2C) (byte 0x6E) (byte -34) (byte -65)]))))))

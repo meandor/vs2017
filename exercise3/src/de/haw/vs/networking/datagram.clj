@@ -1,5 +1,6 @@
 (ns de.haw.vs.networking.datagram
-  (:import (java.util Arrays)))
+  (:import (java.util Arrays)
+           (java.nio.charset StandardCharsets)))
 
 (defn left-fill [size ^bytes array]
   (let [padding (- size (alength array))]
@@ -14,7 +15,7 @@
   (biginteger raw))
 
 (defn payload->bytes [s]
-  (byte-array 24 (map byte s)))
+  (byte-array 24 (into [] (.getBytes s StandardCharsets/UTF_8))))
 
 (defn station->byte [station]
   (if (= "A" station)
@@ -27,7 +28,7 @@
     "B"))
 
 (defn bytes->payload [^bytes raw]
-  (apply str (map char (filter #(not= 0x0 %) raw))))
+  (new String raw StandardCharsets/UTF_8))
 
 (defn byte-array-empty? [^bytes bytes]
   (if (not (nil? bytes))
