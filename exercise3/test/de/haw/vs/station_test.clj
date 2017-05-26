@@ -85,6 +85,7 @@
   (let [state-atom (atom {:slot nil})
         message-slot (atom 0)
         output-chan (async/chan 10)]
+
     (testing "Should select a free slot in the state atom"
       (with-redefs [stat/put-message-on-channel! (fn [_ messages] messages)
                     con/read-message (fn [connector timeout]
@@ -120,3 +121,26 @@
         (stat/read-phase! state-atom 120 3 nil nil)
         (is (= {:slot 1}
                @state-atom))))))
+
+(deftest send-phase!-test
+  (let [send-counter (atom 0)
+        input-chan (async/chan 10)
+        state-atom (atom {:slot          1
+                          :station-class "A"
+                          :utc-offset    2})]
+    (with-redefs [stat/current-time (constantly 1)
+                  con/send-message (fn [connector message]
+                                     (is (= nil connector))
+                                     (is (= (test-message 1) message))
+                                     (swap! send-counter inc))]
+
+      (testing "Should only send a message if the channel has a message"
+        (stat/send-phase! nil input-chan nil)
+        (is (= 0
+               @send-counter)))
+
+      (testing "Should send one message from the channel"
+        (async/>!! input-chan (dissoc (test-message 1) :station-class :send-time :slot))
+        (stat/send-phase! state-atom input-chan nil)
+        (is (= 1
+               @send-counter))))))
