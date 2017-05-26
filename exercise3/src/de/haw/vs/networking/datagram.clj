@@ -43,8 +43,12 @@
      :slot            (nth datagram 25)
      :send-time       (bytes->timestamp (Arrays/copyOfRange datagram 26 34))}))
 
-(defn message->datagram [message]
+(defn- message->datagram-list [message]
   (concat [(station->byte (:station-class message))]
           (payload->bytes (str (:station-name message) (:payload-content message)))
           [(byte (:slot message))]
           (timestamp->bytes (:send-time message))))
+
+(defn message->datagram [message]
+  (let [datagram-list (message->datagram-list message)]
+    (byte-array (count datagram-list) datagram-list)))
