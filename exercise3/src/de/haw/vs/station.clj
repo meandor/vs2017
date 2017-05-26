@@ -37,23 +37,35 @@
          (build-message state-atom)
          (con/send-message connector))))
 
+(defn- log-slot [slot]
+  (log/info "found free slot: " slot)
+  slot)
+
 (defn read-phase!
   "Reads messages from the socket and tries to find an empty slot to send on.
    The read messages are put on the writer channel. Switch to send-phase afterwards."
   [state-atom duration slots output-channel connector]
-  (->> (read-messages connector duration slots)
-       (put-message-on-channel! output-channel)
-       (find-free-slots slots)
-       (first)
-       (swap! state-atom assoc :slot)))
+  (when (and (< 0 slots) (< 0 duration))
+    (->> (read-messages connector duration slots)
+         (put-message-on-channel! output-channel)
+         (find-free-slots slots)
+         (first)
+         (log-slot)
+         (swap! state-atom assoc :slot))))
 
-#_(defn run-phases!
-  "Times "
+(defn run-phases!
+  "Sends at the chosen slot and receive before and after that slot"
   [state-atom duration slots in-chan out-chan connector]
-  (con/attach-server-socket connector)
-  (send-phase! state-atom in-chan connector)
-  (con/attach-client-socket connector)
-  (read-phase! state-atom duration slots out-chan connector)
+  (let [duration-per-slot (/ duration slots)
+        before-slots (- (:slot @state-atom) 1)
+        after-slots (- (+ slots 1) (:slot @state-atom))]
+    (con/attach-client-socket connector)                    ; Read all messages before the slot
+    (read-phase! state-atom (* duration-per-slot before-slots) before-slots out-chan connector)
+    (con/attach-server-socket connector)
+    (Thread/sleep (/ duration-per-slot 2))                  ; send in the middle of my slot
+    (send-phase! state-atom in-chan connector)
+    (con/attach-client-socket connector)
+    (read-phase! state-atom (* duration-per-slot after-slots) after-slots out-chan connector))
   (run-phases! state-atom duration slots in-chan out-chan connector))
 
 (defn status [state-atom]
@@ -71,7 +83,7 @@
                             :utc-offset    utc-offset})
           new-self (assoc self :slot state-atom)]
       (async/thread (read-phase! state-atom frame-size slots-count out-chan connector) ; initial discovery for full frame size
-                    #_(run-phases! state-atom (- frame-size (/ frame-size slots-count)) (- slots-count 1) in-chan out-chan connector)) ; after that run for one station less
+                    (run-phases! state-atom (- frame-size (/ frame-size slots-count)) (- slots-count 1) in-chan out-chan connector)) ; after that run for one station less
       (appstat/register-status-fun app-status #(status state-atom))
       new-self))
 

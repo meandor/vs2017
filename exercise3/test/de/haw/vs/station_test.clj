@@ -120,7 +120,33 @@
                                        nil)]
         (stat/read-phase! state-atom 120 3 nil nil)
         (is (= {:slot 1}
-               @state-atom))))))
+               @state-atom))))
+
+    (testing "Should not change state if no slots are given"
+      (reset! state-atom {:slot 3})
+      (reset! message-slot 0)
+      (with-redefs [stat/put-message-on-channel! (fn [_ messages] messages)
+                    con/read-message (fn [_ _]
+                                       (swap! message-slot inc)
+                                       nil)]
+        (stat/read-phase! state-atom 120 0 nil nil)
+        (is (= {:slot 3}
+               @state-atom))
+        (is (= 0
+               @message-slot))))
+
+    (testing "Should not change state if no duration are given"
+      (reset! state-atom {:slot 3})
+      (reset! message-slot 0)
+      (with-redefs [stat/put-message-on-channel! (fn [_ messages] messages)
+                    con/read-message (fn [_ _]
+                                       (swap! message-slot inc)
+                                       nil)]
+        (stat/read-phase! state-atom 0 10 nil nil)
+        (is (= {:slot 3}
+               @state-atom))
+        (is (= 0
+               @message-slot))))))
 
 (deftest send-phase!-test
   (let [send-counter (atom 0)
