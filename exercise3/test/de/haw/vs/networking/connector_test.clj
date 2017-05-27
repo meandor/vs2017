@@ -57,15 +57,15 @@
                            (get-in status-map [:application :statusDetails :connector])))))))
 
 (def test-message
-  {:payload         "!#"
-   :payload-content ""
-   :send-time       0
-   :slot            0
+  {:payload         "!!!!!!!!!!!!!!!!!!!!!!!!"
+   :payload-content "!!!!!!!!!!!!!!"
+   :send-time       2387225703656530209
+   :slot            33
    :station-class   "B"
-   :station-name    "!#"})
+   :station-name    "!!!!!!!!!!"})
 
 (def test-message-datagram-bytes
-  (byte-array 34 [1 0x21 0x23]))
+  (byte-array 34 (conj (repeat 33 0x21) 1)))
 
 (deftest send-message-test
   (testing "send a message through the socket"
