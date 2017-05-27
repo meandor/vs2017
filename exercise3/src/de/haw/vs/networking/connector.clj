@@ -14,7 +14,7 @@
     (.receive socket packet)
     (Thread/sleep (* 0.98 (/ (.getSoTimeout socket) 2)))
     (catch SocketTimeoutException e
-      (log/warn "Did not get any message yet"))))
+      (log/debug "Did not get any message yet"))))
 
 (defn read-message [{:keys [socket-connection config]} timeout]
   (.setSoTimeout (:socket @socket-connection) timeout)

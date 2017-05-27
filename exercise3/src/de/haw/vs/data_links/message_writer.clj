@@ -6,7 +6,7 @@
             [clojure.core.async :as async]))
 
 (defn message->text [message]
-  (let [date-string (fo/unparse (fo/formatter :date-hour-minute-second-ms) (co/from-long (:send-time message)))]
+  (let [date-string (fo/unparse (fo/formatter :date-hour-minute-second-ms) (co/from-long (long (:send-time message))))]
     (format "%s %s (%s): %s\n" date-string (:station-name message) (:station-class message) (:payload-content message))))
 
 (defn append-to-file [filename message]
