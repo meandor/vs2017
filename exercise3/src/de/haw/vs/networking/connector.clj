@@ -13,7 +13,7 @@
   (try
     (.receive socket packet)
     (log/info "Got message")
-    (Thread/sleep (* 0.98 (/ (.getSoTimeout socket) 2)))
+    (Thread/sleep (* 0.998 (/ (.getSoTimeout socket) 2)))
     (catch SocketTimeoutException e
       (log/info "Did not get any message"))))
 

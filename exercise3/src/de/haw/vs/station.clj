@@ -62,9 +62,9 @@
     (con/attach-client-socket connector)                    ; read all messages before the slot
     (read-phase! state-atom (* duration-per-slot before-slots) before-slots out-chan connector)
     (con/attach-server-socket connector)
-    (Thread/sleep (* 0.98 (/ duration-per-slot 2)))
+    (Thread/sleep (/ duration-per-slot 2))
     (send-phase! state-atom in-chan connector)              ; send in the middle of my slot
-    (Thread/sleep (* 0.98 (/ duration-per-slot 2)))
+    (Thread/sleep (* 0.998 (/ duration-per-slot 2)))
     (con/attach-client-socket connector)
     (read-phase! state-atom (* duration-per-slot after-slots) after-slots out-chan connector)) ; read all messages after the slot
   (run-phases! state-atom duration slots in-chan out-chan connector))
