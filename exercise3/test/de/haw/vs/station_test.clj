@@ -170,3 +170,17 @@
         (stat/send-phase! state-atom input-chan nil)
         (is (= 1
                @send-counter))))))
+
+(deftest wait-for-next-phase!-test
+  (with-redefs [stat/current-time (constantly 1495896445968)]
+    (testing "Should wait for the next frame to start"
+      (let [now (System/currentTimeMillis)]
+        (stat/wait-for-next-phase! 1000 0)
+        (is (and (> (System/currentTimeMillis) (+ now 30))
+                 (< (System/currentTimeMillis) (+ now 34))))))
+
+    (testing "Should wait for the next frame to start"
+      (let [now (System/currentTimeMillis)]
+        (stat/wait-for-next-phase! 1730 0)
+        (is (and (> (System/currentTimeMillis) (+ now 740))
+                 (< (System/currentTimeMillis) (+ now 744))))))))

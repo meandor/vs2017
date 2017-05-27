@@ -59,19 +59,26 @@
   (let [duration-per-slot (/ duration slots)
         before-slots (- (:slot @state-atom) 1)
         after-slots (- (+ slots 1) (:slot @state-atom))]
-    (con/attach-client-socket connector)                    ; Read all messages before the slot
+    (con/attach-client-socket connector)                    ; read all messages before the slot
     (read-phase! state-atom (* duration-per-slot before-slots) before-slots out-chan connector)
     (con/attach-server-socket connector)
-    (Thread/sleep (/ duration-per-slot 2))                  ; send in the middle of my slot
-    (send-phase! state-atom in-chan connector)
+    (Thread/sleep (* 0.98 (/ duration-per-slot 2)))
+    (send-phase! state-atom in-chan connector)              ; send in the middle of my slot
+    (Thread/sleep (* 0.98 (/ duration-per-slot 2)))
     (con/attach-client-socket connector)
-    (read-phase! state-atom (* duration-per-slot after-slots) after-slots out-chan connector))
+    (read-phase! state-atom (* duration-per-slot after-slots) after-slots out-chan connector)) ; read all messages after the slot
   (run-phases! state-atom duration slots in-chan out-chan connector))
 
 (defn status [state-atom]
   (if (nil? (:slot @state-atom))
     (stat/status-detail :station :error "No slot assigned")
     (stat/status-detail :station :ok @state-atom)))
+
+(defn wait-for-next-phase! [frame-size utc-offset]
+  (->> frame-size
+       (mod (current-time utc-offset))
+       (- frame-size)
+       (Thread/sleep)))
 
 (defrecord Station [config app-status connector message-writer in-chan out-chan]
   c/Lifecycle
@@ -83,6 +90,7 @@
                             :utc-offset    utc-offset})
           new-self (assoc self :slot state-atom)]
       (async/thread (read-phase! state-atom frame-size slots-count out-chan connector) ; initial discovery for full frame size
+                    (wait-for-next-phase! frame-size utc-offset) ; wait for the next frame to start
                     (run-phases! state-atom (- frame-size (/ frame-size slots-count)) (- slots-count 1) in-chan out-chan connector)) ; after that run for one station less
       (appstat/register-status-fun app-status #(status state-atom))
       new-self))

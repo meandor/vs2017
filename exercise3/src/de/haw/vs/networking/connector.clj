@@ -12,6 +12,7 @@
 (defn read-bytes-from-socket [^MulticastSocket socket ^DatagramPacket packet]
   (try
     (.receive socket packet)
+    (Thread/sleep (* 0.98 (/ (.getSoTimeout socket) 2)))
     (catch SocketTimeoutException e
       (log/warn "Did not get any message yet"))))
 
