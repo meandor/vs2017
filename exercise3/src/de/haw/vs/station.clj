@@ -15,7 +15,7 @@
 
 (defn read-messages [connector duration slots]
   (->> (range slots)
-       (map (fn [& _] (con/read-message connector (/ duration slots))))
+       (map (fn [& _] (con/read-message-with-collision-detection connector (/ duration slots))))
        (filter #(not (nil? %)))))
 
 (defn put-message-on-channel! [channel messages]

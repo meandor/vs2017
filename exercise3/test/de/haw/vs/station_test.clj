@@ -46,11 +46,11 @@
 (deftest read-messages-test
   (let [message-slot (atom 0)]
     (testing "Should read multiple messages from connector"
-      (with-redefs [con/read-message (fn [connector timeout]
-                                       (swap! message-slot inc)
-                                       (is (= nil connector))
-                                       (is (= 40 timeout))
-                                       (test-message @message-slot))]
+      (with-redefs [con/read-message-with-collision-detection (fn [connector timeout]
+                                                                (swap! message-slot inc)
+                                                                (is (= nil connector))
+                                                                (is (= 40 timeout))
+                                                                (test-message @message-slot))]
         (is (= [{:station-class   "A"
                  :station-name    "station1"
                  :payload-content "foobar"
@@ -67,12 +67,12 @@
 
     (testing "Should read also empty messages from connector"
       (reset! message-slot 0)
-      (with-redefs [con/read-message (fn [connector timeout]
-                                       (swap! message-slot inc)
-                                       (is (= nil connector))
-                                       (is (= 40 timeout))
-                                       (when (= @message-slot 2)
-                                         (test-message @message-slot)))]
+      (with-redefs [con/read-message-with-collision-detection (fn [connector timeout]
+                                                                (swap! message-slot inc)
+                                                                (is (= nil connector))
+                                                                (is (= 40 timeout))
+                                                                (when (= @message-slot 2)
+                                                                  (test-message @message-slot)))]
         (is (= [{:station-class   "A"
                  :station-name    "station2"
                  :payload-content "foobar"
@@ -88,12 +88,12 @@
 
     (testing "Should select a free slot in the state atom"
       (with-redefs [stat/put-message-on-channel! (fn [_ messages] messages)
-                    con/read-message (fn [connector timeout]
-                                       (swap! message-slot inc)
-                                       (is (= nil connector))
-                                       (is (= 40 timeout))
-                                       (when (not= 1 @message-slot)
-                                         (test-message @message-slot)))]
+                    con/read-message-with-collision-detection (fn [connector timeout]
+                                                                (swap! message-slot inc)
+                                                                (is (= nil connector))
+                                                                (is (= 40 timeout))
+                                                                (when (not= 1 @message-slot)
+                                                                  (test-message @message-slot)))]
         (stat/read-phase! state-atom 120 3 nil nil)
         (is (= {:slot 1}
                @state-atom))))
@@ -101,11 +101,11 @@
     (testing "Should keep slot empty if no free slot is found and send messages on the channel"
       (reset! state-atom {:slot nil})
       (reset! message-slot 0)
-      (with-redefs [con/read-message (fn [connector timeout]
-                                       (swap! message-slot inc)
-                                       (is (= nil connector))
-                                       (is (= 40 timeout))
-                                       (test-message @message-slot))]
+      (with-redefs [con/read-message-with-collision-detection (fn [connector timeout]
+                                                                (swap! message-slot inc)
+                                                                (is (= nil connector))
+                                                                (is (= 40 timeout))
+                                                                (test-message @message-slot))]
         (stat/read-phase! state-atom 120 3 output-chan nil)
         (is (= {:slot nil}
                @state-atom))
@@ -114,10 +114,10 @@
     (testing "Should assign slot one if no messages are received"
       (reset! state-atom {:slot nil})
       (with-redefs [stat/put-message-on-channel! (fn [_ messages] messages)
-                    con/read-message (fn [connector timeout]
-                                       (is (= nil connector))
-                                       (is (= 40 timeout))
-                                       nil)]
+                    con/read-message-with-collision-detection (fn [connector timeout]
+                                                                (is (= nil connector))
+                                                                (is (= 40 timeout))
+                                                                nil)]
         (stat/read-phase! state-atom 120 3 nil nil)
         (is (= {:slot 1}
                @state-atom))))
@@ -126,9 +126,9 @@
       (reset! state-atom {:slot 3})
       (reset! message-slot 0)
       (with-redefs [stat/put-message-on-channel! (fn [_ messages] messages)
-                    con/read-message (fn [_ _]
-                                       (swap! message-slot inc)
-                                       nil)]
+                    con/read-message-with-collision-detection (fn [_ _]
+                                                                (swap! message-slot inc)
+                                                                nil)]
         (stat/read-phase! state-atom 120 0 nil nil)
         (is (= {:slot 3}
                @state-atom))
@@ -139,9 +139,9 @@
       (reset! state-atom {:slot 3})
       (reset! message-slot 0)
       (with-redefs [stat/put-message-on-channel! (fn [_ messages] messages)
-                    con/read-message (fn [_ _]
-                                       (swap! message-slot inc)
-                                       nil)]
+                    con/read-message-with-collision-detection (fn [_ _]
+                                                                (swap! message-slot inc)
+                                                                nil)]
         (stat/read-phase! state-atom 0 10 nil nil)
         (is (= {:slot 3}
                @state-atom))

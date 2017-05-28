@@ -5,7 +5,8 @@
             [clj-http.client :as http]
             [clojure.data.json :as json]
             [de.haw.vs.networking.connector :as con]
-            [de.haw.vs.networking.datagram :as dg])
+            [de.haw.vs.networking.datagram :as dg]
+            [clojure.tools.logging :as log])
   (:import (java.net DatagramSocket DatagramPacket)))
 
 (defn test-system [runtime-config]
@@ -85,11 +86,53 @@
                (dissoc @socket-atom :socket)))
         (con/disconnect-socket connector)))))
 
-(deftest receive-message-test
-  (testing "receive a message through the socket"
+(deftest receive-messages-test
+  (testing "receive no message through the socket"
+    (let [socket-atom (con/socket-atom "eth0" "239.255.255.255" 15001)
+          connector {:socket-connection socket-atom
+                     :config            {:config {:datagram-bytes 34}}}]
+      (with-redefs [con/read-bytes-from-socket (fn [socket ^DatagramPacket datagram]
+                                                 nil)]
+        (con/attach-client-socket connector)
+
+        (is (= nil
+               (con/read-message-with-collision-detection connector 2000)))
+
+        (is (= {:address           "239.255.255.255"
+                :interface         "eth0"
+                :port              15001
+                :received-messages 0
+                :send-messages     0}
+               (dissoc @socket-atom :socket)))
+        (con/disconnect-socket connector))))
+
+  (testing "receive one message through the socket"
+    (let [socket-atom (con/socket-atom "eth0" "239.255.255.255" 15001)
+          once (atom true)
+          connector {:socket-connection socket-atom
+                     :config            {:config {:datagram-bytes 34}}}]
+      (with-redefs [con/read-bytes-from-socket (fn [socket ^DatagramPacket datagram]
+                                                 (is (not= nil socket))
+                                                 (is (= (into [] (byte-array 34)) (into [] (.getData datagram))))
+                                                 (when @once
+                                                   (.setData datagram test-message-datagram-bytes)
+                                                   (reset! once false)))]
+        (con/attach-client-socket connector)
+
+        (is (= test-message
+               (con/read-message-with-collision-detection connector 2000)))
+
+        (is (= {:address           "239.255.255.255"
+                :interface         "eth0"
+                :port              15001
+                :received-messages 1
+                :send-messages     0}
+               (dissoc @socket-atom :socket)))
+        (con/disconnect-socket connector))))
+
+  (testing "should detect collision because more than one message was send during timeout"
     (with-redefs [con/read-bytes-from-socket (fn [socket ^DatagramPacket datagram]
                                                (is (not= nil socket))
-                                               (is (= 2000 (.getSoTimeout socket)))
                                                (is (= (into [] (byte-array 34)) (into [] (.getData datagram))))
                                                (.setData datagram test-message-datagram-bytes))]
       (let [socket-atom (con/socket-atom "eth0" "239.255.255.255" 15001)
@@ -97,13 +140,13 @@
                        :config            {:config {:datagram-bytes 34}}}]
         (con/attach-client-socket connector)
 
-        (is (= test-message
-               (con/read-message connector 2000)))
+        (is (= nil
+               (con/read-message-with-collision-detection connector 2000)))
 
         (is (= {:address           "239.255.255.255"
                 :interface         "eth0"
                 :port              15001
-                :received-messages 1
+                :received-messages 0
                 :send-messages     0}
                (dissoc @socket-atom :socket)))
         (con/disconnect-socket connector)))))

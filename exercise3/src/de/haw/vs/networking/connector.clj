@@ -9,22 +9,35 @@
 (defn socket-atom [interface-name address port]
   (atom {:socket nil :received-messages 0 :send-messages 0 :address address :interface interface-name :port port}))
 
-(defn read-bytes-from-socket [^MulticastSocket socket ^DatagramPacket packet]
+(defn- read-bytes-from-socket [^MulticastSocket socket ^DatagramPacket packet]
   (try
     (.receive socket packet)
     (log/info "Got message")
-    (Thread/sleep (* 0.998 (/ (.getSoTimeout socket) 2)))
     (catch SocketTimeoutException e
       (log/info "Did not get any message"))))
 
-(defn read-message [{:keys [socket-connection config]} timeout]
+(defn- read-message [socket-connection datagram-bytes timeout]
   (.setSoTimeout (:socket @socket-connection) timeout)
-  (let [buffer (byte-array (get-in config [:config :datagram-bytes]))
+  (let [buffer (byte-array datagram-bytes)
         packet (new DatagramPacket buffer (count buffer))]
     (read-bytes-from-socket (:socket @socket-connection) packet)
-    (when (dg/datagram->message (.getData packet))
-      (swap! socket-connection update-in [:received-messages] inc))
     (dg/datagram->message (.getData packet))))
+
+(defn- read-messages [socket-connection datagram-bytes timeout]
+  (->> (range timeout)
+       (map (fn [& _] (read-message socket-connection datagram-bytes 1)))
+       (filter #(not (nil? %)))))
+
+(defn read-message-with-collision-detection
+  "Tries to read messages each ms and return the message only if just one message was received"
+  [{:keys [socket-connection config]} timeout]
+  (let [messages (read-messages socket-connection (get-in config [:config :datagram-bytes]) timeout)]
+    (when (first messages)
+      (if (= 1 (count messages))
+        (do
+          (swap! socket-connection update-in [:received-messages] inc)
+          (first messages))
+        (log/info "Collision detected")))))
 
 (defn send-bytes-datagram-socket [^DatagramSocket socket ^DatagramPacket datagram]
   (.send socket datagram))
