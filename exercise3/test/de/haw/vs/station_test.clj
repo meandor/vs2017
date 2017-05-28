@@ -86,7 +86,7 @@
         message-slot (atom 0)
         output-chan (async/chan 10)]
 
-    (testing "Should select a free slot in the state atom"
+    (testing "Should select 1 as only free slot in the state atom"
       (with-redefs [stat/put-message-on-channel! (fn [_ messages] messages)
                     con/read-message-with-collision-detection (fn [connector timeout]
                                                                 (swap! message-slot inc)
@@ -111,15 +111,16 @@
                @state-atom))
         (eventually (is (= 3 (.count (.buf output-chan)))))))
 
-    (testing "Should assign slot one if no messages are received"
+    (testing "Should assign random slot from free slots"
       (reset! state-atom {:slot nil})
       (with-redefs [stat/put-message-on-channel! (fn [_ messages] messages)
+                    rand-nth (constantly 4)
                     con/read-message-with-collision-detection (fn [connector timeout]
                                                                 (is (= nil connector))
-                                                                (is (= 40 timeout))
+                                                                (is (= 24 timeout))
                                                                 nil)]
-        (stat/read-phase! state-atom 120 3 nil nil)
-        (is (= {:slot 1}
+        (stat/read-phase! state-atom 120 5 nil nil)
+        (is (= {:slot 4}
                @state-atom))))
 
     (testing "Should not change state if no slots are given"
@@ -135,7 +136,7 @@
         (is (= 0
                @message-slot))))
 
-    (testing "Should not change state if no duration are given"
+    (testing "Should not change state if no duration is given"
       (reset! state-atom {:slot 3})
       (reset! message-slot 0)
       (with-redefs [stat/put-message-on-channel! (fn [_ messages] messages)

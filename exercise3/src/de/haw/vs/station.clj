@@ -10,8 +10,17 @@
 (defn current-time [offset]
   (+ (System/currentTimeMillis) offset))
 
+(defn collection-not-empty-or-nil
+  "Return the collection if it is not empty, otherwise nil"
+  [col]
+  (when (> (count col) 0)
+    col))
+
 (defn find-free-slots [slots messages]
-  (filter (fn [slot] (nil? (some #{slot} (map :slot messages)))) (drop 1 (range (+ 1 slots)))))
+  (->> (+ 1 slots)
+       (range)
+       (drop 1)
+       (filter (fn [slot] (nil? (some #{slot} (map :slot messages)))))))
 
 (defn read-messages [connector duration slots]
   (->> (range slots)
@@ -46,12 +55,13 @@
    The read messages are put on the writer channel. Switch to send-phase afterwards."
   [state-atom duration slots output-channel connector]
   (when (and (< 0 slots) (< 0 duration))
-    (->> (read-messages connector duration slots)
-         (put-message-on-channel! output-channel)
-         (find-free-slots slots)
-         (first)
-         (log-slot)
-         (swap! state-atom assoc :slot))))
+    (some->> (read-messages connector duration slots)
+             (put-message-on-channel! output-channel)
+             (find-free-slots slots)
+             (collection-not-empty-or-nil)
+             (rand-nth)
+             (log-slot)
+             (swap! state-atom assoc :slot))))
 
 (defn run-phases!
   "Sends at the chosen slot and receive before and after that slot"
