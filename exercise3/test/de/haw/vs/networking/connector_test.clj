@@ -16,7 +16,7 @@
               :message-writer)))
 
 (deftest connector-socket-tests
-  (with-started [system (test-system {:interface-name    "eth0"
+  (with-started [system (test-system {:interface-name    "lo"
                                       :multicast-address "239.255.255.255"
                                       :socket-port       15001})]
                 (testing "should startup the connector and establish the socket multicast connection"
@@ -24,7 +24,7 @@
                         status-map (json/read-str (:body status-page) :key-fn keyword)]
                     (is (= {:message {:address           "239.255.255.255"
                                       :port              15001
-                                      :interface         "eth0"
+                                      :interface         "lo"
                                       :received-messages 0
                                       :send-messages     0
                                       :socket            "class java.net.MulticastSocket"}
@@ -37,7 +37,7 @@
                         status-map (json/read-str (:body status-page) :key-fn keyword)]
                     (is (= {:message {:address           "239.255.255.255"
                                       :port              15001
-                                      :interface         "eth0"
+                                      :interface         "lo"
                                       :received-messages 0
                                       :send-messages     0
                                       :socket            "class java.net.DatagramSocket"}
@@ -50,7 +50,7 @@
                         status-map (json/read-str (:body status-page) :key-fn keyword)]
                     (is (= {:message {:address           "239.255.255.255"
                                       :port              15001
-                                      :interface         "eth0"
+                                      :interface         "lo"
                                       :received-messages 0
                                       :send-messages     0
                                       :socket            "class java.net.MulticastSocket"}
@@ -66,20 +66,20 @@
    :station-name    "!!!!!!!!!!"})
 
 (def test-message-datagram-bytes
-  (byte-array 34 (conj (repeat 33 0x21) 1)))
+  (byte-array 34 (conj (repeat 33 0x21) (byte 0x42))))
 
 (deftest send-message-test
   (testing "send a message through the socket"
     (with-redefs [con/send-bytes-datagram-socket (fn [socket ^DatagramPacket datagram]
                                                    (is (not= nil socket))
                                                    (is (= (into [] test-message-datagram-bytes) (into [] (.getData datagram)))))]
-      (let [socket-atom (con/socket-atom "eth0" "239.255.255.255" 15001)
+      (let [socket-atom (con/socket-atom "lo" "239.255.255.255" 15001)
             connector {:socket-connection socket-atom}]
         (con/attach-server-socket connector)
         (con/send-message connector test-message)
 
         (is (= {:address           "239.255.255.255"
-                :interface         "eth0"
+                :interface         "lo"
                 :port              15001
                 :received-messages 0
                 :send-messages     1}
@@ -88,7 +88,7 @@
 
 (deftest receive-messages-test
   (testing "receive no message through the socket"
-    (let [socket-atom (con/socket-atom "eth0" "239.255.255.255" 15001)
+    (let [socket-atom (con/socket-atom "lo" "239.255.255.255" 15001)
           connector {:socket-connection socket-atom
                      :config            {:config {:datagram-bytes 34}}}]
       (with-redefs [con/read-bytes-from-socket (fn [socket ^DatagramPacket datagram]
@@ -99,7 +99,7 @@
                (con/read-message-with-collision-detection connector 2000)))
 
         (is (= {:address           "239.255.255.255"
-                :interface         "eth0"
+                :interface         "lo"
                 :port              15001
                 :received-messages 0
                 :send-messages     0}
@@ -107,7 +107,7 @@
         (con/disconnect-socket connector))))
 
   (testing "receive one message through the socket"
-    (let [socket-atom (con/socket-atom "eth0" "239.255.255.255" 15001)
+    (let [socket-atom (con/socket-atom "lo" "239.255.255.255" 15001)
           once (atom true)
           connector {:socket-connection socket-atom
                      :config            {:config {:datagram-bytes 34}}}]
@@ -123,7 +123,7 @@
                (con/read-message-with-collision-detection connector 2000)))
 
         (is (= {:address           "239.255.255.255"
-                :interface         "eth0"
+                :interface         "lo"
                 :port              15001
                 :received-messages 1
                 :send-messages     0}
@@ -135,7 +135,7 @@
                                                (is (not= nil socket))
                                                (is (= (into [] (byte-array 34)) (into [] (.getData datagram))))
                                                (.setData datagram test-message-datagram-bytes))]
-      (let [socket-atom (con/socket-atom "eth0" "239.255.255.255" 15001)
+      (let [socket-atom (con/socket-atom "lo" "239.255.255.255" 15001)
             connector {:socket-connection socket-atom
                        :config            {:config {:datagram-bytes 34}}}]
         (con/attach-client-socket connector)
@@ -144,7 +144,7 @@
                (con/read-message-with-collision-detection connector 2000)))
 
         (is (= {:address           "239.255.255.255"
-                :interface         "eth0"
+                :interface         "lo"
                 :port              15001
                 :received-messages 0
                 :send-messages     0}

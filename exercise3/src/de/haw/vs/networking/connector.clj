@@ -88,6 +88,7 @@
   c/Lifecycle
   (start [self]
     (log/info "-> starting Receiver Component")
+    (System/setProperty "java.net.preferIPv4Stack" "true")
     (let [config-params (:config config)
           state-atom (socket-atom (:interface-name config-params) (:multicast-address config-params) (:socket-port config-params))
           new-self (assoc self :socket-connection state-atom)]
