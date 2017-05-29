@@ -9,3 +9,6 @@
 
 (defn current-slot [frame-size slot-count]
   (+ 1 (quot (- (mod current-time frame-size) 1) (/ frame-size slot-count))))
+
+(defn remaining-slots [frame-size slots]
+  (- slots (current-slot frame-size slots)))

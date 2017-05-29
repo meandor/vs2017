@@ -69,3 +69,15 @@
     (with-redefs [clk/current-time 201]
       (is (= 3
              (clk/current-slot 120 3))))))
+
+(deftest remaining-slots-test
+  (testing "Should calculate the remaining  slots of frame size 453 and 3 slots"
+    (with-redefs [clk/current-time 1]
+      (is (= 2
+             (clk/remaining-slots 120 3))))
+    (with-redefs [clk/current-time 41]
+      (is (= 1
+             (clk/remaining-slots 120 3))))
+    (with-redefs [clk/current-time 81]
+      (is (= 0
+             (clk/remaining-slots 120 3))))))
