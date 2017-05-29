@@ -2,7 +2,6 @@
   (:require [clojure.test :refer :all]
             [de.otto.tesla.util.test-utils :refer :all]
             [de.haw.vs.core :as core]
-            [clj-http.client :as http]
             [clojure.data.json :as json]
             [de.haw.vs.networking.connector :as con]
             [de.haw.vs.networking.datagram :as dg]
@@ -21,16 +20,12 @@
                                       :multicast-address "239.255.255.255"
                                       :socket-port       15001})]
                 (testing "should startup the connector and establish the socket multicast connection"
-                  (let [status-page (http/get "http://localhost:8080/status")
-                        status-map (json/read-str (:body status-page) :key-fn keyword)]
-                    (is (= {:message {:address           "239.255.255.255"
-                                      :port              15001
-                                      :interface         "lo"
-                                      :received-messages 0
-                                      :send-messages     0
-                                      :socket            "class java.net.MulticastSocket"}
-                            :status  "OK"}
-                           (get-in status-map [:application :statusDetails :connector])))))))
+                  (is (= {:address           "239.255.255.255"
+                          :port              15001
+                          :interface         "lo"
+                          :received-messages 0
+                          :send-messages     0}
+                         (dissoc @(get-in system [:connector :socket-connection]) :socket))))))
 
 (def test-message
   {:payload         "!!!!!!!!!!!!!!!!!!!!!!!!"

@@ -1,8 +1,6 @@
 (ns de.haw.vs.networking.connector
   (:require [clojure.tools.logging :as log]
             [com.stuartsierra.component :as c]
-            [de.otto.tesla.stateful.app-status :as appstat]
-            [de.otto.status :as stat]
             [de.haw.vs.networking.datagram :as dg]
             [de.haw.vs.clock :as clk])
   (:import (java.net InetAddress NetworkInterface MulticastSocket DatagramPacket DatagramSocket SocketTimeoutException)))
@@ -83,11 +81,6 @@
     (.joinGroup multicast-socket (InetAddress/getByName (:address @socket-connection)))
     (swap! socket-connection assoc :socket multicast-socket)))
 
-(defn status [socket-atom]
-  (if (nil? (:socket @socket-atom))
-    (stat/status-detail :connector :error "No socket attached")
-    (stat/status-detail :connector :ok (update @socket-atom :socket (fn [socket-class] (str (class socket-class)))))))
-
 (defrecord Connector [config app-status]
   c/Lifecycle
   (start [self]
@@ -97,7 +90,6 @@
           state-atom (socket-atom (:interface-name config-params) (:multicast-address config-params) (:socket-port config-params))
           new-self (assoc self :socket-connection state-atom)]
       (attach-socket new-self)
-      (appstat/register-status-fun app-status #(status state-atom))
       new-self))
 
   (stop [self]

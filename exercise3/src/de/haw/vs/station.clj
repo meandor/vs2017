@@ -2,8 +2,6 @@
   (:require [com.stuartsierra.component :as c]
             [clojure.tools.logging :as log]
             [clojure.core.async :as async]
-            [de.otto.tesla.stateful.app-status :as appstat]
-            [de.otto.status :as stat]
             [de.haw.vs.networking.connector :as con]
             [de.haw.vs.clock :as clk])
   (:import (java.net MulticastSocket)))
@@ -78,11 +76,6 @@
       (read-phase (* duration-per-slot after-slots) after-slots out-chan connector)))
   (main-phase state-atom duration slots in-chan out-chan connector))
 
-(defn status [state-atom]
-  (if (nil? (:slot @state-atom))
-    (stat/status-detail :station :error "No slot assigned")
-    (stat/status-detail :station :ok (assoc @state-atom :utc-offset @clk/offset))))
-
 (defn initial-phase
   "Read until frame end. Read phase function finds free slot to send on."
   [state-atom duration slots out-chan connector]
@@ -103,7 +96,6 @@
 
       (async/thread (initial-phase state-atom frame-size slots-count out-chan connector)
                     (main-phase state-atom frame-size slots-count in-chan out-chan connector))
-      (appstat/register-status-fun app-status #(status state-atom))
       new-self))
 
   (stop [self]

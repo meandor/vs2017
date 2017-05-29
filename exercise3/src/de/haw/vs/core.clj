@@ -3,7 +3,6 @@
             [clojure.tools.logging :as log]
             [clojure.core.async :as async]
             [de.otto.tesla.system :as system]
-            [de.otto.tesla.serving-with-httpkit :as httpkit]
             [com.stuartsierra.component :as c]
             [de.haw.vs.networking.connector :as connector]
             [de.haw.vs.station :as station]
@@ -19,9 +18,8 @@
         (assoc
           :payload-source (c/using (payload-source/new-payload-source payload-source->station) [:config])
           :message-writer (c/using (message-writer/new-message-writer station->message-writer) [:config])
-          :connector (c/using (connector/new-connector) [:config :app-status])
-          :station (c/using (station/new-station payload-source->station station->message-writer) [:config :app-status :connector]))
-        (httpkit/add-server))))
+          :connector (c/using (connector/new-connector) [:config])
+          :station (c/using (station/new-station payload-source->station station->message-writer) [:config :connector])))))
 
 (defn display-help []
   (println "Execute: java -jar exercise3.jar INTERFACENAME MULTICASTADDRESS PORT STATIONCLASS UTCOFFSET\n"))
