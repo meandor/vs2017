@@ -56,10 +56,12 @@
 (defn send-message-collision-safe? [{:keys [socket-connection]} message]
   (let [received-messages (read-messages socket-connection 34 (clk/ms-until-slot-middle 1000 25 (:slot message)))]
     (if (= 0 (count received-messages))
-      (do (send-message socket-connection (assoc message :send-time clk/current-time))
+      (do (send-message socket-connection (assoc message :send-time (clk/current-time)))
+          (log/debug "no collision, sending")
           (clk/wait-until-slot-end 40)
           true)
       (do (clk/wait-until-slot-end 40)
+          (log/debug "collision, not sending")
           false))))
 
 (defn disconnect-socket [{:keys [socket-connection]}]

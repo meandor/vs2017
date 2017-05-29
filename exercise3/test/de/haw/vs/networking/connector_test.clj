@@ -43,7 +43,7 @@
         connector {:socket-connection socket-atom}]
     (con/attach-socket connector)
     (testing "send a message through the socket"
-      (with-redefs [clk/current-time 2387225703656530209
+      (with-redefs [clk/current-time (constantly 2387225703656530209)
                     con/read-messages (fn [_ datagram-bytes timeout]
                                         (is (= 34 datagram-bytes))
                                         (is (= 11 timeout))
@@ -67,7 +67,7 @@
 
     (testing "do not send a message because collision was detected"
       (let [send-count (atom 0)]
-        (with-redefs [clk/current-time 2387225703656530209
+        (with-redefs [clk/current-time (constantly 2387225703656530209)
                       con/read-messages (fn [_ datagram-bytes timeout]
                                           (is (= 34 datagram-bytes))
                                           (is (= 11 timeout))

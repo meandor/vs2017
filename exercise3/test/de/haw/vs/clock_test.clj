@@ -14,91 +14,91 @@
 
 (deftest current-frame-test
   (testing "Should return the current frame number"
-    (with-redefs [clk/current-time 123]
+    (with-redefs [clk/current-time (constantly 123)]
       (is (= 12
              (clk/current-frame 10))))
 
-    (with-redefs [clk/current-time 1537]
+    (with-redefs [clk/current-time (constantly 1537)]
       (is (= 153
              (clk/current-frame 10))))))
 
 (deftest current-slot-test
   (testing "Should return 1 as the current slot number"
-    (with-redefs [clk/current-time 1]
+    (with-redefs [clk/current-time (constantly 1)]
       (is (= 1
              (clk/current-slot 120 3))))
 
-    (with-redefs [clk/current-time 22]
+    (with-redefs [clk/current-time (constantly 22)]
       (is (= 1
              (clk/current-slot 120 3))))
 
-    (with-redefs [clk/current-time 40]
+    (with-redefs [clk/current-time (constantly 40)]
       (is (= 1
              (clk/current-slot 120 3))))
 
-    (with-redefs [clk/current-time 123]
+    (with-redefs [clk/current-time (constantly 123)]
       (is (= 1
              (clk/current-slot 120 3)))))
 
   (testing "Should return two as the current slot number"
-    (with-redefs [clk/current-time 41]
+    (with-redefs [clk/current-time (constantly 41)]
       (is (= 2
              (clk/current-slot 120 3))))
 
-    (with-redefs [clk/current-time 57]
+    (with-redefs [clk/current-time (constantly 57)]
       (is (= 2
              (clk/current-slot 120 3))))
 
-    (with-redefs [clk/current-time 80]
+    (with-redefs [clk/current-time (constantly 80)]
       (is (= 2
              (clk/current-slot 120 3))))
 
-    (with-redefs [clk/current-time 178]
+    (with-redefs [clk/current-time (constantly 178)]
       (is (= 2
              (clk/current-slot 120 3)))))
 
   (testing "Should return three as the current slot number"
-    (with-redefs [clk/current-time 81]
+    (with-redefs [clk/current-time (constantly 81)]
       (is (= 3
              (clk/current-slot 120 3))))
 
-    (with-redefs [clk/current-time 114]
+    (with-redefs [clk/current-time (constantly 114)]
       (is (= 3
              (clk/current-slot 120 3))))
 
-    (with-redefs [clk/current-time 201]
+    (with-redefs [clk/current-time (constantly 201)]
       (is (= 3
              (clk/current-slot 120 3))))))
 
 (deftest remaining-slots-test
   (testing "Should calculate the remaining  slots of frame size 453 and 3 slots"
-    (with-redefs [clk/current-time 1]
+    (with-redefs [clk/current-time (constantly 1)]
       (is (= 2
              (clk/remaining-slots 120 3))))
-    (with-redefs [clk/current-time 41]
+    (with-redefs [clk/current-time (constantly 41)]
       (is (= 1
              (clk/remaining-slots 120 3))))
-    (with-redefs [clk/current-time 81]
+    (with-redefs [clk/current-time (constantly 81)]
       (is (= 0
              (clk/remaining-slots 120 3))))))
 
 (deftest wait-until-slot-end-test
   (testing "Should wait for the slot with size 1000 to end"
-    (with-redefs [clk/current-time 1495896445968]
+    (with-redefs [clk/current-time (constantly 1495896445968)]
       (let [now (System/currentTimeMillis)]
         (clk/wait-until-slot-end 1000)
         (is (and (> (System/currentTimeMillis) (+ now 30))
                  (< (System/currentTimeMillis) (+ now 36)))))))
 
   (testing "Should wait for the slot with size 123 to end"
-    (with-redefs [clk/current-time 1]
+    (with-redefs [clk/current-time (constantly 1)]
       (let [now (System/currentTimeMillis)]
         (clk/wait-until-slot-end 123)
         (is (and (> (System/currentTimeMillis) (+ now 120))
                  (< (System/currentTimeMillis) (+ now 127))))))))
 
 (deftest ms-until-slot-middle-test
-  (with-redefs [clk/current-time 12]
+  (with-redefs [clk/current-time (constantly 12)]
     (testing "Should return the time before the slot middle of the first slot in ms"
       (is (= 8
              (clk/ms-until-slot-middle 120 3 1))))
