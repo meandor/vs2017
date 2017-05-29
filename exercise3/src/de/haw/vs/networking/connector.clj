@@ -56,21 +56,15 @@
 
 (defn disconnect-socket [{:keys [socket-connection]}]
   (try
-    (when (= MulticastSocket (class (:socket @socket-connection)))
-      (log/info "leaving multicast group")
-      (.leaveGroup (:socket @socket-connection)
-                   (InetAddress/getByName (:address @socket-connection))))
+    (log/info "leaving multicast group")
+    (.leaveGroup (:socket @socket-connection)
+                 (InetAddress/getByName (:address @socket-connection)))
     (log/info "closing socket")
     (.close (:socket @socket-connection))
     (catch Exception e
       (log/warn "Socket could not be disconnected, maybe none present"))))
 
-(defn attach-server-socket [{:keys [socket-connection] :as self}]
-  (disconnect-socket self)
-  (log/info "attaching server socket")
-  (swap! socket-connection assoc :socket (new DatagramSocket (:port @socket-connection))))
-
-(defn attach-client-socket [{:keys [socket-connection] :as self}]
+(defn attach-socket [{:keys [socket-connection] :as self}]
   (disconnect-socket self)
   (log/info (format "joined socket at %s:%s %s" (:address @socket-connection) (:port @socket-connection) (:interface @socket-connection)))
   (let [multicast-socket (new MulticastSocket (:port @socket-connection))]
@@ -92,7 +86,7 @@
     (let [config-params (:config config)
           state-atom (socket-atom (:interface-name config-params) (:multicast-address config-params) (:socket-port config-params))
           new-self (assoc self :socket-connection state-atom)]
-      (attach-client-socket new-self)
+      (attach-socket new-self)
       (appstat/register-status-fun app-status #(status state-atom))
       new-self))
 

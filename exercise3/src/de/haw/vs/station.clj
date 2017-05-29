@@ -67,14 +67,11 @@
   (let [duration-per-slot (/ duration slots)
         before-slots (- (:slot @state-atom) 1)
         after-slots (- (+ slots 1) (:slot @state-atom))]
-    (con/attach-client-socket connector)                    ; read all messages before the slot
     (some->> (read-phase (* duration-per-slot before-slots) before-slots out-chan connector)
              (swap! state-atom assoc :slot))
-    (con/attach-server-socket connector)
     (Thread/sleep (/ duration-per-slot 2))
     (send-phase state-atom in-chan connector)               ; send in the middle of my slot
     (Thread/sleep (* 0.998 (/ duration-per-slot 2)))
-    (con/attach-client-socket connector)
     (read-phase (* duration-per-slot after-slots) after-slots out-chan connector)) ; read all messages after the slot
   (main-phase state-atom duration slots in-chan out-chan connector))
 

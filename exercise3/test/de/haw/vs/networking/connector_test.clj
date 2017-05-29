@@ -29,32 +29,6 @@
                                       :send-messages     0
                                       :socket            "class java.net.MulticastSocket"}
                             :status  "OK"}
-                           (get-in status-map [:application :statusDetails :connector])))))
-
-                (testing "should switch the socket to datagram socket"
-                  (con/attach-server-socket (:connector system))
-                  (let [status-page (http/get "http://localhost:8080/status")
-                        status-map (json/read-str (:body status-page) :key-fn keyword)]
-                    (is (= {:message {:address           "239.255.255.255"
-                                      :port              15001
-                                      :interface         "lo"
-                                      :received-messages 0
-                                      :send-messages     0
-                                      :socket            "class java.net.DatagramSocket"}
-                            :status  "OK"}
-                           (get-in status-map [:application :statusDetails :connector])))))
-
-                (testing "should switch the socket back to multicast socket"
-                  (con/attach-client-socket (:connector system))
-                  (let [status-page (http/get "http://localhost:8080/status")
-                        status-map (json/read-str (:body status-page) :key-fn keyword)]
-                    (is (= {:message {:address           "239.255.255.255"
-                                      :port              15001
-                                      :interface         "lo"
-                                      :received-messages 0
-                                      :send-messages     0
-                                      :socket            "class java.net.MulticastSocket"}
-                            :status  "OK"}
                            (get-in status-map [:application :statusDetails :connector])))))))
 
 (def test-message
@@ -75,7 +49,7 @@
                                                    (is (= (into [] test-message-datagram-bytes) (into [] (.getData datagram)))))]
       (let [socket-atom (con/socket-atom "lo" "239.255.255.255" 15001)
             connector {:socket-connection socket-atom}]
-        (con/attach-server-socket connector)
+        (con/attach-socket connector)
         (con/send-message connector test-message)
 
         (is (= {:address           "239.255.255.255"
@@ -93,7 +67,7 @@
                      :config            {:config {:datagram-bytes 34}}}]
       (with-redefs [con/read-bytes-from-socket (fn [socket ^DatagramPacket datagram]
                                                  nil)]
-        (con/attach-client-socket connector)
+        (con/attach-socket connector)
 
         (is (= nil
                (con/read-message-with-collision-detection connector 2000)))
@@ -117,7 +91,7 @@
                                                  (when @once
                                                    (.setData datagram test-message-datagram-bytes)
                                                    (reset! once false)))]
-        (con/attach-client-socket connector)
+        (con/attach-socket connector)
 
         (is (= test-message
                (con/read-message-with-collision-detection connector 2000)))
@@ -138,7 +112,7 @@
       (let [socket-atom (con/socket-atom "lo" "239.255.255.255" 15001)
             connector {:socket-connection socket-atom
                        :config            {:config {:datagram-bytes 34}}}]
-        (con/attach-client-socket connector)
+        (con/attach-socket connector)
 
         (is (= nil
                (con/read-message-with-collision-detection connector 2000)))
