@@ -222,7 +222,7 @@
       \settowidth{\haw@tw}{Fakult\"at Technik und Informatik}
       \parbox[t]{\haw@tw}{%
         \normalfont\itshape%
-        Fakult�t Technik und Informatik\\
+        Fakultät Technik und Informatik\\
         Studiendepartment Informatik
       }\hfill
       \settowidth{\haw@tw}{Faculty of Engineering and Computer Science}
@@ -256,19 +256,19 @@
     \theHAWThesisType\ eingereicht im Rahmen der \theHAWExaminationType\\ \par
     im Studiengang \theHAWDegreeProgramme\\
     am Department Informatik\\
-    der Fakult�t Technik und Informatik\\
-    der Hochschule f�r Angewandte Wissenschaften Hamburg\par
+    der Fakultät Technik und Informatik\\
+    der Hochschule für Angewandte Wissenschaften Hamburg\par
   \bigskip}
 
   \@tempcnta=0
   \def\and{\strut\\
     \advance\@tempcnta by 1
-    \ifcase\@tempcnta Betreuender Pr�fer:\ \ignorespaces
+    \ifcase\@tempcnta Betreuender Prüfer:\ \ignorespaces
     \or Zweitgutachter:\ \ignorespaces 
     \fi
   }%
   \ifthenelse{\not\equal{\theHAWExperts}{}}{%
-    Betreuender Pr�fer:\ \ignorespaces\theHAWExperts\par \bigskip} \par
+    Betreuender Prüfer:\ \ignorespaces\theHAWExperts\par \bigskip} \par
   Eingereicht am: \theHAWReleaseDate
   \endgroup
 }
@@ -415,9 +415,7 @@
 \newcommand*{\detailref}[1]{\ref{#1} (S.~\pageref{#1})}
 
 \def\haw@defaultAsurency{%
-  Hiermit versichere ich, dass ich die vorliegende
-  Arbeit  ohne fremde Hilfe selb\-st\"an\-dig verfasst und nur die
-  angegebenen Hilfsmittel benutzt habe.
+  Hiermit erkläre ich, dass ich diese schriftliche Ausarbeitung meines Referates selbstständig und ohne fremde Hilfe verfasst habe und keine anderen als die angegebenen Quellen und Hilfsmittel benutzt habe sowie die aus fremden Quellen (dazu zählen auch Internetquellen) direkt oder indirekt übernommenen Gedanken oder Wortlaute als solche kenntlich gemacht habe. Zudem erkläre ich, dass der zugehörige Programmcode von mir selbständig implementiert wurde ohne diesen oder Teile davon von Dritten im Wortlaut oder dem Sinn nach übernommen zu haben. Die Arbeit habe ich bisher keinem anderen Prüfungsamt in gleicher oder vergleichbarer Form vorgelegt. Sie wurde bisher nicht veröffentlicht.
 }
 
 \newcommand{\HAWasurency}[1][\haw@defaultAsurency]{%
