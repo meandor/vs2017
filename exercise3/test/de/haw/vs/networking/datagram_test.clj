@@ -42,7 +42,7 @@
 
 (deftest transform-message-to-datagram-test
   (testing "should convert a message into a datagram of size 34"
-    (is (= [(byte 0x0)
+    (is (= [(byte 0x41)
             (byte 0x74) (byte 0x65) (byte 0x61) (byte 0x6D)
             (byte 0x20) (byte 0x30) (byte 0x31) (byte 0x2D)
             (byte 0x30) (byte 0x31) (byte 0x70) (byte 0x61)
@@ -81,7 +81,7 @@
             :slot            4
             :station-class   "B"
             :station-name    "team 01-01"}
-           (d/datagram->message (byte-array 34 [(byte 0x1)
+           (d/datagram->message (byte-array 34 [(byte 0x42)
                                                 (byte 0x74) (byte 0x65) (byte 0x61) (byte 0x6D)
                                                 (byte 0x20) (byte 0x30) (byte 0x31) (byte 0x2D)
                                                 (byte 0x30) (byte 0x31) (byte 0x70) (byte 0x61)

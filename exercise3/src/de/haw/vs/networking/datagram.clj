@@ -19,11 +19,11 @@
 
 (defn station->byte [station]
   (if (= "A" station)
-    (byte 0x0)
-    (byte 0x1)))
+    (byte 0x41)
+    (byte 0x42)))
 
 (defn byte->station [raw]
-  (if (= (byte 0x0) raw)
+  (if (= (byte 0x41) raw)
     "A"
     "B"))
 
