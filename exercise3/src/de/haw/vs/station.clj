@@ -25,7 +25,7 @@
        (map (fn [& _] (con/read-message-with-collision-detection connector (/ duration slots))))
        (filter #(not (nil? %)))))
 
-(defn put-message-on-channel! [channel messages]
+(defn put-message-on-channel [channel messages]
   (doseq [message messages]
     (async/go (async/>! channel message)))
   messages)
@@ -36,7 +36,7 @@
     :station-class (:station-class @state-atom)
     :send-time clk/current-time))
 
-(defn send-phase!
+(defn send-phase
   "Sends a message from the input channel if any is present"
   [state-atom input-chan connector]
   (when (< 0 (.count (.buf input-chan)))
@@ -48,34 +48,35 @@
   (log/info "found free slot: " slot)
   slot)
 
-(defn read-phase!
-  "Reads messages from the socket and tries to find an empty slot to send on.
-   The read messages are put on the writer channel. Switch to send-phase afterwards."
-  [state-atom duration slots output-channel connector]
+(defn read-phase
+  "Reads messages from the socket, finds free slots and takes random slot from
+   that as new slot to send on. The read messages are put on the writer channel."
+  [duration slots output-channel connector]
   (when (and (< 0 slots) (< 0 duration))
     (some->> (read-messages connector duration slots)
-             (put-message-on-channel! output-channel)
+             (put-message-on-channel output-channel)
              (find-free-slots slots)
              (collection-not-empty-or-nil)
              (rand-nth)
-             (log-slot)
-             (swap! state-atom assoc :slot))))
+             (log-slot))))
 
-(defn run-phases!
-  "Sends at the chosen slot and receive before and after that slot"
+(defn main-phase
+  "Read until chosen slot, choose new slot for next frame, send message on that slot,
+   use the new slot, read until the end of frame and do everything again."
   [state-atom duration slots in-chan out-chan connector]
   (let [duration-per-slot (/ duration slots)
         before-slots (- (:slot @state-atom) 1)
         after-slots (- (+ slots 1) (:slot @state-atom))]
     (con/attach-client-socket connector)                    ; read all messages before the slot
-    (read-phase! state-atom (* duration-per-slot before-slots) before-slots out-chan connector)
+    (some->> (read-phase (* duration-per-slot before-slots) before-slots out-chan connector)
+             (swap! state-atom assoc :slot))
     (con/attach-server-socket connector)
     (Thread/sleep (/ duration-per-slot 2))
-    (send-phase! state-atom in-chan connector)              ; send in the middle of my slot
+    (send-phase state-atom in-chan connector)               ; send in the middle of my slot
     (Thread/sleep (* 0.998 (/ duration-per-slot 2)))
     (con/attach-client-socket connector)
-    (read-phase! state-atom (* duration-per-slot after-slots) after-slots out-chan connector)) ; read all messages after the slot
-  (run-phases! state-atom duration slots in-chan out-chan connector))
+    (read-phase (* duration-per-slot after-slots) after-slots out-chan connector)) ; read all messages after the slot
+  (main-phase state-atom duration slots in-chan out-chan connector))
 
 (defn status [state-atom]
   (if (nil? (:slot @state-atom))
@@ -84,6 +85,14 @@
 
 (defn wait-until-slot-end [slot-size]
   (Thread/sleep (- slot-size (mod clk/current-time slot-size))))
+
+(defn initial-phase
+  "Read until frame end. Read phase function finds free slot to send on."
+  [state-atom duration slots out-chan connector]
+  (let [remaining-slots (clk/remaining-slots duration slots)
+        remaining-duration (* remaining-slots (/ duration slots))]
+    (some->> (read-phase remaining-duration remaining-slots out-chan connector)
+             (swap! state-atom assoc :slot))))
 
 (defrecord Station [config app-status connector message-writer in-chan out-chan]
   c/Lifecycle
@@ -95,9 +104,8 @@
           new-self (assoc self :slot state-atom)]
       (reset! clk/offset utc-offset)                        ; set initial utc offset
 
-      (async/thread (read-phase! state-atom frame-size slots-count out-chan connector) ; initial discovery for full frame size
-                    #_(wait-for-next-phase! frame-size utc-offset) ; wait for the next frame to start
-                    (run-phases! state-atom (- frame-size (/ frame-size slots-count)) (- slots-count 1) in-chan out-chan connector)) ; after that run for one station less
+      (async/thread (initial-phase state-atom frame-size slots-count out-chan connector)
+                    (main-phase state-atom frame-size slots-count in-chan out-chan connector))
       (appstat/register-status-fun app-status #(status state-atom))
       new-self))
 
