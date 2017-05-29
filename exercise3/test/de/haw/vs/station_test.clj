@@ -41,8 +41,7 @@
    :station-name    (str "station" slot)
    :payload-content "foobar"
    :payload         (str "station" slot "foobar")
-   :slot            slot
-   :send-time       slot})
+   :slot            slot})
 
 (deftest read-messages-test
   (let [message-slot (atom 0)]
@@ -56,14 +55,12 @@
                  :station-name    "station1"
                  :payload-content "foobar"
                  :payload         "station1foobar"
-                 :slot            1
-                 :send-time       1}
+                 :slot            1}
                 {:station-class   "A"
                  :station-name    "station2"
                  :payload-content "foobar"
                  :payload         "station2foobar"
-                 :slot            2
-                 :send-time       2}]
+                 :slot            2}]
                (stat/read-messages nil 80 2)))))
 
     (testing "Should read also empty messages from connector"
@@ -78,8 +75,7 @@
                  :station-name    "station2"
                  :payload-content "foobar"
                  :payload         "station2foobar"
-                 :slot            2
-                 :send-time       2}]
+                 :slot            2}]
                (stat/read-messages nil 80 2)))))))
 
 (deftest read-phase!-test
@@ -152,18 +148,21 @@
                           :station-class "A"
                           :utc-offset    2})]
     (with-redefs [clk/current-time 1
-                  con/send-message (fn [connector message]
-                                     (is (= nil connector))
-                                     (is (= (test-message 1) message))
-                                     (swap! send-counter inc))]
+                  con/send-message-collision-safe? (fn [connector message]
+                                                     (is (= nil connector))
+                                                     (is (= (test-message 1) message))
+                                                     (swap! send-counter inc)
+                                                     true)]
 
-      (testing "Should only send a message if the channel has a message"
-        (stat/send-phase nil input-chan nil)
+      (testing "Should not send a message because channel is empty"
+        (is (= false
+               (stat/send-phase nil input-chan nil)))
         (is (= 0
                @send-counter)))
 
       (testing "Should send one message from the channel"
         (async/>!! input-chan (dissoc (test-message 1) :station-class :send-time :slot))
-        (stat/send-phase state-atom input-chan nil)
+        (is (= true
+               (stat/send-phase state-atom input-chan nil)))
         (is (= 1
                @send-counter))))))

@@ -6,7 +6,8 @@
             [clojure.data.json :as json]
             [de.haw.vs.networking.connector :as con]
             [de.haw.vs.networking.datagram :as dg]
-            [clojure.tools.logging :as log])
+            [clojure.tools.logging :as log]
+            [de.haw.vs.clock :as clk])
   (:import (java.net DatagramSocket DatagramPacket)))
 
 (defn test-system [runtime-config]
@@ -35,30 +36,65 @@
   {:payload         "!!!!!!!!!!!!!!!!!!!!!!!!"
    :payload-content "!!!!!!!!!!!!!!"
    :send-time       2387225703656530209
-   :slot            33
+   :slot            6
    :station-class   "B"
    :station-name    "!!!!!!!!!!"})
 
 (def test-message-datagram-bytes
-  (byte-array 34 (conj (repeat 33 0x21) (byte 0x42))))
+  (dg/message->datagram test-message))
 
 (deftest send-message-test
-  (testing "send a message through the socket"
-    (with-redefs [con/send-bytes-datagram-socket (fn [socket ^DatagramPacket datagram]
-                                                   (is (not= nil socket))
-                                                   (is (= (into [] test-message-datagram-bytes) (into [] (.getData datagram)))))]
-      (let [socket-atom (con/socket-atom "lo" "239.255.255.255" 15001)
-            connector {:socket-connection socket-atom}]
-        (con/attach-socket connector)
-        (con/send-message connector test-message)
+  (let [socket-atom (con/socket-atom "lo" "239.255.255.255" 15001)
+        connector {:socket-connection socket-atom}]
+    (con/attach-socket connector)
+    (testing "send a message through the socket"
+      (with-redefs [clk/current-time 2387225703656530209
+                    con/read-messages (fn [_ datagram-bytes timeout]
+                                        (is (= 34 datagram-bytes))
+                                        (is (= 11 timeout))
+                                        (Thread/sleep timeout)
+                                        [])
+                    con/send-bytes-datagram-socket (fn [socket ^DatagramPacket datagram]
+                                                     (is (= (:socket @socket-atom) socket))
+                                                     (is (= (into [] test-message-datagram-bytes) (into [] (.getData datagram)))))]
+        (let [now (System/currentTimeMillis)]
+          (is (= true
+                 (con/send-message-collision-safe? connector test-message)))
 
-        (is (= {:address           "239.255.255.255"
-                :interface         "lo"
-                :port              15001
-                :received-messages 0
-                :send-messages     1}
-               (dissoc @socket-atom :socket)))
-        (con/disconnect-socket connector)))))
+          (is (= 45 (- (System/currentTimeMillis) now)))
+
+          (is (= {:address           "239.255.255.255"
+                  :interface         "lo"
+                  :port              15001
+                  :received-messages 0
+                  :send-messages     1}
+                 (dissoc @socket-atom :socket))))))
+
+    (testing "do not send a message because collision was detected"
+      (let [send-count (atom 0)]
+        (with-redefs [clk/current-time 2387225703656530209
+                      con/read-messages (fn [_ datagram-bytes timeout]
+                                          (is (= 34 datagram-bytes))
+                                          (is (= 11 timeout))
+                                          (Thread/sleep timeout)
+                                          [1 2 3 4])
+                      con/send-bytes-datagram-socket (fn [& _] (swap! send-count inc))]
+          (let [now (System/currentTimeMillis)]
+            (is (= false
+                   (con/send-message-collision-safe? connector test-message)))
+
+            (is (= 44 (- (System/currentTimeMillis) now)))
+
+            (is (= 0
+                   @send-count))
+
+            (is (= {:address           "239.255.255.255"
+                    :interface         "lo"
+                    :port              15001
+                    :received-messages 0
+                    :send-messages     1}
+                   (dissoc @socket-atom :socket)))))))
+    (con/disconnect-socket connector)))
 
 (deftest receive-messages-test
   (testing "receive no message through the socket"

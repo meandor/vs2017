@@ -30,19 +30,19 @@
     (async/go (async/>! channel message)))
   messages)
 
-(defn build-message [state-atom payload-map]
+(defn add-station-params-to-message [state-atom payload-map]
   (assoc payload-map
     :slot (:slot @state-atom)
-    :station-class (:station-class @state-atom)
-    :send-time clk/current-time))
+    :station-class (:station-class @state-atom)))
 
 (defn send-phase
   "Sends a message from the input channel if any is present"
   [state-atom input-chan connector]
-  (when (< 0 (.count (.buf input-chan)))
+  (if (< 0 (.count (.buf input-chan)))
     (->> (async/<!! input-chan)
-         (build-message state-atom)
-         (con/send-message connector))))
+         (add-station-params-to-message state-atom)
+         (con/send-message-collision-safe? connector))
+    false))
 
 (defn- log-slot [slot]
   (log/info "found free slot: " slot)
@@ -70,9 +70,12 @@
     (some->> (read-phase (* duration-per-slot before-slots) before-slots out-chan connector)
              (swap! state-atom assoc :slot))
     (Thread/sleep (/ duration-per-slot 2))
-    (send-phase state-atom in-chan connector)               ; send in the middle of my slot
-    (Thread/sleep (* 0.998 (/ duration-per-slot 2)))
-    (read-phase (* duration-per-slot after-slots) after-slots out-chan connector)) ; read all messages after the slot
+    (when (send-phase state-atom in-chan connector)         ; when collision is detected, signal need of new slot number
+      (swap! state-atom assoc :slot nil))
+    (if (nil? (:slot @state-atom))                          ; read all messages after the slot, assign new slot if send was unsuccessful before
+      (some->> (read-phase (* duration-per-slot after-slots) after-slots out-chan connector)
+               (swap! state-atom assoc :slot))
+      (read-phase (* duration-per-slot after-slots) after-slots out-chan connector)))
   (main-phase state-atom duration slots in-chan out-chan connector))
 
 (defn status [state-atom]

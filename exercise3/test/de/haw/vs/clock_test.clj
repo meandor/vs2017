@@ -96,3 +96,17 @@
         (clk/wait-until-slot-end 123)
         (is (and (> (System/currentTimeMillis) (+ now 120))
                  (< (System/currentTimeMillis) (+ now 127))))))))
+
+(deftest ms-until-slot-middle-test
+  (with-redefs [clk/current-time 12]
+    (testing "Should return the time before the slot middle of the first slot in ms"
+      (is (= 8
+             (clk/ms-until-slot-middle 120 3 1))))
+
+    (testing "Should return the time before the slot middle of the second slot in ms"
+      (is (= 48
+             (clk/ms-until-slot-middle 120 3 2))))
+
+    (testing "Should return the time before the slot middle of the fourth slot in ms"
+      (is (= 128
+             (clk/ms-until-slot-middle 160 4 4))))))

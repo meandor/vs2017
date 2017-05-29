@@ -3,7 +3,8 @@
             [com.stuartsierra.component :as c]
             [de.otto.tesla.stateful.app-status :as appstat]
             [de.otto.status :as stat]
-            [de.haw.vs.networking.datagram :as dg])
+            [de.haw.vs.networking.datagram :as dg]
+            [de.haw.vs.clock :as clk])
   (:import (java.net InetAddress NetworkInterface MulticastSocket DatagramPacket DatagramSocket SocketTimeoutException)))
 
 (defn socket-atom [interface-name address port]
@@ -39,10 +40,10 @@
           (first messages))
         (log/info "Collision detected")))))
 
-(defn send-bytes-datagram-socket [^DatagramSocket socket ^DatagramPacket datagram]
+(defn- send-bytes-datagram-socket [^DatagramSocket socket ^DatagramPacket datagram]
   (.send socket datagram))
 
-(defn send-message [{:keys [socket-connection]} message]
+(defn- send-message [socket-connection message]
   (log/info "sending message:" message)
   (let [^bytes datagram-bytes (dg/message->datagram message)]
     (log/debug "sending datagram:" (into [] datagram-bytes))
@@ -53,6 +54,15 @@
               (:port @socket-connection))
          (send-bytes-datagram-socket (:socket @socket-connection)))
     (swap! socket-connection update-in [:send-messages] inc)))
+
+(defn send-message-collision-safe? [{:keys [socket-connection]} message]
+  (let [received-messages (read-messages socket-connection 34 (clk/ms-until-slot-middle 1000 25 (:slot message)))]
+    (if (= 0 (count received-messages))
+      (do (send-message socket-connection (assoc message :send-time clk/current-time))
+          (clk/wait-until-slot-end 40)
+          true)
+      (do (clk/wait-until-slot-end 40)
+          false))))
 
 (defn disconnect-socket [{:keys [socket-connection]}]
   (try
