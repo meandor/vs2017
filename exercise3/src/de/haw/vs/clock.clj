@@ -12,3 +12,6 @@
 
 (defn remaining-slots [frame-size slots]
   (- slots (current-slot frame-size slots)))
+
+(defn wait-until-slot-end [slot-size]
+  (Thread/sleep (- slot-size (mod current-time slot-size))))

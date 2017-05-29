@@ -80,9 +80,6 @@
     (stat/status-detail :station :error "No slot assigned")
     (stat/status-detail :station :ok (assoc @state-atom :utc-offset @clk/offset))))
 
-(defn wait-until-slot-end [slot-size]
-  (Thread/sleep (- slot-size (mod clk/current-time slot-size))))
-
 (defn initial-phase
   "Read until frame end. Read phase function finds free slot to send on."
   [state-atom duration slots out-chan connector]

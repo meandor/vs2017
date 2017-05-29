@@ -81,3 +81,18 @@
     (with-redefs [clk/current-time 81]
       (is (= 0
              (clk/remaining-slots 120 3))))))
+
+(deftest wait-until-slot-end-test
+  (testing "Should wait for the slot with size 1000 to end"
+    (with-redefs [clk/current-time 1495896445968]
+      (let [now (System/currentTimeMillis)]
+        (clk/wait-until-slot-end 1000)
+        (is (and (> (System/currentTimeMillis) (+ now 30))
+                 (< (System/currentTimeMillis) (+ now 36)))))))
+
+  (testing "Should wait for the slot with size 123 to end"
+    (with-redefs [clk/current-time 1]
+      (let [now (System/currentTimeMillis)]
+        (clk/wait-until-slot-end 123)
+        (is (and (> (System/currentTimeMillis) (+ now 120))
+                 (< (System/currentTimeMillis) (+ now 127))))))))
