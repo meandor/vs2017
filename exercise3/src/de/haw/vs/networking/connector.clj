@@ -11,9 +11,9 @@
 (defn- read-bytes-from-socket [^MulticastSocket socket ^DatagramPacket packet]
   (try
     (.receive socket packet)
-    (log/info "Got message")
+    (log/debug "Got message")
     (catch SocketTimeoutException e
-      (log/info "Did not get any message"))))
+      (log/debug "Did not get any message"))))
 
 (defn- read-message [socket-connection datagram-bytes timeout]
   (.setSoTimeout (:socket @socket-connection) timeout)
