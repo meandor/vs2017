@@ -7,10 +7,8 @@
               ,DIV11
               ]{scrbook}
 \usepackage[ngerman,english]{babel}
-%% see http://www.tex.ac.uk/cgi-bin/texfaq2html?label=uselmfonts
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-%\usepackage[latin1]{inputenc}
 \usepackage{libertine}
 \usepackage{pifont}
 \usepackage{microtype}
@@ -148,6 +146,13 @@ Das zu verwendende Medium ist ein Socket, der per IP Multicast Nachrichtenpakete
 Die Frames haben eine Länge von einer Sekunde. Ein Frame hat 25 Slots. Diese sind von 1 bis 25 nummeriert. Die Frames sind in
 Sekunden seit dem 1.1.1970, 00:00 Uhr nummeriert.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{frame-structure.png}
+\caption[frame-structure]{Aufteilung des Mediums in Frames und Slots, Quelle: \cite{exercise}}
+\label{fig:frame-structure}
+\end{figure}
+
 Jede Station darf nur einmal pro Frame senden. Das muss in der Mitte ihres zugeteilten Slots passieren.
 
 Die Vergabe der Slots soll ohne zentrale Vergabeinstanz geschehen. Das geschieht, indem jedes Nachrichtenpaket ein Datenfeld enthält, in das die sendende Station die Nummer ihres Slots einträgt, die sie für den nächsten Frame zum Senden verwendet.
@@ -183,6 +188,9 @@ Als Datenquelle für die Nutzdaten soll das STDIN des Produktes verwendet werden
 Das Produkt muss auch in einer ssh-Sitzung auf einem anderen Rechner gestartet werden können. Es muss auf Rechnern mit Linux Betriebssystem lauffähig sein.
 
 \chapter{Gesamtsystem}
+Das Produkt ist in Clojure (v1.9) umgesetzt worden. Clojure ist eine funktionale Programmiersprache, die auf der JVM läuft. Dabei ist eine interoperabilität mit Java möglich. Das erleichtert den Umgang mit Sockets, da der Umgang mit diesen in Java gut dokumentiert und verwendbar ist. Außerdem hat Clojure im Vergleich mit Erlang einige andere Vorteile wie lazily evaluated Sequences oder eine bessere Testumgebung.
+
+Funktionale Programmiersprachen haben den Vorteil in verteilten Systemen, das die Ergebnisse von Funktionen bei gleichen Parametern immer gleich sind. Diese Immutability von Daten hat den Vorteil, das nebenläufige Prozesse dadurch keine Datensynchronisation machen müssen. Dadurch wird eine erhöhte Threadsicherheit erreicht.
 
 \section{Architekturüberblick}
 
@@ -232,9 +240,6 @@ Das Produkt muss auch in einer ssh-Sitzung auf einem anderen Rechner gestartet w
 
 \subsection{Konfigurationsparameter}
 
-
-%See also \cite{documentation_bib}.
-%%%%
 
 %% appendix if used
 %%\appendix
