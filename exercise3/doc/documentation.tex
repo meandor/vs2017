@@ -77,6 +77,10 @@
 %% recalculate text area
 \typearea[current]{last}
 
+%% no indentation at paragraphs
+\setlength\parindent{0pt}
+\setlength\parskip{\medskipamount}
+
 \makeindex
 \makenomenclature
 
@@ -107,11 +111,9 @@
 %% note: this is one command on multiple lines
 \HAWAbstractPage
 %% German abstract
-{Schlüsselwort 1, Schlüsselwort 2}%
-{Dieses Dokument \ldots}
+{STDMA, Verteilte Systeme, Clojure}%
 %% English abstract
-{keyword 1, keyword 2}%
-{This document \ldots}
+{STDMA, Distributed Systems, Clojure}%
 
 \newpage
 \singlespacing
@@ -131,12 +133,107 @@
 %% include chapter file (chapter1.tex)
 %%\include{chapter1}
 
-%%%%
-%% add some text to generate a sample document
-\chapter{Sample Chapter}
+\chapter{Einführung und Ziele}
+In verteilten Systemen werden oft Nachrichten unter verschiedenen Teilnehmern eines Netzes ausgetauscht. Dabei sind diese Teilnehmer oft nur durch ein Medium miteinander verbunden. Dieses eine Medium muss dann mehrere Teilnehmer unterstützen können.
+
+Um dieses Problem zu lösen soll ein Softwareprodukt erstellt werden, das eine Station darstellt, die auf einem Medium Nachrichten empfangen und senden kann.
+
+Dabei sollen mehrere Stationen auf einem Medium Nachrichten verschicken und senden. Das geschieht, indem das Medium in feste Frames aufgeteilt wird und jeder Frame eine feste Anzahl an Slots hat, in dem aus allen teilnehmenden Stationen immer nur eine in ihrem zugeteilten Slot Senden darf. Das Medium wird hierbei im Betracht der Zeit aufgeteilt. Diese Aufteilung (Multiplexing) wird auch time-division multiple access (TDMA) genannt.
+In diesem Fall sollen die Stationen selber untereinander ihre Slots zum Senden verwalten und untereinander gleichmäßig aufteilen.
+Das wird auch Self-organized time-division multiple access (STDMA) genannt.
+
+\section{Randbedingungen}
+Das zu verwendende Medium ist ein Socket, der per IP Multicast Nachrichtenpakete (Datagrams) an mehrere Klienten austeilen kann. Die TTL der Multicast-Pakete ist auf 1 zu setzen, um unnötige Netzlasten und Netzstörungen zu vermeiden.
+
+Die Frames haben eine Länge von einer Sekunde. Ein Frame hat 25 Slots. Diese sind von 1 bis 25 nummeriert. Die Frames sind in
+Sekunden seit dem 1.1.1970, 00:00 Uhr nummeriert.
+
+Jede Station darf nur einmal pro Frame senden. Das muss in der Mitte ihres zugeteilten Slots passieren.
+
+Die Vergabe der Slots soll ohne zentrale Vergabeinstanz geschehen. Das geschieht, indem jedes Nachrichtenpaket ein Datenfeld enthält, in das die sendende Station die Nummer ihres Slots einträgt, die sie für den nächsten Frame zum Senden verwendet.
+Das bedeutet also, dass durch das Lesen der Nachrichtenpakete in einem Frame bestimmt werden kann, welche Slots im nächsten Frame frei sind.
+
+Ein Nachrichtenpaket hat folgende Struktur:
+\begin{itemize}
+	\item Byte 0: Stationsklasse ('A' oder 'B')
+	\item Byte 1 – 24: Nutzdaten. (Darin Byte 1 – 10: Name der sendenden Station.)
+	\item Byte 25: Nummer des Slots, in dem die Station im nächsten Frame senden wird.
+	\item Byte 26 – 33: Zeitpunkt, zu dem dieses Paket gesendet wurde. Einheit: Millisekunden seit dem 1.1.1970 als 8-Byte Integer, Big Endian.
+\end{itemize}
+
+Gesamtlänge: 34 Bytes
+
+Stationen haben dabei eine Unterteilung in Klasse A und B. Diese Klassen werden für eine Synchronisierung der Zeit verwendet. Generell wird die UTC Zeit verwendet. Die Uhr einer Station kann einen anfänglichen Offset haben. Die Stationen synchronisieren dann untereinander im Laufe der Teilnahme am Netz ihre Uhren untereinander, so dass der Offset sich verändern kann.
+
+Klasse A Uhren gelten als hinreichend genau und als Referenz zur Synchronisation. Klasse B und Klasse A Stationen können dann anhand anderer empfangen Nachrichtenpakete von Klasse A Stationen ihren Offset verändern. Dabei wird die Sendezeit und die Klasse innerhalb eines Nachrichtenpaketes verwendet.
+
+Bei Kollisionen sollen die betroffenen Nachrichtenpakete als nicht empfangen betrachtet werden. Ein kollisionsfreier Betrieb mit maximal 25 Stationen muss nach endlicher Zeit erreicht werden und darf nicht wieder verlassen werden.
+
+Das Produkt soll über die Kommandozeile gestartet werden können. Dabei müssen folgende Parameter mit übergeben werden können:
+\begin{itemize}
+	\item Interfacename des Kommunikationsendpunktes
+	\item Adresse der Multicast Gruppe, Klasse D IP-Adresse
+	\item Port des Sockets
+	\item Stationsklasse, A oder B
+	\item Anfänglicher UTC Offset
+\end{itemize}
+Als Datenquelle für die Nutzdaten soll das STDIN des Produktes verwendet werden, um der Station neue Nutzdaten zukommen zu lassen.
+
+\section{Kontextabgrezung}
+Das Produkt muss auch in einer ssh-Sitzung auf einem anderen Rechner gestartet werden können. Es muss auf Rechnern mit Linux Betriebssystem lauffähig sein.
+
+\chapter{Gesamtsystem}
+
+\section{Architekturüberblick}
+
+\section{Konfigurationsparameter}
+
+\section{Benutzungsschnittstellen}
+
+\chapter{Subsysteme und Komponenten}
+
+\section{Connector}
+
+\subsection{Aufgabe und Verantwortung}
+
+\subsection{Schnittstelle}
+
+\subsection{Entwurfsentscheidungen}
+
+\subsection{Konfigurationsparameter}
+
+\section{Payload-Source}
+
+\subsection{Aufgabe und Verantwortung}
+
+\subsection{Schnittstelle}
+
+\subsection{Entwurfsentscheidungen}
+
+\subsection{Konfigurationsparameter}
+
+\section{Message-Writer}
+
+\subsection{Aufgabe und Verantwortung}
+
+\subsection{Schnittstelle}
+
+\subsection{Entwurfsentscheidungen}
+
+\subsection{Konfigurationsparameter}
+
+\section{Station}
+
+\subsection{Aufgabe und Verantwortung}
+
+\subsection{Schnittstelle}
+
+\subsection{Entwurfsentscheidungen}
+
+\subsection{Konfigurationsparameter}
 
 
-See also \cite{documentation_bib}.
+%See also \cite{documentation_bib}.
 %%%%
 
 %% appendix if used
