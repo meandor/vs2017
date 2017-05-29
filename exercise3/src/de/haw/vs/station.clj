@@ -1,14 +1,12 @@
 (ns de.haw.vs.station
   (:require [com.stuartsierra.component :as c]
             [clojure.tools.logging :as log]
-            [de.haw.vs.networking.connector :as con]
+            [clojure.core.async :as async]
             [de.otto.tesla.stateful.app-status :as appstat]
             [de.otto.status :as stat]
-            [clojure.core.async :as async])
+            [de.haw.vs.networking.connector :as con]
+            [de.haw.vs.clock :as clk])
   (:import (java.net MulticastSocket)))
-
-(defn current-time [offset]
-  (+ (System/currentTimeMillis) offset))
 
 (defn collection-not-empty-or-nil
   "Return the collection if it is not empty, otherwise nil"
@@ -36,7 +34,7 @@
   (assoc payload-map
     :slot (:slot @state-atom)
     :station-class (:station-class @state-atom)
-    :send-time (current-time (:utc-offset @state-atom))))
+    :send-time clk/current-time))
 
 (defn send-phase!
   "Sends a message from the input channel if any is present"
@@ -82,13 +80,10 @@
 (defn status [state-atom]
   (if (nil? (:slot @state-atom))
     (stat/status-detail :station :error "No slot assigned")
-    (stat/status-detail :station :ok @state-atom)))
+    (stat/status-detail :station :ok (assoc @state-atom :utc-offset @clk/offset))))
 
-(defn wait-for-next-phase! [frame-size utc-offset]
-  (->> frame-size
-       (mod (current-time utc-offset))
-       (- frame-size)
-       (Thread/sleep)))
+(defn wait-until-slot-end [slot-size]
+  (Thread/sleep (- slot-size (mod clk/current-time slot-size))))
 
 (defrecord Station [config app-status connector message-writer in-chan out-chan]
   c/Lifecycle
@@ -96,11 +91,12 @@
     (log/info "-> starting Station Component")
     (let [{:keys [station-class utc-offset frame-size slots-count]} (:config config)
           state-atom (atom {:slot          nil
-                            :station-class station-class
-                            :utc-offset    utc-offset})
+                            :station-class station-class})
           new-self (assoc self :slot state-atom)]
+      (reset! clk/offset utc-offset)                        ; set initial utc offset
+
       (async/thread (read-phase! state-atom frame-size slots-count out-chan connector) ; initial discovery for full frame size
-                    (wait-for-next-phase! frame-size utc-offset) ; wait for the next frame to start
+                    #_(wait-for-next-phase! frame-size utc-offset) ; wait for the next frame to start
                     (run-phases! state-atom (- frame-size (/ frame-size slots-count)) (- slots-count 1) in-chan out-chan connector)) ; after that run for one station less
       (appstat/register-status-fun app-status #(status state-atom))
       new-self))

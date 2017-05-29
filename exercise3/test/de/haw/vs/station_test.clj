@@ -3,7 +3,8 @@
             [de.haw.vs.station :as stat]
             [de.haw.vs.networking.connector :as con]
             [clojure.core.async :as async]
-            [de.otto.tesla.util.test-utils :refer :all]))
+            [de.otto.tesla.util.test-utils :refer :all]
+            [de.haw.vs.clock :as clk]))
 
 (deftest find-free-slots-test
   (testing "Should find one free slot"
@@ -155,7 +156,7 @@
         state-atom (atom {:slot          1
                           :station-class "A"
                           :utc-offset    2})]
-    (with-redefs [stat/current-time (constantly 1)
+    (with-redefs [clk/current-time 1
                   con/send-message (fn [connector message]
                                      (is (= nil connector))
                                      (is (= (test-message 1) message))
@@ -172,16 +173,17 @@
         (is (= 1
                @send-counter))))))
 
-(deftest wait-for-next-phase!-test
-  (with-redefs [stat/current-time (constantly 1495896445968)]
-    (testing "Should wait for the next frame to start"
+(deftest wait-until-slot-end-test
+  (testing "Should wait for the slot with size 1000 to end"
+    (with-redefs [clk/current-time 1495896445968]
       (let [now (System/currentTimeMillis)]
-        (stat/wait-for-next-phase! 1000 0)
+        (stat/wait-until-slot-end 1000)
         (is (and (> (System/currentTimeMillis) (+ now 30))
-                 (< (System/currentTimeMillis) (+ now 34))))))
+                 (< (System/currentTimeMillis) (+ now 36)))))))
 
-    (testing "Should wait for the next frame to start"
+  (testing "Should wait for the slot with size 123 to end"
+    (with-redefs [clk/current-time 1]
       (let [now (System/currentTimeMillis)]
-        (stat/wait-for-next-phase! 1730 0)
-        (is (and (> (System/currentTimeMillis) (+ now 740))
-                 (< (System/currentTimeMillis) (+ now 744))))))))
+        (stat/wait-until-slot-end 123)
+        (is (and (> (System/currentTimeMillis) (+ now 120))
+                 (< (System/currentTimeMillis) (+ now 127))))))))
