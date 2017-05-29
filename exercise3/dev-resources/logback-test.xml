@@ -8,7 +8,7 @@
             <pattern>%date{HH:mm:ss.SSS} [%thread] %-5level %logger{15} - %mescaped%n</pattern>
         </encoder>
     </appender>
-    <root level="${log_level:-debug}">
+    <root level="${log_level:-info}">
         <appender-ref ref="console"/>
     </root>
 </configuration>
