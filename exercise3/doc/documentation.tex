@@ -64,6 +64,9 @@
 %% more fancy C++
 \DeclareRobustCommand{\cxx}{C\raisebox{0.25ex}{{\scriptsize +\kern-0.25ex +}}}
 
+\include{clj-latex}
+\lstset{language=clojure}
+
 \clubpenalty=10000
 \widowpenalty=10000
 \displaywidowpenalty=10000
@@ -110,8 +113,10 @@
 \HAWAbstractPage
 %% German abstract
 {STDMA, Verteilte Systeme, Clojure}%
+{Umsetzung einer STDMA Station auf IP-Multicast Socket Basis}%
 %% English abstract
 {STDMA, Distributed Systems, Clojure}%
+{Implementation of an STDMA Station via IP-Multicast Sockets}%
 
 \newpage
 \singlespacing
@@ -121,7 +126,7 @@
 %% enable if these lists should be shown on their own page
 %%\listoftables
 %%\listoffigures
-\lstlistoflistings
+%\lstlistoflistings
 
 %% main
 \mainmatter
@@ -193,45 +198,223 @@ Das Produkt ist in Clojure (v1.9) umgesetzt worden. Clojure ist eine funktionale
 Funktionale Programmiersprachen haben den Vorteil in verteilten Systemen, das die Ergebnisse von Funktionen bei gleichen Parametern immer gleich sind. Diese Immutability von Daten hat den Vorteil, das nebenläufige Prozesse dadurch keine Datensynchronisation machen müssen. Dadurch wird eine erhöhte Threadsicherheit erreicht.
 
 \section{Architekturüberblick}
+Das System ist in drei Pakete aufgeteilt, die jeweils aus verschiedenen Komponenten bestehen.
+Die Pakete sind die Business Logik (Basis Paket), die Verbindungs Logik (Network Paket) und die Daten Logik (Data Links Paket).
+
+Das Paket mit der Business Logik enthält die Stations Komponente, die Uhren Komponente und den Haupteinstiegspunkt des Systems, das alle Komponenten zusammen baut. Hier sind die fachlichen Logiken, die das Verhalten der Station beeinflussen definiert.
+
+Das Paket mit der Verbindungslogik enthält die Verbindungs Komponente und die Datagram Komponente. Hier werden alle verbindungsrelevanten Informationen verarbeitet. Dazu gehört der Aufbau und der Abbau und das Versenden und Verschicken von Nachrichtenpaketen auf Netzebene (Datagramme).
+
+Das Daten Logik Paket beinhaltet die Payload Source Komponente und die Message Writer Komponente. Dieses Paket ist für die Datensenke und Datenquelle zuständig.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{component-diagram.png}
+\caption[component-diagram]{Komponentendiagramm des Gesamtsystems}
+\label{fig:component-diagram}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{activity-diagram.png}
+\caption[activity-diagram]{Aktivitätendiagramm der Nachrichtenbehandlung im Gesamtsystem}
+\label{fig:component-diagram}
+\end{figure}
 
 \section{Konfigurationsparameter}
+Es existiert eine Konfigurationsdatei (./resources/default.edn), die folgende Parameter bestimmt:
+\begin{itemize}
+	\item Anzahl der slots
+	\item Länge eines Frames in ms
+	\item Länge eines Nachrichtenpaketes
+	\item Länge der Nutznachricht
+	\item Datei für die Datensenke
+\end{itemize}
 
 \section{Benutzungsschnittstellen}
+Das System wird als .jar über die Kommandozeile gestartet mit folgenden Parameter (in Reihenfolge):
+\begin{itemize}
+	\item Interfacename 
+	\item Multicastadresse
+	\item Port
+	\item Stationsklasse
+	\item Initialer UTC Offset
+\end{itemize}
 
 \chapter{Subsysteme und Komponenten}
+\section{Datagram}
+\subsection{Aufgabe und Verantwortung}
+Das Datagram Modul ist dafür verantwortlich aus vorhanden Nachrichten Byte Pakete zu erstellen und diese wieder in Nachrichten zurück zu konvertieren.
+
+\subsection{Schnittstelle}
+\begin{lstlisting}
+; Prueft ob uebergebene Bytes nicht leer sind
+Bytes -> Boolean
+byte-array-empty?(bytes-array)
+
+; Konvertiert uebergebene Bytes in ein Nachricht
+Bytes -> Nachricht
+datagram->message(bytes-array)
+
+; Kodiert uebergebene Nachricht in ein Bytes
+Nachricht -> Bytes
+message->datagram(message)
+\end{lstlisting}
+Eine Nachricht ist eine Map folgender Gestalt:
+\begin{lstlisting}
+{:station-class   String
+ :station-name    String
+ :payload-content String
+ :payload         String
+ :slot            Nummer
+ :send-time       Nummer}
+\end{lstlisting}
+
+\subsection{Entwurfsentscheidungen}
+Nutznachrichten werden in ihrer Zeichenketten Form als UTF-8 konvertiert behandelt. Die Stationsklasse wird in Byte der jeweiligen String Repräsentation des Klassennamen konvertiert ('A' oder 'B').
+
+Die Zeitstempel in den Nachrichten werden als Big Endian Bytes behandelt (eventuelles Zero Padding ist links).
 
 \section{Connector}
-
 \subsection{Aufgabe und Verantwortung}
+Der Connector abstrahiert die Netzwerkverbindung, die per Multicast Sockets umgesetzt wurde. Über den Connector werden Nachrichten verschickt und empfangen. Das Verschicken und Empfangen ist mit einer Kollisionserkennung ausgestattet, so dass falsche Nachrichtenpakete verworfen werden.
+
+Der Connector versendet Nachrichten und konvertiert diese in Nachrichtenpakete (Bytes). Beim Lesen werden Nachrichtenpakete (Bytes) eingelesen und als konvertierte Nachrichten zurückgegeben.
 
 \subsection{Schnittstelle}
+\begin{lstlisting}
+; Startet den Connector und verbindet den Socket
+Map -> Komponente
+new-connector(config)
+
+; Sendet eine Nachricht, wenn das Senden Kollisionsfrei ist
+(Komponente, Nachricht) -> Boolean
+send-message-collision-safe?(connector, message)
+
+; Liest Nachrichten bis zum Ablauf des Timeouts
+(Komponente, Nummer) -> Bytes
+read-message-with-collision-detection(connector, timeout) 
+\end{lstlisting}
+
+Eine Komponente ist eine Map, die den State und die Konfiguration der Komponente enthalten in jeweils wieder einer Map.
+\begin{lstlisting}
+Map -> Map
+{:config             Map
+ :socket-connection  Map}
+\end{lstlisting}
 
 \subsection{Entwurfsentscheidungen}
+Der Connector hat einen State, der seine Socketverbindung und Informationen zu dieser beinhaltet. Dazu gehört die IP-Adresse, der Port und das Interface.
+
+Der Connector verbindet seinen Socket beim Start und tritt der angegebenen Multicast Gruppe bei. Beim Herunterfahren, baut er die Verbindung wieder ab.
+
+Der Sendevorgang im Connector liest vor dem Zeitpunkt des Sendens (20 ms nach Aufruf) Nachrichten, um zu überprüfen, ob der geplante Sendevorgang überhaupt gültig ist. Wenn Nachrichten vor dem Senden empfangen wurden, dann wird das eigentlich nun folgende Senden eine Kollision hervorrufen, da dann mehrere Nachrichtenpakete in einem Slot versendet wurden.
+Wenn vor dem Senden Nachrichten empfangen wurden, dann wird die eigentliche zu sendende Nachricht verworfen und nicht gesendet. Es wird bis zum Ende des Slots gewartet. Die Funktion signalisiert dann, dass nicht gesendet wurde.
+Falls vorher keine Nachricht empfangen wurde, wird die Nachricht mit dem nun aktuellen Zeitstempel über den Socket aus dem State versendet. Danach wird gewartet, bis der Slot abgelaufen ist. Die Funktion signalisiert ein erfolgreiches Senden.
+
+Der Lesevorgang prüft in einem bestimmten Zeitfenster (timeout) jede ms, ob eine Nachricht auf dem Socket anliegt. Falls eine Nachricht anliegt, wird diese in die Liste der empfangenen Nachrichten angefügt. Die daraus resultierende Liste enthält alle empfangenen Nachrichten. Wenn diese Liste genau ein Element enthält, wird dieses Element als Nachricht zurück gegeben. Ansonsten wird das leere Element (nil) zurückgegeben. Das ist der Fall, wenn eine Kollision während des Lesens erkannt wurde.
+
+Die Lese- und Sendevorgänge sind so aufgebaut, dass diese über eine anzugebende Laufzeit laufen. Alle Zeitabhängigen Funktionen wie der aktuelle Zeitstempel, die Zeit bis zum Ablaufen eines Slots oder die Mitte des Slots wird bei der Clock-Komponente abgerufen.
 
 \subsection{Konfigurationsparameter}
+\begin{itemize}
+	\item Interfacename
+	\item Multicastadresse
+	\item Port
+\end{itemize}
 
 \section{Payload-Source}
-
 \subsection{Aufgabe und Verantwortung}
+Die Payloud-Source Komponente ist für das Bereitstellen der zu verwendenden Nutznachrichten zuständig. Diese kommen aus einer externen Datenquelle.
 
 \subsection{Schnittstelle}
+\begin{lstlisting}
+; Startet die Komponente mit angegebenen Kanal
+Kanal -> Komponente
+new-payload-source(out-chan)
+\end{lstlisting}
 
 \subsection{Entwurfsentscheidungen}
+Die Payload-Source Komponente ist ein eigenständiger Prozess. Die Nutzdaten (24 Bytes) werden in diesem Prozess ständig aus dem STDIN gelesen und auf einen Kanal gelegt. Dieser Kanal ist mit der Stations Komponente verbunden. Dadurch werden auf den Kanal alle empfangenen Nutzdaten aus der externen Datenquelle auf diesem Kanal nebenläufig hinzugefügt. Wenn der Kanal eine Größe größer Null hat, dann dient dieser gleichzeitig als Nutzdatenbuffer und hält immer eine bestimmte Anzahl an Nutzdaten bereit.
 
 \subsection{Konfigurationsparameter}
+\begin{itemize}
+	\item Kanalgröße
+\end{itemize}
 
 \section{Message-Writer}
-
 \subsection{Aufgabe und Verantwortung}
+Der Message-Writer dafür zuständig empfangene Nachrichten in einer Datei bereit zu stellen.
 
 \subsection{Schnittstelle}
+\begin{lstlisting}
+; Startet die Komponente mit angegebenen Kanal
+Kanal -> Komponente
+new-message-writer(in-chan)
+\end{lstlisting}
 
 \subsection{Entwurfsentscheidungen}
+Der Message-Writer ist ein eigener Prozess, der kontinuierlich eine Nachricht (falls vorhanden) aus dem Kanal herausnimmt und die Nutzdaten aus dieser an eine Datei als neue Zeile anfügt. Der Kanal aus dem entnommen wird kann eine feste Größe haben. Eine Größe größer Null veranlasst, dass der Kanal als Buffer von gelesenen Nachrichten fungiert.
 
 \subsection{Konfigurationsparameter}
+\begin{itemize}
+	\item Kanalgröße
+	\item Ausgabedatei
+\end{itemize}
+
+\section{Clock}
+\subsection{Aufgabe und Verantwortung}
+Die Clock ist der zentrale Anfragepunkt für die aktuellen Zeit und zeitabängige Werte. Dazu gehören die restliche Zeit bis zu einem Slot- oder Frameende, der aktuelle Slot in Abhängigkeit von der Zeit, die restlichen Slots in Abhängigkeit von der Zeit und die Zeit bis zur Mitte eines Slots. Die aktuelle Zeit hat eine einstellbare Abweichung.
+
+\subsection{Schnittstelle}
+\begin{lstlisting}
+; Enthaelt den State mit der Abweichung
+() -> State
+offset
+
+; Gibt die aktuelle Zeit zurueck
+() -> Nummer
+current-time
+
+; Gibt den aktuellen Frame zurueck, abhaengig der Framelaenge
+Nummer -> Nummer
+current-frame(frame-size)
+
+; Gibt den aktuellen Slot zurueck, abhaengig der Framelaenge und
+; Slotanzahl
+(Nummer, Nummer) -> Nummer
+current-slot(frame-size, slot-count)
+
+; Gibt Anzahl der restlichen Slots im Frame zurueck
+(Nummer, Nummer) -> Nummer
+remaining-slots(frame-size, slot-count)
+
+; Gibt die restlichen ms pro festen Zeitabstand zurueck
+Nummer -> Nummer
+remaining-time-until-end(duration)
+
+; Blockiert bis ein Slot abgelaufen ist
+Nummer -> ()
+wait-until-slot-end(slot-duration)
+
+; Zeit bis die Mitte eines Slots erreicht ist
+Nummer -> Nummer
+ms-until-slot-middle(slot-duration)
+
+; Berechnet und setzt Abweichung neu
+
+change-offset(incoming-time, message)
+\end{lstlisting}
+
+\subsection{Entwurfsentscheidungen}
+Die Komponente enthält einen State, der die Abweichung speichert. Die Änderung der Abweichung wird nur von der Stations Komponente veranlasst. Die Komponente an sich wird nur vom Connector und von der Station verwendet.
+
+TODO UPdate offset
+
+\subsection{Konfigurationsparameter}
+TODO
 
 \section{Station}
-
 \subsection{Aufgabe und Verantwortung}
 
 \subsection{Schnittstelle}
