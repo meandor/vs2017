@@ -8,18 +8,20 @@ The network traffic is organized on that medium by STDMA.
 ## Usage
 To run the tests:
 ````bash
-./lein.sh test
+./lein test
 ````
 
 To build the jar
 ````bash
-./lein.sh uberjar
+./lein uberjar
 ````
 
 To run the app
 ````bash
-./lein.sh run [args]
+./lein run [args]
 ````
+
+If you are using a windows machine use ./lein.bat instead of ./lein
 
 To run the jar:
 ````bash
