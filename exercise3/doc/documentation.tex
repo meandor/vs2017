@@ -221,6 +221,13 @@ Das Daten Verbinungs Paket beinhaltet die Payload Source Komponente und die Mess
 \label{fig:component-diagram}
 \end{figure}
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{sequence-diagram.png}
+\caption[sequence-diagram]{Sequenzdiagramm der Nachrichtenbehandlung im Gesamtsystem}
+\label{fig:sequence-diagram}
+\end{figure}
+
 \section{Konfigurationsparameter}
 Es existiert eine Konfigurationsdatei (./resources/default.edn), die folgende Parameter bestimmt:
 \begin{itemize}
@@ -315,6 +322,8 @@ Falls vorher keine Nachricht empfangen wurde, wird die Nachricht mit dem nun akt
 Der Lesevorgang prüft in einem bestimmten Zeitfenster (timeout) jede ms, ob eine Nachricht auf dem Socket anliegt. Falls eine Nachricht anliegt, wird diese in die Liste der empfangenen Nachrichten angefügt. Die daraus resultierende Liste enthält alle empfangenen Nachrichten. Wenn diese Liste genau ein Element enthält, wird dieses Element als Nachricht zurück gegeben. Ansonsten wird das leere Element (nil) zurückgegeben. Das ist der Fall, wenn eine Kollision während des Lesens erkannt wurde.
 
 Die Lese- und Sendevorgänge sind so aufgebaut, dass diese über eine anzugebende Laufzeit laufen. Alle Zeitabhängigen Funktionen wie der aktuelle Zeitstempel, die Zeit bis zum Ablaufen eines Slots oder die Mitte des Slots wird bei der Clock-Komponente abgerufen.
+
+Die Konvertierung der Nachrichten in Bytes zum Versend und die Konvertierung der Bytes in Nachrichten beim Empfang geschieht durch das Datagram Modul.
 
 \subsection{Konfigurationsparameter}
 \begin{itemize}
