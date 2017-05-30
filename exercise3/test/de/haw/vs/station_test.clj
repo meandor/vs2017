@@ -6,35 +6,42 @@
             [de.otto.tesla.util.test-utils :refer :all]
             [de.haw.vs.clock :as clk]))
 
+(deftest range-starting-with-one-test
+  (is (= [1 2 3] (stat/range-starting-with-one 3)))
+
+  (is (= [1 2 3 4] (stat/range-starting-with-one 4)))
+
+  (is (= [1 2 3 4 5 6] (stat/range-starting-with-one 6))))
+
 (deftest find-free-slots-test
   (testing "Should find one free slot"
     (is (= [1]
-           (stat/find-free-slots 3 [{:station-class   "A"
-                                     :station-name    "foo"
-                                     :payload-content "foobar"
-                                     :payload         "foo foobar"
-                                     :slot            2
-                                     :send-time       (System/currentTimeMillis)}
-                                    {:station-class   "B"
-                                     :station-name    "foo3"
-                                     :payload-content "foobar3"
-                                     :payload         "foo3 foobar3"
-                                     :slot            3
-                                     :send-time       (System/currentTimeMillis)}]))))
+           (stat/find-free-slots [1 2 3] [{:station-class   "A"
+                                           :station-name    "foo"
+                                           :payload-content "foobar"
+                                           :payload         "foo foobar"
+                                           :slot            2
+                                           :send-time       (System/currentTimeMillis)}
+                                          {:station-class   "B"
+                                           :station-name    "foo3"
+                                           :payload-content "foobar3"
+                                           :payload         "foo3 foobar3"
+                                           :slot            3
+                                           :send-time       (System/currentTimeMillis)}]))))
   (testing "Should find two free slot"
-    (is (= [2 4]
-           (stat/find-free-slots 4 [{:station-class   "A"
-                                     :station-name    "foo"
-                                     :payload-content "foobar"
-                                     :payload         "foo foobar"
-                                     :slot            1
-                                     :send-time       (System/currentTimeMillis)}
-                                    {:station-class   "B"
-                                     :station-name    "foo3"
-                                     :payload-content "foobar3"
-                                     :payload         "foo3 foobar3"
-                                     :slot            3
-                                     :send-time       (System/currentTimeMillis)}])))))
+    (is (= [3 4 6]
+           (stat/find-free-slots [2 3 4 5 6] [{:station-class   "A"
+                                               :station-name    "foo"
+                                               :payload-content "foobar"
+                                               :payload         "foo foobar"
+                                               :slot            2
+                                               :send-time       (System/currentTimeMillis)}
+                                              {:station-class   "B"
+                                               :station-name    "foo3"
+                                               :payload-content "foobar3"
+                                               :payload         "foo3 foobar3"
+                                               :slot            5
+                                               :send-time       (System/currentTimeMillis)}])))))
 
 (defn test-message [slot]
   {:station-class   "A"
@@ -78,70 +85,7 @@
                  :slot            2}]
                (stat/read-messages nil 80 2)))))))
 
-(deftest read-phase!-test
-  (let [message-slot (atom 0)
-        output-chan (async/chan 10)]
-
-    (testing "Should select 1 as only free slot in the state atom"
-      (with-redefs [stat/put-message-on-channel (fn [_ messages] messages)
-                    con/read-message-with-collision-detection (fn [connector timeout]
-                                                                (swap! message-slot inc)
-                                                                (is (= nil connector))
-                                                                (is (= 40 timeout))
-                                                                (when (not= 1 @message-slot)
-                                                                  (test-message @message-slot)))]
-
-        (is (= 1
-               (stat/read-phase 120 3 nil nil) 1))))
-
-    (testing "Should keep slot empty if no free slot is found and send messages on the channel"
-      (reset! message-slot 0)
-      (with-redefs [con/read-message-with-collision-detection (fn [connector timeout]
-                                                                (swap! message-slot inc)
-                                                                (is (= nil connector))
-                                                                (is (= 40 timeout))
-                                                                (test-message @message-slot))]
-
-        (is (= nil
-               (stat/read-phase 120 3 output-chan nil)))
-        (eventually (is (= 3 (.count (.buf output-chan)))))))
-
-    (testing "Should assign random slot from free slots"
-      (with-redefs [stat/put-message-on-channel (fn [_ messages] messages)
-                    rand-nth (constantly 4)
-                    con/read-message-with-collision-detection (fn [connector timeout]
-                                                                (is (= nil connector))
-                                                                (is (= 24 timeout))
-                                                                nil)]
-
-        (is (= 4
-               (stat/read-phase 120 5 nil nil)))))
-
-    (testing "Should not read messages if no slots are given"
-      (reset! message-slot 0)
-      (with-redefs [stat/put-message-on-channel (fn [_ messages] messages)
-                    con/read-message-with-collision-detection (fn [_ _]
-                                                                (swap! message-slot inc)
-                                                                nil)]
-
-        (is (= nil
-               (stat/read-phase 120 0 nil nil)))
-        (is (= 0
-               @message-slot))))
-
-    (testing "Should not read messages if no duration is given"
-      (reset! message-slot 0)
-      (with-redefs [stat/put-message-on-channel (fn [_ messages] messages)
-                    con/read-message-with-collision-detection (fn [_ _]
-                                                                (swap! message-slot inc)
-                                                                nil)]
-
-        (is (= nil
-               (stat/read-phase 0 10 nil nil)))
-        (is (= 0
-               @message-slot))))))
-
-(deftest send-phase!-test
+(deftest send-message-test
   (let [send-counter (atom 0)
         input-chan (async/chan 10)
         state-atom (atom {:slot          1
@@ -156,13 +100,13 @@
 
       (testing "Should not send a message because channel is empty"
         (is (= false
-               (stat/send-phase nil input-chan nil)))
+               (stat/message-was-send? nil input-chan nil)))
         (is (= 0
                @send-counter)))
 
       (testing "Should send one message from the channel"
         (async/>!! input-chan (dissoc (test-message 1) :station-class :send-time :slot))
         (is (= true
-               (stat/send-phase state-atom input-chan nil)))
+               (stat/message-was-send? state-atom input-chan nil)))
         (is (= 1
                @send-counter))))))

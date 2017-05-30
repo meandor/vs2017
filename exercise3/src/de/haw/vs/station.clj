@@ -6,24 +6,20 @@
             [de.haw.vs.clock :as clk])
   (:import (java.net MulticastSocket)))
 
-(defn collection-not-empty-or-nil
-  "Return the collection if it is not empty, otherwise nil"
-  [col]
-  (when (> (count col) 0)
-    col))
-
-(defn find-free-slots [slots messages]
-  (->> (+ 1 slots)
+(defn range-starting-with-one [last]
+  (->> (+ 1 last)
        (range)
-       (drop 1)
-       (filter (fn [slot] (nil? (some #{slot} (map :slot messages)))))))
+       (drop 1)))
+
+(defn find-free-slots [available-slot-list messages]
+  (filter (fn [slot] (nil? (some #{slot} (map :slot messages)))) available-slot-list))
 
 (defn read-messages [connector duration slots]
   (->> (range slots)
        (map (fn [& _] (con/read-message-with-collision-detection connector (/ duration slots))))
        (filter #(not (nil? %)))))
 
-(defn put-message-on-channel [channel messages]
+(defn put-messages-on-channel [channel messages]
   (doseq [message messages]
     (async/go (async/>! channel message)))
   messages)
@@ -33,7 +29,7 @@
     :slot (:slot @state-atom)
     :station-class (:station-class @state-atom)))
 
-(defn send-phase
+(defn message-was-send?
   "Sends a message from the input channel if any is present"
   [state-atom input-chan connector]
   (if (< 0 (.count (.buf input-chan)))
@@ -46,17 +42,9 @@
   (log/info "found free slot: " slot)
   slot)
 
-(defn read-phase
-  "Reads messages from the socket, finds free slots and takes random slot from
-   that as new slot to send on. The read messages are put on the writer channel."
-  [duration slots output-channel connector]
-  (when (and (< 0 slots) (< 0 duration))
-    (some->> (read-messages connector duration slots)
-             (put-message-on-channel output-channel)
-             (find-free-slots slots)
-             (collection-not-empty-or-nil)
-             (rand-nth)
-             (log-slot))))
+(defn save-into-atom [atom value]
+  (reset! atom value)
+  value)
 
 (defn main-phase
   "Read until chosen slot, choose new slot for next frame, send message on that slot,
@@ -64,24 +52,34 @@
   [state-atom duration slots in-chan out-chan connector]
   (let [duration-per-slot (/ duration slots)
         before-slots (- (:slot @state-atom) 1)
-        after-slots (- (+ slots 1) (:slot @state-atom))]
-    (some->> (read-phase (* duration-per-slot before-slots) before-slots out-chan connector)
+        after-slots (- (+ slots 1) (:slot @state-atom))
+        free-slots (atom [])]
+    (log/info "current slot: " (:slot @state-atom))
+    (some->> (read-messages connector (* before-slots duration-per-slot) before-slots) ; read until chosen slot and select slot for next frame
+             (find-free-slots (range-starting-with-one slots))
+             (save-into-atom free-slots)
+             (rand-nth)
+             (log-slot)
              (swap! state-atom assoc :slot))
-    (Thread/sleep (/ duration-per-slot 2))
-    (when (send-phase state-atom in-chan connector)         ; when collision is detected, signal need of new slot number
-      (swap! state-atom assoc :slot nil))
-    (if (nil? (:slot @state-atom))                          ; read all messages after the slot, assign new slot if send was unsuccessful before
-      (some->> (read-phase (* duration-per-slot after-slots) after-slots out-chan connector)
-               (swap! state-atom assoc :slot))
-      (read-phase (* duration-per-slot after-slots) after-slots out-chan connector)))
+    (if (message-was-send? state-atom in-chan connector)
+      (read-messages connector (* after-slots duration-per-slot) after-slots) ; collision free sending
+      (some->> (read-messages connector (* after-slots duration-per-slot) after-slots)
+               (find-free-slots @free-slots)
+               (rand-nth)
+               (log-slot)
+               (swap! state-atom assoc :slot))))
   (main-phase state-atom duration slots in-chan out-chan connector))
 
 (defn initial-phase
-  "Read until frame end. Read phase function finds free slot to send on."
+  "Read until frame end, find free slots, take a random one, use it for sending."
   [state-atom duration slots out-chan connector]
   (let [remaining-slots (clk/remaining-slots duration slots)
         remaining-duration (* remaining-slots (/ duration slots))]
-    (some->> (read-phase remaining-duration remaining-slots out-chan connector)
+    (some->> (read-messages connector remaining-duration remaining-slots)
+             (put-messages-on-channel out-chan)
+             (find-free-slots (range-starting-with-one slots))
+             (rand-nth)
+             (log-slot)
              (swap! state-atom assoc :slot))))
 
 (defrecord Station [config app-status connector message-writer in-chan out-chan]
@@ -89,11 +87,10 @@
   (start [self]
     (log/info "-> starting Station Component")
     (let [{:keys [station-class utc-offset frame-size slots-count]} (:config config)
-          state-atom (atom {:slot          nil
+          state-atom (atom {:slot          (rand-int slots-count)
                             :station-class station-class})
           new-self (assoc self :slot state-atom)]
       (reset! clk/offset utc-offset)                        ; set initial utc offset
-
       (async/thread (initial-phase state-atom frame-size slots-count out-chan connector)
                     (main-phase state-atom frame-size slots-count in-chan out-chan connector))
       new-self))
