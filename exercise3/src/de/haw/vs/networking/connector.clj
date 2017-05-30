@@ -11,9 +11,8 @@
 (defn- read-bytes-from-socket [^MulticastSocket socket ^DatagramPacket packet]
   (try
     (.receive socket packet)
-    (log/debug "Got message")
     (catch SocketTimeoutException e
-      (log/debug "Did not get any message"))))
+      nil)))
 
 (defn- read-message [socket-connection datagram-bytes timeout]
   (.setSoTimeout (:socket @socket-connection) timeout)
@@ -24,28 +23,25 @@
 
 (defn- read-messages [socket-connection datagram-bytes timeout]
   (->> (range timeout)
-       (map (fn [& _] (read-message socket-connection datagram-bytes 1)))
-       (filter #(not (nil? %)))))
+       (reduce (fn [acc _] (if-let [message (read-message socket-connection datagram-bytes 1)]
+                             (conj acc message)
+                             acc)) [])))
 
 (defn read-message-with-collision-detection
-  "Tries to read messages each ms and return the message only if just one message was received"
+  "Reads messages each ms until the slot ends (timeout) and return the message only if just one message was received"
   [{:keys [socket-connection config]} timeout]
-  (log/info "start reading message")
+  #_(log/info "start reading message")
   (let [messages (read-messages socket-connection (get-in config [:config :datagram-bytes]) timeout)]
-    (when (first messages)
-      (if (= 1 (count messages))
-        (do
-          (swap! socket-connection update-in [:received-messages] inc)
-          (first messages))
-        (log/info "Collision detected")))))
+    (when (and (first messages) (nil? (second messages)))
+      (first messages))))
 
 (defn- send-bytes-datagram-socket [^DatagramSocket socket ^DatagramPacket datagram]
   (.send socket datagram))
 
 (defn- send-message [socket-connection message]
-  (log/info "sending message:" message)
+  #_(log/info "sending message:" message)
   (let [^bytes datagram-bytes (dg/message->datagram message)]
-    (log/debug "sending datagram:" (into [] datagram-bytes))
+    #_(log/debug "sending datagram:" (into [] datagram-bytes))
     (->> (new DatagramPacket
               datagram-bytes
               (alength datagram-bytes)
@@ -55,14 +51,15 @@
     (swap! socket-connection update-in [:send-messages] inc)))
 
 (defn send-message-collision-safe? [{:keys [socket-connection]} message]
-  (let [received-messages (read-messages socket-connection 34 (clk/ms-until-slot-middle 1000 25 (:slot message)))]
-    (if (= 0 (count received-messages))
+  #_(log/info (clk/ms-until-slot-middle 1000 25 (:slot message)))
+  (let [received-messages (read-messages socket-connection 34 20)]
+    (if (= [] received-messages)
       (do (send-message socket-connection (assoc message :send-time (clk/current-time)))
-          (log/debug "no collision, sending")
+          #_(log/debug "no collision, sending")
           (clk/wait-until-slot-end 40)
           true)
       (do (clk/wait-until-slot-end 40)
-          (log/debug "collision, not sending")
+          #_(log/debug "collision, not sending")
           false))))
 
 (defn disconnect-socket [{:keys [socket-connection]}]

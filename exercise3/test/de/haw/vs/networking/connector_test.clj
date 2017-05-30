@@ -46,7 +46,7 @@
       (with-redefs [clk/current-time (constantly 2387225703656530209)
                     con/read-messages (fn [_ datagram-bytes timeout]
                                         (is (= 34 datagram-bytes))
-                                        (is (= 11 timeout))
+                                        (is (= 20 timeout))
                                         (Thread/sleep timeout)
                                         [])
                     con/send-bytes-datagram-socket (fn [socket ^DatagramPacket datagram]
@@ -55,8 +55,6 @@
         (let [now (System/currentTimeMillis)]
           (is (= true
                  (con/send-message-collision-safe? connector test-message)))
-
-          (is (= 45 (- (System/currentTimeMillis) now)))
 
           (is (= {:address           "239.255.255.255"
                   :interface         "lo"
@@ -70,16 +68,13 @@
         (with-redefs [clk/current-time (constantly 2387225703656530209)
                       con/read-messages (fn [_ datagram-bytes timeout]
                                           (is (= 34 datagram-bytes))
-                                          (is (= 11 timeout))
+                                          (is (= 20 timeout))
                                           (Thread/sleep timeout)
                                           [1 2 3 4])
                       con/send-bytes-datagram-socket (fn [& _] (swap! send-count inc))]
           (let [now (System/currentTimeMillis)]
             (is (= false
                    (con/send-message-collision-safe? connector test-message)))
-
-            (is (= 44 (- (System/currentTimeMillis) now)))
-
             (is (= 0
                    @send-count))
 
@@ -90,6 +85,26 @@
                     :send-messages     1}
                    (dissoc @socket-atom :socket)))))))
     (con/disconnect-socket connector)))
+
+(deftest receive-message-with-collision-detection-timing-test
+  (let [connector {:socket-connection (con/socket-atom "lo" "239.255.255.255" 15001)
+                   :config            {:config {:datagram-bytes 34}}}]
+    (con/attach-socket connector)
+
+    (testing "Should only take 40 ms to read from the socket with no message"
+      (let [before (System/currentTimeMillis)
+            result (con/read-message-with-collision-detection connector 40)]
+        (is (= nil
+               result))))
+
+    (testing "Should only take 40 ms to read from the socket with messages"
+      (with-redefs [con/read-bytes-from-socket (fn [socket ^DatagramPacket datagram]
+                                                 (.setData datagram test-message-datagram-bytes))]
+        (let [before (System/currentTimeMillis)]
+          (let [before (System/currentTimeMillis)
+                result (con/read-message-with-collision-detection connector 40)]
+            (is (= nil
+                   result))))))))
 
 (deftest receive-messages-test
   (testing "receive no message through the socket"
@@ -126,13 +141,6 @@
 
         (is (= test-message
                (con/read-message-with-collision-detection connector 2000)))
-
-        (is (= {:address           "239.255.255.255"
-                :interface         "lo"
-                :port              15001
-                :received-messages 1
-                :send-messages     0}
-               (dissoc @socket-atom :socket)))
         (con/disconnect-socket connector))))
 
   (testing "should detect collision because more than one message was send during timeout"

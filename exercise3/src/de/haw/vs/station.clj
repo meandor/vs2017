@@ -54,7 +54,7 @@
         before-slots (- (:slot @state-atom) 1)
         after-slots (- (+ slots 1) (:slot @state-atom))
         free-slots (atom [])]
-    (log/info "current slot: " (:slot @state-atom))
+    #_(log/info "current slot: " (:slot @state-atom))
     (some->> (read-messages connector (* before-slots duration-per-slot) before-slots) ; read until chosen slot and select slot for next frame
              (find-free-slots (range-starting-with-one slots))
              (save-into-atom free-slots)
@@ -92,6 +92,8 @@
           new-self (assoc self :slot state-atom)]
       (reset! clk/offset utc-offset)                        ; set initial utc offset
       (async/thread (initial-phase state-atom frame-size slots-count out-chan connector)
+                    (clk/wait-until-slot-end (/ frame-size slots-count))
+                    (log/info "Starting main phase")
                     (main-phase state-atom frame-size slots-count in-chan out-chan connector))
       new-self))
 
