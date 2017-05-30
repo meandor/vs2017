@@ -3,8 +3,7 @@
             [clojure.tools.logging :as log]
             [clojure.core.async :as async]
             [de.haw.vs.networking.connector :as con]
-            [de.haw.vs.clock :as clk])
-  (:import (java.net MulticastSocket)))
+            [de.haw.vs.clock :as clk]))
 
 (defn range-starting-with-one [last]
   (->> (+ 1 last)
