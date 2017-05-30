@@ -372,7 +372,7 @@ Die Clock ist der zentrale Anfragepunkt für die aktuellen Zeit und zeitabängig
 () -> State
 offset
 
-; Gibt die aktuelle Zeit zurueck
+; Gibt die aktuelle Zeit + Abweichung zurueck
 () -> Nummer
 current-time
 
@@ -393,7 +393,7 @@ remaining-slots(frame-size, slot-count)
 Nummer -> Nummer
 remaining-time-until-end(duration)
 
-; Blockiert bis ein Slot abgelaufen ist
+; Blockiert den aufrufenden Prozess bis ein Slot abgelaufen ist
 Nummer -> ()
 wait-until-slot-end(slot-duration)
 
@@ -401,18 +401,26 @@ wait-until-slot-end(slot-duration)
 Nummer -> Nummer
 ms-until-slot-middle(slot-duration)
 
-; Berechnet und setzt Abweichung neu
-
-change-offset(incoming-time, message)
+; Startet die Komponente mit dem einkommenden Kanal
+Kanal -> Komponente
+new-clock(in-chan)
 \end{lstlisting}
 
 \subsection{Entwurfsentscheidungen}
-Die Komponente enthält einen State, der die Abweichung speichert. Die Änderung der Abweichung wird nur von der Stations Komponente veranlasst. Die Komponente an sich wird nur vom Connector und von der Station verwendet.
+Die Komponente ist ein eigenständiger Prozess und stellt Funktionen, die in Abhängigkeit zur aktuellen Zeit stehen zur Verfügung. Sie enthält einen State, der die Abweichung speichert. Die Komponente an sich wird nur vom Connector und von der Station verwendet.
 
-TODO UPdate offset
+Die Clock Komponente verarbeitet in ihrem Prozess die Nachrichten, die im einkommenden Kanal  von der Stationskomponente sind. Die Nachrichten in diesem Kanal enthalten zusätzlich die Zeit, zu der sie angetroffen sind.
+Wenn die Nachricht von einer Station der Klasse A kommt, wird sie weiter behandelt. Nachricht von Stationen der Klasse B werden nicht weiter betrachtet.
+Anhand der Ankunftszeit und der Sendezeit und dem vorherigen Offset, wird die Abweichung neu berechnet (siehe Gleichung \ref{equ:offset-calculation}).
+\begin{equation}
+Offset_{i+1} = \frac{Offset_i + (Empfangszeit - Sendezeit)}{2}
+\label{equ:offset-calculation}
+\end{equation}
 
 \subsection{Konfigurationsparameter}
-TODO
+\begin{itemize}
+    \item Anfänglicher Offset
+\end{itemize}
 
 \section{Station}
 \subsection{Aufgabe und Verantwortung}
@@ -421,13 +429,9 @@ Einkommende Nachrichten werden auf den ausgehenden Kanal zur Message-Writer Komp
 
 \subsection{Schnittstelle}
 \begin{lstlisting}
-; Startet die Komponente
-(Kanal, Kanal) -> Komponente
-new-station(in-chan, out-chan)
-
-; Startet die Komponente
-(Kanal, Kanal) -> Komponente
-new-station(in-chan, out-chan)
+; Startet die Komponente mit den Kanaelen
+(Kanal, Kanal, Kanal) -> Komponente
+new-station(in-chan, out-chan-clock, out-chan-message-writer)
 \end{lstlisting}
 
 \subsection{Entwurfsentscheidungen}
@@ -435,7 +439,7 @@ Die Station ist ein eigener Prozess. Sie hat einen State, in dem der aktuelle Sl
 
 Der Arbeitsablauf der Station besteht aus einer Initalisierungsphase und einer Hauptphase.
 Die Initialisierungsphase beginnt damit, alle Nachrichten bis zum Ende des aktuellen Frames $n$ zu lesen und die erhaltenen Nachrichten nach freien Slots und der Zeitsynchronisation auszuwerten.
-Die empfangenen Nachrichten und die jeweiligen Zeiten des Empfanges werden auf den Kanal der Clock Komponente getan. Dort werden Sie dann ausgewertet. Die Empfangenen Nachrichten werden außerdem auf den ausgehenden Kanal zum Message-Writer gelegt.
+Die empfangenen Nachrichten erweitert um die jeweiligen Zeit des Empfanges werden auf den ausgehenden Kanal zur Clock Komponente getan. Dort werden Sie dann ausgewertet. Die Empfangenen Nachrichten werden außerdem auf den ausgehenden Kanal zum Message-Writer gelegt.
 Freie Slots werden ausgewählt, indem von den 25 verfügbaren Slots die Slots aus den erhaltenen Nachrichten entfernt werden. Dadurch bleiben nur noch die Slots übrig, in denen im nächsten Frame $n + 1$ nicht gesendet wird. Von diesen freien Slots wird ein zufälliger Slot gewählt, den die Station zum Senden im Frame $n + 1$ verwendet und im State speichert.
 
 Nun beginnt die Hauptphase. In der Hauptphase wird bis zum derzeitigen gespeicherten Slot aus dem State gelesen. Die empfangenen Nachrichten werden wieder nach freien Slots für das nächste Frame und für die Zeitsynchronisation ausgewertet (wie in der Initialisierungsphase). Aus den freien Slots wird wieder ein zufälliger gewählt und im State gespeichert. Das ist der Slot zum Senden im nächsten Frame.
@@ -443,11 +447,28 @@ Danach fängt die Station an zu senden. Dazu wird ein Nutzdatenpaket aus dem ein
 Wenn eins vorhanden ist, wird diese an die zu sendende Nachricht hinzugefügt, wie auch die Stationsklasse und der Slot aus dem State (Slot für das Senden im nächsten Frame).
 Diese Nachricht wird dann mit dem Connector versendet.
 Wenn das Versenden ein Erfolg war (keine Kollision), dann wird bis zum Ende des Frames wieder gelesen. Die dadurch erhaltenen Nachrichten werden wieder zur Zeitsynchronisation auf den ausgehenden Kanal zur Clock Komponente gelegt.
-Wenn das Versenden nicht erfolgreich war (Kollision), dann wird wie im erfolgreichen Fall vorgegangen, nur wird zusätzlich am Ende des Frames wieder ein neuer freier Slot zum Senden gewählt in Abhängigkeit der empfangenen Nachrichten. Dieser Slot wird dann wieder im State gespeichert.
-Danach fängt die Hauptphase wieder von vorne an.
+Wenn das Versenden nicht erfolgreich war (Kollision), dann wird wie im erfolgreichen Fall vorgegangen, nur wird zusätzlich am Ende des Frames wieder ein neuer freier Slot zum Senden gewählt (in Abhängigkeit der empfangenen Nachrichten). Dieser Slot wird dann wieder im State gespeichert.
+Danach fängt die Hauptphase wieder von vorne an (Schleife).
 
 \subsection{Konfigurationsparameter}
+\begin{itemize}
+    \item Stationsklasse
+    \item Framegröße
+    \item Gesamtanzahl der Slots
+\end{itemize}
 
+\chapter{Kollisionsfreier Ablauf}
+Es wird ein kollisionsfreier Ablauf in anbetracht von maximal 25 Teilnehmern auf dem Medium angestrebt und näher untersucht.
+
+Die Station stößt in festen Frames sequentiell das Senden und Empfangen an. Kollisionen können hier durch verschiedene Gegebenheiten auftreten.
+Zum einen kann ein zeitlicher Versatz vorhanden sein, wodurch nicht in den richtigen Slots empfangen und vor allem gesendet wird. Das wird durch die Auswertung der empfangenen Nachrichten und der Neuberechnung der Abweichung der UTC-Zeit (Zeitsynchronisation) abgefangen.
+Die Station muss also darauf achten, ihre sequentielle Arbeit in den Frames einzuhalten und sich immer in den festen Slots im Frame bewegen. Das wird durch den Connector garantiert, dessen Lese- und Sendevorgänge immer mit Timeouts arbeiten. Dadurch kann sich ein kollisionsfreier Ablauf in endlicher Zeit einpendeln.
+
+Eine andere Quelle für Kollisionen kann entstehen, wenn alle Stationen nach einer festen Regel freie Slots auswählen und dadurch die gleichen Slots zum Senden im nächsten Frame haben. Das wird wiederum durch die Stations Komponente umgangen, in dem immer ein zufälliger freier Slot gewählt wird. Dadurch verteilt sich die Slot Auswahl und ein kollisionsfreier Ablauf kann sich mit der Zeit wieder einpendeln.
+
+Zusätzlich dazu werden Kollisionen vermieden, in dem der Connector das Senden auf Kollisionen überprüft und das der Station meldet. Die Station wählt dadurch ja am Ende des Frames eine neue Station zum Senden im nächsten Frame aus den vorhandenen Nachrichten aus, was eine Kollision aktiv verhindert und zum kollisionsfreien Ablauf beiträgt.
+
+Durch diese Maßnahmen kann ein kollisionsfreier Ablauf in endlicher Zeit erreicht werden.
 
 %% appendix if used
 %%\appendix
