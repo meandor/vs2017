@@ -31,6 +31,7 @@
   {:payload         "!!!!!!!!!!!!!!!!!!!!!!!!"
    :payload-content "!!!!!!!!!!!!!!"
    :send-time       2387225703656530209
+   :received-time   1337
    :slot            6
    :station-class   "B"
    :station-name    "!!!!!!!!!!"})
@@ -131,7 +132,8 @@
           once (atom true)
           connector {:socket-connection socket-atom
                      :config            {:config {:datagram-bytes 34}}}]
-      (with-redefs [con/read-bytes-from-socket (fn [socket ^DatagramPacket datagram]
+      (with-redefs [clk/current-time (constantly 1337)
+                    con/read-bytes-from-socket (fn [socket ^DatagramPacket datagram]
                                                  (is (not= nil socket))
                                                  (is (= (into [] (byte-array 34)) (into [] (.getData datagram))))
                                                  (when @once

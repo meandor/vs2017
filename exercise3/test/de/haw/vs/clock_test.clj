@@ -110,3 +110,24 @@
     (testing "Should return the time before the slot middle of the fourth slot in ms"
       (is (= 128
              (clk/ms-until-slot-middle 160 4 4))))))
+
+(deftest process-message-test
+  (testing "Should update the offset dependent on the message"
+    (reset! clk/offset 0)
+
+    (is (= 42
+           (clk/process-message {:station-class "A"
+                                 :send-time     1253
+                                 :received-time 1337})))
+    (is (= 42
+           @clk/offset)))
+
+  (testing "Should not update the offset because station class type B"
+    (reset! clk/offset 0)
+
+    (is (= nil
+           (clk/process-message {:station-class "B"
+                                 :send-time     1253
+                                 :received-time 1337})))
+    (is (= 0
+           @clk/offset))))

@@ -24,7 +24,7 @@
 (defn- read-messages [socket-connection datagram-bytes timeout]
   (->> (range timeout)
        (reduce (fn [acc _] (if-let [message (read-message socket-connection datagram-bytes 1)]
-                             (conj acc message)
+                             (conj acc (assoc message :received-time (clk/current-time)))
                              acc)) [])))
 
 (defn read-message-with-collision-detection
