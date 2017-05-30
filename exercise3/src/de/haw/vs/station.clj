@@ -82,7 +82,7 @@
              (log-slot)
              (swap! state-atom assoc :slot))))
 
-(defrecord Station [config app-status connector message-writer in-chan out-chan]
+(defrecord Station [config connector message-writer in-chan out-chan]
   c/Lifecycle
   (start [self]
     (log/info "-> starting Station Component")

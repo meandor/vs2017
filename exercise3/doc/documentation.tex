@@ -199,13 +199,13 @@ Funktionale Programmiersprachen haben den Vorteil in verteilten Systemen, das di
 
 \section{Architekturüberblick}
 Das System ist in drei Pakete aufgeteilt, die jeweils aus verschiedenen Komponenten bestehen.
-Die Pakete sind die Business Logik (Basis Paket), die Verbindungs Logik (Network Paket) und die Daten Logik (Data Links Paket).
+Die Pakete sind die Business Logik (Basis Paket), die Verbindungs Logik (Network Paket) und die Daten Verbindungs Logik (Data-Links Paket).
 
 Das Paket mit der Business Logik enthält die Stations Komponente, die Uhren Komponente und den Haupteinstiegspunkt des Systems, das alle Komponenten zusammen baut. Hier sind die fachlichen Logiken, die das Verhalten der Station beeinflussen definiert.
 
 Das Paket mit der Verbindungslogik enthält die Verbindungs Komponente und die Datagram Komponente. Hier werden alle verbindungsrelevanten Informationen verarbeitet. Dazu gehört der Aufbau und der Abbau und das Versenden und Verschicken von Nachrichtenpaketen auf Netzebene (Datagramme).
 
-Das Daten Logik Paket beinhaltet die Payload Source Komponente und die Message Writer Komponente. Dieses Paket ist für die Datensenke und Datenquelle zuständig.
+Das Daten Verbinungs Paket beinhaltet die Payload Source Komponente und die Message Writer Komponente. Dieses Paket ist für die Datensenke und Datenquelle zuständig. Sie Laufen Nebenläufig zu den anderen Komponenten, damit Sie diese nicht blockieren und so die fachliche Aufgabe des Gesamtsystems isoliert davon arbeiten kann.
 
 \begin{figure}[h]
 \centering
@@ -416,10 +416,35 @@ TODO
 
 \section{Station}
 \subsection{Aufgabe und Verantwortung}
+Die Station ist für die Verwaltung der Slots und das Koordinieren des sequentielle Senden und Empfangen von Nachrichten verantwortlich. Dabei werden die Nutzdaten des einkommenden Kanals von der Payload-Source Komponente zum Versenden der Nachrichten genommen.
+Einkommende Nachrichten werden auf den ausgehenden Kanal zur Message-Writer Komponente gelegt.
 
 \subsection{Schnittstelle}
+\begin{lstlisting}
+; Startet die Komponente
+(Kanal, Kanal) -> Komponente
+new-station(in-chan, out-chan)
+
+; Startet die Komponente
+(Kanal, Kanal) -> Komponente
+new-station(in-chan, out-chan)
+\end{lstlisting}
 
 \subsection{Entwurfsentscheidungen}
+Die Station ist ein eigener Prozess. Sie hat einen State, in dem der aktuelle Slot zum Senden und die Stationsklasse gespeichert ist. Sie benutzt den Connector, um Daten zu senden und zu empfangen. Die Clock Komponente wird verwendet um die jeweiligen Slots und Frames zu identifizieren.
+
+Der Arbeitsablauf der Station besteht aus einer Initalisierungsphase und einer Hauptphase.
+Die Initialisierungsphase beginnt damit, alle Nachrichten bis zum Ende des aktuellen Frames $n$ zu lesen und die erhaltenen Nachrichten nach freien Slots und der Zeitsynchronisation auszuwerten.
+Die empfangenen Nachrichten und die jeweiligen Zeiten des Empfanges werden auf den Kanal der Clock Komponente getan. Dort werden Sie dann ausgewertet. Die Empfangenen Nachrichten werden außerdem auf den ausgehenden Kanal zum Message-Writer gelegt.
+Freie Slots werden ausgewählt, indem von den 25 verfügbaren Slots die Slots aus den erhaltenen Nachrichten entfernt werden. Dadurch bleiben nur noch die Slots übrig, in denen im nächsten Frame $n + 1$ nicht gesendet wird. Von diesen freien Slots wird ein zufälliger Slot gewählt, den die Station zum Senden im Frame $n + 1$ verwendet und im State speichert.
+
+Nun beginnt die Hauptphase. In der Hauptphase wird bis zum derzeitigen gespeicherten Slot aus dem State gelesen. Die empfangenen Nachrichten werden wieder nach freien Slots für das nächste Frame und für die Zeitsynchronisation ausgewertet (wie in der Initialisierungsphase). Aus den freien Slots wird wieder ein zufälliger gewählt und im State gespeichert. Das ist der Slot zum Senden im nächsten Frame.
+Danach fängt die Station an zu senden. Dazu wird ein Nutzdatenpaket aus dem einkommenden Kanal von der Payload-Source Komponente genommen, falls eins vorhanden ist. Wenn keins vorhanden ist, wird nicht gesendet.
+Wenn eins vorhanden ist, wird diese an die zu sendende Nachricht hinzugefügt, wie auch die Stationsklasse und der Slot aus dem State (Slot für das Senden im nächsten Frame).
+Diese Nachricht wird dann mit dem Connector versendet.
+Wenn das Versenden ein Erfolg war (keine Kollision), dann wird bis zum Ende des Frames wieder gelesen. Die dadurch erhaltenen Nachrichten werden wieder zur Zeitsynchronisation auf den ausgehenden Kanal zur Clock Komponente gelegt.
+Wenn das Versenden nicht erfolgreich war (Kollision), dann wird wie im erfolgreichen Fall vorgegangen, nur wird zusätzlich am Ende des Frames wieder ein neuer freier Slot zum Senden gewählt in Abhängigkeit der empfangenen Nachrichten. Dieser Slot wird dann wieder im State gespeichert.
+Danach fängt die Hauptphase wieder von vorne an.
 
 \subsection{Konfigurationsparameter}
 
