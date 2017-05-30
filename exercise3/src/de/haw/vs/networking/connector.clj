@@ -30,6 +30,7 @@
 (defn read-message-with-collision-detection
   "Tries to read messages each ms and return the message only if just one message was received"
   [{:keys [socket-connection config]} timeout]
+  (log/info "start reading message")
   (let [messages (read-messages socket-connection (get-in config [:config :datagram-bytes]) timeout)]
     (when (first messages)
       (if (= 1 (count messages))
