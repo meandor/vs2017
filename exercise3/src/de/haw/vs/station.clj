@@ -63,7 +63,7 @@
              (swap! state-atom assoc :slot))
     (if (message-was-send? state-atom in-chan connector)
       (read-messages connector (* after-slots duration-per-slot) after-slots) ; collision free sending
-      (some->> (read-messages connector (* after-slots duration-per-slot) after-slots)
+      (some->> (read-messages connector (* after-slots duration-per-slot) after-slots) ;if collision during sending, take a new slot
                (find-free-slots @free-slots)
                (rand-nth)
                (log-slot)
