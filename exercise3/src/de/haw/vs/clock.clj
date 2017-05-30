@@ -14,8 +14,11 @@
 (defn remaining-slots [frame-size slot-count]
   (- slot-count (current-slot frame-size slot-count)))
 
+(defn remaining-time-until-end [duration]
+  (- duration (mod (current-time) duration)))
+
 (defn wait-until-slot-end [slot-duration]
-  (Thread/sleep (- slot-duration (mod (current-time) slot-duration))))
+  (Thread/sleep (remaining-time-until-end slot-duration)))
 
 (defn ms-until-slot-middle [frame-size slot-count slot-number]
   (let [duration-per-slot (/ frame-size slot-count)]
