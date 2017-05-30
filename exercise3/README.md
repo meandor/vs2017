@@ -1,25 +1,38 @@
 # exercise3
 
-A `clojure-microservice` receiving and sending messages via multicast sockets.
+A `clojure` app receiving and sending messages via multicast sockets.
  
 This microservice represents a sending and receiving station on one medium (socket).
 The network traffic is organized on that medium by STDMA.
 
 ## Usage
+To run the tests:
+````bash
+./lein.sh test
+````
 
-FIXME: explanation
+To build the jar
+````bash
+./lein.sh uberjar
+````
 
-    $ java -jar exercise3-0.1.0-standalone.jar [args]
+To run the app
+````bash
+./lein.sh run [args]
+````
 
-## Options
+To run the jar:
+````bash
+java -jar exercise3-0.1.0-standalone.jar [args]
+````
 
-FIXME: listing of options this app accepts.
+Where args are:
 
-## Examples
+`--help`, or
 
-## License
+`<interfaceName> <mcastAddress> <receivePort> <stationClass> <UTCoffsetMs>`
 
-Copyright © 2017 Daniel Schruhl
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+To run the scenario:
+````bash
+./bin/startStations.sh <interfaceName> <mcastAddress> <receivePort> <firstIndex> <lastIndex> <stationClass> <UTCoffsetMs>
+````
