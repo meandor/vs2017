@@ -316,7 +316,15 @@ Der Connector hat einen State, der seine Socketverbindung und Informationen zu d
 Der Connector verbindet seinen Socket beim Start und tritt der angegebenen Multicast Gruppe bei. Beim Herunterfahren, baut er die Verbindung wieder ab.
 
 Der Sendevorgang im Connector liest vor dem Zeitpunkt des Sendens (20 ms nach Aufruf) Nachrichten, um zu überprüfen, ob der geplante Sendevorgang überhaupt gültig ist. Wenn Nachrichten vor dem Senden empfangen wurden, dann wird das eigentlich nun folgende Senden eine Kollision hervorrufen, da dann mehrere Nachrichtenpakete in einem Slot versendet wurden.
-Wenn vor dem Senden Nachrichten empfangen wurden, dann wird die eigentliche zu sendende Nachricht verworfen und nicht gesendet. Es wird bis zum Ende des Slots gewartet. Die Funktion signalisiert dann, dass nicht gesendet wurde.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.4\textwidth]{send-collision.png}
+\caption[send-collision]{Sendevorgang mit Kollisionserkennung}
+\label{fig:send-collision}
+\end{figure}
+
+Wenn vor dem Senden Nachrichten empfangen wurden, dann wird die eigentliche zu sendende Nachricht verworfen und nicht gesendet (siehe Abbildung \ref{fig:send-collision}). Es wird bis zum Ende des Slots gewartet. Die Funktion signalisiert dann, dass nicht gesendet wurde.
 Falls vorher keine Nachricht empfangen wurde, wird die Nachricht mit dem nun aktuellen Zeitstempel über den Socket aus dem State versendet. Danach wird gewartet, bis der Slot abgelaufen ist. Die Funktion signalisiert ein erfolgreiches Senden.
 
 Der Lesevorgang prüft in einem bestimmten Zeitfenster (timeout) jede ms, ob eine Nachricht auf dem Socket anliegt. Falls eine Nachricht anliegt, wird diese in die Liste der empfangenen Nachrichten angefügt. Die daraus resultierende Liste enthält alle empfangenen Nachrichten. Wenn diese Liste genau ein Element enthält, wird dieses Element als Nachricht zurück gegeben. Ansonsten wird das leere Element (nil) zurückgegeben. Das ist der Fall, wenn eine Kollision während des Lesens erkannt wurde.
@@ -456,8 +464,15 @@ Danach fängt die Station an zu senden. Dazu wird ein Nutzdatenpaket aus dem ein
 Wenn eins vorhanden ist, wird diese an die zu sendende Nachricht hinzugefügt, wie auch die Stationsklasse und der Slot aus dem State (Slot für das Senden im nächsten Frame).
 Diese Nachricht wird dann mit dem Connector versendet.
 Wenn das Versenden ein Erfolg war (keine Kollision), dann wird bis zum Ende des Frames wieder gelesen. Die dadurch erhaltenen Nachrichten werden wieder zur Zeitsynchronisation auf den ausgehenden Kanal zur Clock Komponente gelegt.
-Wenn das Versenden nicht erfolgreich war (Kollision), dann wird wie im erfolgreichen Fall vorgegangen, nur wird zusätzlich am Ende des Frames wieder ein neuer freier Slot zum Senden gewählt (in Abhängigkeit der empfangenen Nachrichten). Dieser Slot wird dann wieder im State gespeichert.
+Wenn das Versenden nicht erfolgreich war (Kollision), dann wird wie im erfolgreichen Fall vorgegangen, nur wird zusätzlich am Ende des Frames wieder ein neuer freier Slot zum Senden gewählt (in Abhängigkeit der empfangenen Nachrichten). Dieser Slot wird dann wieder im State gespeichert (siehe Abbildung \ref{fig:station-collision}).
 Danach fängt die Hauptphase wieder von vorne an (Schleife).
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.4\textwidth]{station-collision.png}
+\caption[station-collision]{Kollisionsbehandlung beim Senden}
+\label{fig:station-collision}
+\end{figure}
 
 \subsection{Konfigurationsparameter}
 \begin{itemize}
