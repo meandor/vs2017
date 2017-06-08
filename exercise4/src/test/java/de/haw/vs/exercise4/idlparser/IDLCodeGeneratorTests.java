@@ -24,11 +24,7 @@ public class IDLCodeGeneratorTests {
         List<String> result = codeGenerator.generateCodeLines(module, new IDLToJavaTranslator());
         codeGenerator.writeToOutputFile(result, "Test");
         File f = new File("Test.java");
-        if(f.exists() && !f.isDirectory()) {
-            assertTrue(true);
-        } else {
-            assertTrue(false);
-        }
+        assertTrue(f.exists() && !f.isDirectory());
     }
 
     private IDLmodule parseTestFile() {

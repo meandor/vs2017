@@ -206,7 +206,6 @@ public class Parser {
 			System.out.println("Usage: java -jar Parser.jar <input idl filename> <output java filename>");
 		}
 
-
 	}
 
 	/**
