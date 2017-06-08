@@ -1,0 +1,11 @@
+_*
+.eunit
+*.o
+*.beam
+!nameservice.beam
+*.plt
+*.swp
+*.swo
+.erlang.cookie
+erl_crash.dump
+.idea
