@@ -27,7 +27,9 @@ public class IDLToJavaTranslator implements IDLTranslator {
     @Override
     public String declareMethod(IDLCompiler.MethodData methodData) {
         StringBuilder builder = new StringBuilder();
-        builder.append("public abstract double ");
+        builder.append("public abstract ");
+        builder.append(IDLCompiler.getSupportedJavaDataTypeName(methodData.getReturnType()));
+        builder.append(" ");
         builder.append(methodData.getName());
         builder.append("(");
         char c = 'a';
