@@ -1,11 +1,12 @@
 package de.haw.vs.exercise4.idlparser;
 
-import com.sun.xml.internal.bind.v2.model.core.ID;
 import de.haw.vs.exercise4.idlparser.IDLCompiler.MethodData;
 import de.haw.vs.exercise4.idlparser.IDLCompiler.SupportedDataTypes;
 
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 

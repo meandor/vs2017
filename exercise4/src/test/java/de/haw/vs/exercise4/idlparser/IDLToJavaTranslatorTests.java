@@ -2,8 +2,8 @@ package de.haw.vs.exercise4.idlparser;
 
 import org.junit.Test;
 
+import static de.haw.vs.exercise4.idlparser.IDLCompiler.SupportedDataTypes.DOUBLE;
 import static org.junit.Assert.assertEquals;
-import static de.haw.vs.exercise4.idlparser.IDLCompiler.SupportedDataTypes.*;
 
 public class IDLToJavaTranslatorTests {
 

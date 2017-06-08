@@ -13,8 +13,9 @@ dependencies {
 
 jar {
     manifest {
-        attributes "Main-Class": "de.haw.vs.exercise4.Main"
+        attributes "Main-Class": "de.haw.vs.exercise4.idlparser.Parser"
     }
+    baseName 'Parser'
 
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
