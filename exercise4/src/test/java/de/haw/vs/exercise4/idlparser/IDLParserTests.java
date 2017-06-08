@@ -7,7 +7,7 @@ import static de.haw.vs.exercise4.idlparser.IDLCompiler.SupportedDataTypes.*;
 
 public class IDLParserTests {
 
-    private IDLToJavaGenerator javaGenerator = new IDLToJavaGenerator();
+    private IDLToJavaTranslator javaGenerator = new IDLToJavaTranslator();
 
     @Test
     public void testModuleDeclaration() {
