@@ -1,5 +1,6 @@
 package de.haw.vs.exercise4.idlparser;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,10 +12,31 @@ public class IDLCodeGenerator {
             result.add(translator.openClassDeclaration(idLclass));
             result.add(translator.declareNarrowCastMethod(idLclass));
             for(IDLCompiler.MethodData methodData :idLclass.getMethods()) {
-                translator.declareMethod(methodData);
+                result.add(translator.declareMethod(methodData));
             }
             result.add(translator.closeClassDeclaration());
         }
        return result;
     }
+
+    public void writeToOutputFile(List<String> parsedLines, String filename) throws IOException{
+
+        if (!filename.endsWith(".java")) {
+            filename = filename + ".java";
+        }
+
+        File fout = new File(filename);
+        FileOutputStream fos = new FileOutputStream(fout);
+
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+
+        for (String line : parsedLines) {
+            bw.write(line);
+            bw.newLine();
+            bw.newLine();
+        }
+
+        bw.close();
+    }
+
 }

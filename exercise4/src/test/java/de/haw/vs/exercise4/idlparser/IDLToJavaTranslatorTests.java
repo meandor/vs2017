@@ -5,7 +5,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static de.haw.vs.exercise4.idlparser.IDLCompiler.SupportedDataTypes.*;
 
-public class IDLParserTests {
+public class IDLToJavaTranslatorTests {
 
     private IDLToJavaTranslator javaGenerator = new IDLToJavaTranslator();
 
@@ -50,7 +50,7 @@ public class IDLParserTests {
                 );
 
         String classDeclaration = javaGenerator.declareMethod(methodData);
-        String expected = "public abstract double add(double a, double b) throws Exception;";
+        String expected = "\tpublic abstract double add(double a, double b) throws Exception;";
         assertEquals(expected, classDeclaration);
     }
 

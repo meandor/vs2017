@@ -1,11 +1,13 @@
 package de.haw.vs.exercise4.idlparser;
 
+import com.sun.xml.internal.bind.v2.model.core.ID;
 import de.haw.vs.exercise4.idlparser.IDLCompiler.MethodData;
 import de.haw.vs.exercise4.idlparser.IDLCompiler.SupportedDataTypes;
 
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Parser main class.
@@ -174,20 +176,37 @@ public class Parser {
 		}
 	}	
 
+	public static IDLmodule parse(String file) throws IOException {
+		IDLfileReader in = new IDLfileReader(new FileReader(file));
+		return parseModule(in);
+	}
+
 	public static void main(String[] args) {
 
+		if(args.length == 2) {
+			String idlFileName;
+			String outputFileName;
+			idlFileName = args[0];
+			outputFileName = args[1];
 
-		String IDLfileName = "src/main/resources/calc.idl";   //TODO should be parameterised.
-		
-		try {
-			IDLfileReader in = new IDLfileReader(new FileReader(IDLfileName));
-			IDLmodule module = parseModule(in);  // Parse IDL file
-			// output of what we parsed from IDL file (just for testing)
-			printModule(module);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
+			try {
+
+				IDLmodule module = parse(idlFileName);  // Parse IDL file
+				System.out.println("Parsed idl input file successfully with following shema:");
+				printModule(module);
+				System.out.println("Generating java stub, writing to: " + outputFileName);
+				IDLCodeGenerator codeGenerator = new IDLCodeGenerator();
+				List<String> result = codeGenerator.generateCodeLines(module, new IDLToJavaTranslator());
+				codeGenerator.writeToOutputFile(result, outputFileName);
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			System.out.println("Usage: java -jar Parser.jar <input idl filename> <output java filename>");
 		}
+
+
 	}
 
 	/**
