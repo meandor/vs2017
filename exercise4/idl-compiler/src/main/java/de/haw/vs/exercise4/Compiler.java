@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Parser main class.
+ * Compiler main class.
  *
  * @author (c) H. Schulz, 2016
  *         This programme is provided 'As-is', without any guarantee of any kind, implied or otherwise and is wholly unsupported.
  *         You may use and modify it as long as you state the above copyright.
  */
-public class Parser {
+public class Compiler {
     public static final String BEGIN = "{";
     public static final String BEGIN_REGEX = "\\{";
     public static final String END = "};";
@@ -180,7 +180,6 @@ public class Parser {
     }
 
     public static void main(String[] args) {
-
         if (args.length == 2) {
             String idlFileName;
             String outputFileName;
@@ -188,7 +187,6 @@ public class Parser {
             outputFileName = args[1];
 
             try {
-
                 IDLmodule module = parse(idlFileName);  // Parse IDL file
                 System.out.println("Parsed idl input file successfully with following shema:");
                 printModule(module);
@@ -201,7 +199,7 @@ public class Parser {
                 e.printStackTrace();
             }
         } else {
-            System.out.println("Usage: java -jar Parser.jar <input idl filename> <output java filename>");
+            System.out.println("Usage: java -jar Compiler.jar <input idl filename> <output java filename>");
         }
 
     }
@@ -235,5 +233,4 @@ public class Parser {
             }
         }
     }
-
 }

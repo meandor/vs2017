@@ -3,7 +3,6 @@ package de.haw.vs.exercise4;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -27,7 +26,7 @@ public class IDLCodeGeneratorTests {
     private IDLmodule parseTestFile() {
         String IDLfileName = "./src/test/resources/calc.idl";
         try {
-            return Parser.parse(IDLfileName);
+            return Compiler.parse(IDLfileName);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -51,10 +50,11 @@ public class IDLCodeGeneratorTests {
 
     @Test
     public void testWriteToFile() throws Exception {
+        final String outputFile = "./src/test/resources/Test";
+        Files.deleteIfExists(Paths.get(outputFile));
         List<String> expected = new ArrayList<>();
         expected.add("start");
         expected.add("stop");
-        final String outputFile = "./src/test/resources/Test";
         testee.writeToOutputFile(expected, outputFile);
 
         List<String> actual = Files.readAllLines(Paths.get(outputFile + ".java"));

@@ -53,5 +53,4 @@ public class IDLToJavaTranslatorTests {
         String expected = "\tpublic abstract double add(double a, double b) throws Exception;";
         assertEquals(expected, classDeclaration);
     }
-
 }

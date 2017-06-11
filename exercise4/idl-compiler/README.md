@@ -20,9 +20,9 @@ For a more detailed description take a look in the documentation or the tests.
 ## Usage
 To compile a <IDL-FILE-LOCATION>:
 ```bash
-./bin/idl-compiler <IDL-FILE-LOCATION>  
+./bin/idl-compiler <IDL-FILE-LOCATION> <OUTPUT-FILE-LOCATION> 
 ```
-This will output the generated Java Classes in the current folder.
+This will output the generated Java Classes in the <OUTPUT-FILE-LOCATION>.
 
 To build the compiler:
 ```bash

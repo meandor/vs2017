@@ -13,5 +13,4 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-mainClassName = 'de.haw.vs.exercise4.Parser'
-
+mainClassName = 'de.haw.vs.exercise4.Compiler'
