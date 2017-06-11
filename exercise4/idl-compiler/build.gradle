@@ -1,0 +1,17 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'application'
+
+version = '0.1.0-SNAPSHOT'
+group = 'de.haw.vsp'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    testCompile 'junit:junit:4.12'
+}
+
+mainClassName = 'App'
+

@@ -11,13 +11,36 @@ dependencies {
     testCompile('junit:junit:4.12')
 }
 
-jar {
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+}
+
+// parser.jar
+task parserJar(type: Jar) {
+    baseName 'Parser'
+    from(sourceSets.main.output) {
+        include "my/util/package/**"
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
     manifest {
         attributes "Main-Class": "de.haw.vs.exercise4.idlparser.Parser"
     }
-    baseName 'Parser'
+}
 
-    from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+// client.jar
+task clientJar(type: Jar) {
+    from(sourceSets.main.output) {
+        include "my/client/package/**"
+    }
+}
+
+// server.jar
+task serverJar(type: Jar) {
+    from(sourceSets.main.output) {
+        include "my/client/package/**"
     }
 }
