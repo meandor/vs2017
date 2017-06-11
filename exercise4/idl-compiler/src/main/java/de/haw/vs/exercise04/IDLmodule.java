@@ -1,4 +1,4 @@
-package de.haw.vs.exercise4.idlparser;
+package de.haw.vs.exercise04;
 
 import java.util.ArrayList;
 

@@ -1,5 +1,4 @@
-package de.haw.vs.exercise4.idlparser;
-import de.haw.vs.exercise4.idlparser.IDLCompiler.MethodData;
+package de.haw.vs.exercise04;
 
 
 /**
@@ -11,9 +10,9 @@ public class IDLclass {
 	// this (IDL-)class's name
 	private String className;
 	// methods of this class
-	private MethodData methods[];
+	private IDLCompiler.MethodData methods[];
 
-	public IDLclass(String name, String module, MethodData methods[]) {
+	public IDLclass(String name, String module, IDLCompiler.MethodData methods[]) {
 		this.className = name;
 		this.moduleName = module;
 		this.methods = methods;
@@ -27,7 +26,7 @@ public class IDLclass {
 		return className;
 	}
 	
-	public MethodData[] getMethods() {
+	public IDLCompiler.MethodData[] getMethods() {
 		return methods;
 	}
 }

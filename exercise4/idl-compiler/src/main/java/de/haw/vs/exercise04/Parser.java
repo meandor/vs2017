@@ -1,7 +1,4 @@
-package de.haw.vs.exercise4.idlparser;
-
-import de.haw.vs.exercise4.idlparser.IDLCompiler.MethodData;
-import de.haw.vs.exercise4.idlparser.IDLCompiler.SupportedDataTypes;
+package de.haw.vs.exercise04;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -96,7 +93,7 @@ public class Parser {
 	 * @throws IOException
 	 */
 	private static IDLclass parseClass(IDLfileReader in, String currentModuleName) throws IOException {
-		ArrayList<MethodData> methodList = new ArrayList<MethodData>();
+		ArrayList<IDLCompiler.MethodData> methodList = new ArrayList<IDLCompiler.MethodData>();
 		
 		String line = in.readLine();
 		if (line != null) {
@@ -115,12 +112,12 @@ public class Parser {
 					String rTypeString = tokens3[0]; // return value
 					String methodName = tokens3[1]; // method name
 
-					SupportedDataTypes paramTypes[] = parseParams(in.getLineNo(),
+					IDLCompiler.SupportedDataTypes paramTypes[] = parseParams(in.getLineNo(),
 							tokens2[1]);
 
 					// into data container
 					methodList
-							.add(new MethodData(methodName, IDLCompiler.getSupportedTypeForKeyword(rTypeString), paramTypes));
+							.add(new IDLCompiler.MethodData(methodName, IDLCompiler.getSupportedTypeForKeyword(rTypeString), paramTypes));
 					line = in.readLine();
 				}
 
@@ -131,7 +128,7 @@ public class Parser {
 				}
 
 				// method data -> array
-				MethodData methodArray[] = new MethodData[methodList.size()];
+				IDLCompiler.MethodData methodArray[] = new IDLCompiler.MethodData[methodList.size()];
 
 				//return IDL class
 				return new IDLclass(className, currentModuleName,
@@ -154,12 +151,12 @@ public class Parser {
 	/**
 	 * Evaluate parameter list. (No reading done here!)
 	 */
-	private static SupportedDataTypes[] parseParams(int lineNo, String paramList) {
+	private static IDLCompiler.SupportedDataTypes[] parseParams(int lineNo, String paramList) {
 		if (paramList != null && paramList.length() > 0) {
 			String[] paramEntries = paramList.trim().split(PARAM_SEPARATOR);
 			
 			// param data container
-			SupportedDataTypes paramTypes[] = new SupportedDataTypes[paramEntries.length];
+			IDLCompiler.SupportedDataTypes paramTypes[] = new IDLCompiler.SupportedDataTypes[paramEntries.length];
 						
 			for (int i=0; i<paramEntries.length; i++) {
 				String[] typeAndParamName = paramEntries[i].trim().split(" ");
@@ -173,7 +170,7 @@ public class Parser {
 			}
 			return paramTypes;
 		} else {
-			return new SupportedDataTypes[0];  // empty list
+			return new IDLCompiler.SupportedDataTypes[0];  // empty list
 		}
 	}	
 
@@ -224,13 +221,13 @@ public class Parser {
 			System.out.println(" class: " + classes[i].getClassName());
 			
 			// methods
-			MethodData[] methods = classes[i].getMethods();
+			IDLCompiler.MethodData[] methods = classes[i].getMethods();
 			for (int k=0; k<methods.length; k++) {
 				System.out.print("  method: " + IDLCompiler.getSupportedIDLDataTypeName(methods[k].getReturnType()) 
 						+ " " + methods[k].getName() + " ");
 				
 				// parameters
-				SupportedDataTypes[] paramTypes = methods[k].getParamTypes();
+				IDLCompiler.SupportedDataTypes[] paramTypes = methods[k].getParamTypes();
 				for (int m=0; m<paramTypes.length; m++) {
 					System.out.print(IDLCompiler.getSupportedIDLDataTypeName(paramTypes[m]) + " ");
 				}
