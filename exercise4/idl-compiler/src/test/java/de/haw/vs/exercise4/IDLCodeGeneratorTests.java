@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -57,7 +59,7 @@ public class IDLCodeGeneratorTests {
         expected.add("stop");
         testee.writeToOutputFile(expected, outputFile);
 
-        List<String> actual = Files.readAllLines(Paths.get(outputFile + ".java"));
+        List<String> actual = Files.readAllLines(Paths.get(outputFile + ".java"), StandardCharsets.UTF_8);
         assertEquals(expected, actual);
     }
 }
