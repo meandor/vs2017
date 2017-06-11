@@ -33,7 +33,6 @@ public class IDLCodeGenerator {
         for (String line : parsedLines) {
             bw.write(line);
             bw.newLine();
-            bw.newLine();
         }
 
         bw.close();
