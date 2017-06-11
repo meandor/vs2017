@@ -1,0 +1,6 @@
+language: java
+env:
+ - TEST_DIR=exercise4/idl-compiler
+ - TEST_DIR=exercise4/middleware
+
+before_install: cd $TEST_DIR
