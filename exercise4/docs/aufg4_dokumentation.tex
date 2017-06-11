@@ -24,7 +24,9 @@
 \\
 \textbf{Aufgabenteilung:}
 \begin{itemize}
-    \item
+    \item IDL Compiler
+    \item Namensdienst
+    \item mware\_lib Library
 \end{itemize}
 
 \textbf{Quellenangaben:}
@@ -35,12 +37,14 @@
 
 \textbf{Bearbeitungszeitraum:}
 \begin{itemize}
-	\item
+	\item 11.06.2017 4 Stunden (DS)
 \end{itemize}
 
 \textbf{Aktueller Stand:}
 \begin{itemize}
-	\item
+	\item IDL Compiler begonnen
+    \item Namensdienst
+    \item mware\_lib Library
 \end{itemize}
 
 \textbf{Änderung des Entwurfs:}
@@ -51,10 +55,57 @@
 \newpage
 
 \section{Einführung und Ziele}
+Es soll eine einfache objektorientierte Middleware entworfen werden, die Methodenaufrufe
+eines entfernten Objektes ermöglicht.
+
+Zur Orientierung gilt hierbei die CORBA Architektur. Genauer soll hier ein ORB zur
+Verfügung gestellt werden, der es ermöglicht Methoden von entfernten Objekten aufzurufen.
+
+Zur Abstraktion und Beschreibung der Schnittstellen der Objekte soll eine IDL verwendet werden.
+Diese IDL wird dann zur Erzeugung von Klassen- und Methodenrümpfen verwendet.
+
+Außerdem beinhaltet der ORB einen Namensdienst, der Objektreferenzen in einem Netz mit Namen finden
+kann.
+
+Die Middleware an sich soll durch eine Library abstrahiert und verwendbar sein.
 
 \subsection{Randbedingungen}
+Der Namensdienst soll auf einem entfernten Rechner unabhängig von der Middleware Library
+lauffähig sein. Der Port muss zur Laufzeit einstellbar sein.
+
+Der IDL-Compiler soll in einem Package oder einer \texttt{.jar} Datei zur Verfügung gestellt
+werden. Der Compiler soll folgende IDL Typen unterstützen:
+
+\begin{itemize}
+    \item module (keine Schachtelung, 1 Modul pro Datei)
+    \item class (nicht als Parameter oder Returnwert, keine Schachtelung)
+    \item int
+    \item double
+    \item string
+\end{itemize}
+
+Ein Beispiel:
+\begin{lstlisting}
+module math_ops {
+  class Calculator {
+   double add(double a, double b);
+   string getStr(double a);
+ };
+};
+\end{lstlisting}
+
+Die Middleware Library soll in einem Package \texttt{mware\_lib} zusammengefasst werden.
+
+Wenn eine Serverapplikation während eines entfernten Methodenaufrufes eine RuntimeException
+wirft, soll diese an den Aufrufer weitergeleitet werden.
+
+Es soll möglich sein, dass zwei oder mehrere Klienten die selbe Objektreferenz zeitgleich
+nutzen wollen. Das soll innerhalb der Middleware nicht zu Deadlocks führen.
 
 \subsection{Kontextbegrenzung}
+Die Implementierung soll in Java vorliegen.
+
+Die Behebung von Deadlocks in den Anwendungen ist nicht Aufgabe der Middleware.
 
 \newpage
 
