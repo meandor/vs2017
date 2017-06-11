@@ -110,12 +110,19 @@ Die Behebung von Deadlocks in den Anwendungen ist nicht Aufgabe der Middleware.
 \newpage
 
 \section{Gesamtsystem}
+Das Gesamtsystem besteht aus drei Subsystemen, die unabhängig voneinander lauffähig sind.
+Dabei sind das NameService System und das IDL-Compiler System Applikationen, die über
+die Kommandozeile gestartet werden können.
+
+Die Middleware Library (mware\_lib) ist eine Bibliothek, die in der jeweiligen Applikation,
+die die Middleware verwenden soll eingebunden werden muss. Die Middleware Library ist also
+nicht direkt über die Kommandozeile startbar.
 
 \subsection{Bausteinsicht}
 %\begin{figure}[H]
 %    \centering
 %    \includegraphics[width=0.5\textwidth]{component-diagram.png}
-%    \caption[seq-dia]{Komponentendiagramm der ggT-App}
+%    \caption[seq-dia]{Komponentendiagramm der Middleware Infrastruktur}
 %    \label{fig:component-diagram}
 %\end{figure}
 
@@ -130,5 +137,24 @@ Die Behebung von Deadlocks in den Anwendungen ist nicht Aufgabe der Middleware.
 \newpage
 
 \section{Subsysteme und Komponenten}
+
+\subsection{NameService}
+\subsubsection{Aufgabe und Verantwortung}
+Der NameService bildet Namen auf Objektreferenzen ab. Er wird verwendet, um Objekte anhand
+ihres Namens zu finden und anzusprechen und um Objekte anzumelden.
+
+\subsubsection{Schnittstelle}
+\begin{lstlisting}
+
+\end{lstlisting}
+
+\subsubsection{Entwurfsentscheidungen}
+Der Port, an dem der NameService läuft ist zur Laufzeit einstellbar. Das geschieht über
+den Startparameter.
+
+\subsubsection{Konfigurationsparameter}
+\begin{itemize}
+    \item Port des NameServices
+\end{itemize}
 
 \end{document}
