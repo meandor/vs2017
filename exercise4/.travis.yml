@@ -1,0 +1,6 @@
+language: java
+env:
+ - TEST_DIR=idl-compiler
+ - TEST_DIR=middleware
+
+before_install: cd $TEST_DIR
