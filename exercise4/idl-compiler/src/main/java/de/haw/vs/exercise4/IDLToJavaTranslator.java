@@ -1,4 +1,4 @@
-package de.haw.vs.exercise04;
+package de.haw.vs.exercise4;
 
 public class IDLToJavaTranslator implements IDLTranslator {
 

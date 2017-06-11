@@ -1,4 +1,4 @@
-package de.haw.vs.exercise04;
+package de.haw.vs.exercise4;
 
 import org.junit.Before;
 import org.junit.Test;

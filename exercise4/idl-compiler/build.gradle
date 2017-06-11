@@ -3,7 +3,7 @@ apply plugin: 'idea'
 apply plugin: 'application'
 
 version = '0.1.0-SNAPSHOT'
-group = 'de.haw.vsp'
+group = 'de.haw.vs'
 
 repositories {
     jcenter()
@@ -13,5 +13,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-mainClassName = 'App'
+mainClassName = 'de.haw.vs.exercise4.Parser'
 

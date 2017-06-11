@@ -1,5 +1,4 @@
-package de.haw.vs.exercise04;
-
+package de.haw.vs.exercise4;
 
 /**
  * IDL compiler main class.
