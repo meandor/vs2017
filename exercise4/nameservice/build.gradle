@@ -14,4 +14,4 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-mainClassName = 'de.haw.vs.nameservice.App'
+mainClassName = 'de.haw.vs.nameservice.NameServiceStarter'
