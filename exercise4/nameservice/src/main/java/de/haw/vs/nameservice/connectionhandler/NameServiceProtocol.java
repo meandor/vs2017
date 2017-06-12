@@ -1,5 +1,8 @@
 package de.haw.vs.nameservice.connectionhandler;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -15,5 +18,19 @@ public class NameServiceProtocol {
     static String extractAlias(byte[] message) {
         byte[] aliasBytes = Arrays.copyOfRange(message, MSG_TYPE_POSITION + 1, ALIAS_LENGTH - 1);
         return new String(aliasBytes, StandardCharsets.UTF_8);
+    }
+
+    static Object extractObject(byte[] message) throws IOException, ClassNotFoundException {
+        Object result = null;
+        int byteOffset = MSG_TYPE_POSITION + ALIAS_LENGTH + 1;
+        byte[] objectBytes = Arrays.copyOfRange(message, byteOffset, message.length);
+
+        ByteArrayInputStream byteStream = new ByteArrayInputStream(objectBytes);
+        ObjectInputStream objStream = new ObjectInputStream(byteStream);
+        result = objStream.readObject();
+        objStream.close();
+        byteStream.close();
+
+        return result;
     }
 }
