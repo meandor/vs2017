@@ -16,6 +16,16 @@ public class NameServiceProtocolTest {
     }
 
     @Test
+    public void testExtractAliasWithZeroPadding() throws Exception {
+        byte[] message = new byte[]{
+                0x1, 0x61, 0x20, 0x20, 0x61, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
+        };
+
+        assertEquals("a  a", NameServiceProtocol.extractAlias(message));
+    }
+
+
+    @Test
     public void testExtractObject() throws Exception {
         byte[] message = new byte[]{
                 0x1,

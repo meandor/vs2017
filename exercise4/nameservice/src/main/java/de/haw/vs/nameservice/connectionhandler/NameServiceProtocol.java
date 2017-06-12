@@ -17,7 +17,7 @@ public class NameServiceProtocol {
 
     static String extractAlias(byte[] message) {
         byte[] aliasBytes = Arrays.copyOfRange(message, MSG_TYPE_POSITION + 1, ALIAS_LENGTH - 1);
-        return new String(aliasBytes, StandardCharsets.UTF_8);
+        return new String(aliasBytes, StandardCharsets.UTF_8).replaceAll("\0", "");
     }
 
     static Object extractObject(byte[] message) throws IOException, ClassNotFoundException {
