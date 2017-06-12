@@ -145,17 +145,24 @@ ihres Namens zu finden und anzusprechen und um Objekte anzumelden.
 
 \subsubsection{Schnittstelle}
 \begin{lstlisting}
-
+Die Schnittstellen sind ansprechbar mittels u.g. Nachrichtenformat per TCP an gegebenem Port. 
+public void rebind(Object servant, String name); 
+Bindet ein Objekt an einen Platzhalter im Namensdienst.
+public Object resolve(String name); 
+Loest eine Namensreferenz auf ein Java - Objekt auf.
+Das Ergebnis wird als serialisiertes Java - Objekt per TCP an den Aufrufer gesendet.
 \end{lstlisting}
 
 \subsubsection{Entwurfsentscheidungen}
 Der Port, an dem der NameService läuft ist zur Laufzeit einstellbar. Das geschieht über
 den Startparameter.
 
-Der Nameservice Empfängt Nachrichten im folgenden Format:\newline
-Byte 0: Art des Befehls. (0 = Rebind, 1 = Resolve, 2 = Shutdown)
-Byte 1 - 11: Alias für rebind / resolve
-Byte 12 - n: Serialisiertes Objekt
+Der Nameservice Empfängt Nachrichten im folgenden Format:
+\begin{itemize}
+\item Byte 0: Art des Befehls. (0 = Rebind, 1 = Resolve, 2 = Shutdown) 
+\item Byte 1 - 11: Alias für rebind / resolve
+\item Byte 12 - n: Serialisiertes Objekt
+\end{itemize}
 
 \subsubsection{Konfigurationsparameter}
 \begin{itemize}
