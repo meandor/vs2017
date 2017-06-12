@@ -1,5 +1,7 @@
 package de.haw.vs.nameservice.connectionhandler;
 
+import java.io.IOException;
+
 /**
  * Interface handling incoming Client requests
  */
@@ -10,5 +12,5 @@ public interface IClientRequestHandler extends Runnable {
      *
      * @param request String of incoming request
      */
-    public void handleIncomingRequest(String request);
+    public void handleIncomingRequest(String request) throws IOException;
 }

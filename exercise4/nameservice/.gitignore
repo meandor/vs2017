@@ -17,3 +17,4 @@ src/test/resources/*.java
 gradle-app.setting
 !gradle-wrapper.jar
 .gradletasknamecache
+src/test/resources/output.txt
