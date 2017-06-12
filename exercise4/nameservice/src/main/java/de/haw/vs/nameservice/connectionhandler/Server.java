@@ -30,7 +30,7 @@ public class Server implements IServer {
 
     @Override
     public void run() {
-        log.info("Started server:" + stopping);
+        log.info("Started server");
         while (!stopping) {
             try {
                 Socket clientSocket = serverSocket.accept();
