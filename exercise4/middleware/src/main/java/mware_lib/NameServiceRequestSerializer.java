@@ -18,8 +18,8 @@ public class NameServiceRequestSerializer {
         byte[] serializedObject = serializeObject(servant);
         byte[] serializedMessage = new byte[MSG_TYPE_LENGTH + ALIAS_LENGTH + serializedObject.length];
         serializedMessage[0] = REBIND;
-        for (int i = 1; i < MSG_TYPE_LENGTH + ALIAS_LENGTH && i < name.length(); i++) {
-            serializedMessage[i] = (byte) name.charAt(i);
+        for (int i = 1; i < MSG_TYPE_LENGTH + ALIAS_LENGTH && i-1 < name.length(); i++) {
+            serializedMessage[i] = (byte) name.charAt(i-1);
         }
         return appendSerializedObjectToSerializedMessage(serializedObject, serializedMessage);
     }
@@ -27,8 +27,8 @@ public class NameServiceRequestSerializer {
     public static byte[] serializeResolveMessage(String name){
         byte[] serializedMessage = new byte[MSG_TYPE_LENGTH + ALIAS_LENGTH];
         serializedMessage[0] = RESOLVE;
-        for (int i = 1; i < MSG_TYPE_LENGTH + ALIAS_LENGTH && i < name.length(); i++) {
-            serializedMessage[i] = (byte) name.charAt(i);
+        for (int i = 1; i < ALIAS_LENGTH + MSG_TYPE_LENGTH && i-1 < name.length(); i++) {
+            serializedMessage[i] = (byte) name.charAt(i - 1);
         }
         return serializedMessage;
     }

@@ -42,6 +42,7 @@ public class NameServiceProxy extends NameService {
             ObjectInputStream socketInputStream =  new ObjectInputStream(stubSocket.getInputStream())) {
             byte[] serializedMessage = NameServiceRequestSerializer.serializeResolveMessage(name);
             socketOutputStream.write(serializedMessage);
+            socketOutputStream.flush();
             return socketInputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();

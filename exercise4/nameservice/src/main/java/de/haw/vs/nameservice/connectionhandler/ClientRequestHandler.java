@@ -46,7 +46,8 @@ public class ClientRequestHandler implements IClientRequestHandler {
                 break;
             case NameServiceProtocol.RESOLVE:
                 String resolveAlias = NameServiceProtocol.extractAlias(request);
-                output.writeObject(this.nameService.resolve(resolveAlias));
+                Object resolved = this.nameService.resolve(resolveAlias);
+                output.writeObject(resolved);
                 output.flush();
                 break;
             default:
