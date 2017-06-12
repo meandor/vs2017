@@ -10,7 +10,8 @@ repositories {
 }
 
 dependencies {
+    compile 'ch.qos.logback:logback-classic:1.2.3'
     testCompile 'junit:junit:4.12'
 }
 
-mainClassName = 'App'
+mainClassName = 'de.haw.vs.nameservice.App'
