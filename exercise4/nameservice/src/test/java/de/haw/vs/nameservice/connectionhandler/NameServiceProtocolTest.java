@@ -2,6 +2,7 @@ package de.haw.vs.nameservice.connectionhandler;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class NameServiceProtocolTest {
@@ -34,5 +35,11 @@ public class NameServiceProtocolTest {
         };
 
         assertEquals("asd", NameServiceProtocol.extractObject(message));
+    }
+
+    @Test
+    public void testSerializeObject() throws Exception {
+        byte[] expected = new byte[]{(byte) 0xAC, (byte) 0xED, 0x0, 0x5, 0x74, 0x0, 0x3, 0x61, 0x73, 0x64};
+        assertArrayEquals(expected, NameServiceProtocol.serializeObject("asd"));
     }
 }

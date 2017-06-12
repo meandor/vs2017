@@ -1,8 +1,6 @@
 package de.haw.vs.nameservice.connectionhandler;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -32,5 +30,13 @@ public class NameServiceProtocol {
         byteStream.close();
 
         return result;
+    }
+
+    static byte[] serializeObject(Object object) throws IOException {
+        try (ByteArrayOutputStream output = new ByteArrayOutputStream();
+             ObjectOutput objectOutput = new ObjectOutputStream(output)) {
+            objectOutput.writeObject(object);
+            return output.toByteArray();
+        }
     }
 }
