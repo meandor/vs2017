@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server implements IServer {
@@ -15,7 +15,7 @@ public class Server implements IServer {
     private volatile boolean stopping;
     private final Logger log = LoggerFactory.getLogger(Server.class);
     private final int maxConcurrentConnections = 30;
-    private final Executor threadPool = Executors.newFixedThreadPool(maxConcurrentConnections);
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(maxConcurrentConnections);
 
     @Override
     public void initServer(int port) {
@@ -35,7 +35,7 @@ public class Server implements IServer {
             try {
                 Socket clientSocket = serverSocket.accept();
                 IClientRequestHandler clientRequest = new ClientRequestHandler(clientSocket);
-                threadPool.execute(clientRequest);
+                threadPool.submit(clientRequest);
             } catch (IOException e) {
                 log.warn("Error while client tried to connect", e);
             }
