@@ -12,4 +12,12 @@ public abstract class NameService {
      * @param name    String representation of the object
      */
     public abstract void rebind(Object servant, String name);
+
+    /**
+     * Returns the Object reference from the given servant
+     *
+     * @param name String of servant
+     * @return general Object reference
+     */
+    public abstract Object resolve(String name);
 }
