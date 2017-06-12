@@ -152,6 +152,11 @@ ihres Namens zu finden und anzusprechen und um Objekte anzumelden.
 Der Port, an dem der NameService läuft ist zur Laufzeit einstellbar. Das geschieht über
 den Startparameter.
 
+Der Nameservice Empfängt Nachrichten im folgenden Format:\newline
+Byte 0: Art des Befehls. (0 = Rebind, 1 = Resolve, 2 = Shutdown)
+Byte 1 - 11: Alias für rebind / resolve
+Byte 12 - n: Serialisiertes Objekt
+
 \subsubsection{Konfigurationsparameter}
 \begin{itemize}
     \item Port des NameServices
