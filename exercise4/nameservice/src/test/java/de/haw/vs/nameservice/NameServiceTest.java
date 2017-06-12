@@ -1,6 +1,5 @@
 package de.haw.vs.nameservice;
 
-import de.haw.vs.nameservice.NameService;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,7 +14,13 @@ public class NameServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        this.testee = new NameService();
+        this.testee = NameService.getInstance();
+    }
+
+    @Test
+    public void testSingletonInstance() throws Exception {
+        assertEquals(this.testee, NameService.getInstance());
+        assertEquals(this.testee, NameService.getInstance());
     }
 
     @Test

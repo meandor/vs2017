@@ -10,8 +10,16 @@ public class NameService {
 
     private ConcurrentMap<String, Object> registry;
     private final Logger logger = LoggerFactory.getLogger(NameService.class);
+    private static NameService instance;
 
-    public NameService() {
+    public static NameService getInstance() {
+        if (instance == null) {
+            instance = new NameService();
+        }
+        return instance;
+    }
+
+    private NameService() {
         this.registry = new ConcurrentHashMap<>();
     }
 
