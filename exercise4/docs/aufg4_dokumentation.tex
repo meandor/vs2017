@@ -145,7 +145,8 @@ ihres Namens zu finden und anzusprechen und um Objekte anzumelden.
 
 \subsubsection{Schnittstelle}
 \begin{lstlisting}
-Die Schnittstellen sind ansprechbar mittels u.g. Nachrichtenformat per TCP an gegebenem Port. 
+Die Schnittstellen sind ansprechbar mittels u.g. 
+Nachrichtenformat per TCP an gegebenem Port. 
 public void rebind(Object servant, String name); 
 Bindet ein Objekt an einen Platzhalter im Namensdienst.
 public Object resolve(String name); 
@@ -197,5 +198,35 @@ Sprache getrennt, und die Testbarkeit der einzelnen Vorgänge gegeben.
     \item Pfad zur Eingabedatei
     \item Pfad zur Ausgabedatei (existierende Dateien werden überschrieben)    
 \end{itemize}
+
+\subsection{mware lib}
+\subsubsection{Aufgabe und Verantwortung}
+Die Bibiothek / das Package mware lib stellt die Kernfunktionalität bereit.
+Die Schnitstelle nach außen ist die Klasse ObjectBroker, die eine Referenz auf eine
+Implementierung des NameService Protokolls hält.
+
+
+\subsubsection{Schnittstelle}
+\begin{lstlisting}
+public NameService getNameService();
+Gibt die Referenz auf das Proxyobjekt fuer den NameService an den Aufrufer.
+public void shutDown();
+Beendet den Object Request Broker und seine Dependencies.
+\end{lstlisting}
+
+\subsubsection{Entwurfsentscheidungen}
+Der Object Request Broker wird gemäß Vorgabe in einer statischen Methode initialisiert.
+Hierbei wird ein Nameservice Proxyobjekt erzeugt, und zur weiteren Verwendung referenziert.
+Das Nameservice Proxyobjekt leitet alle Methodenaufrufe des NameService an eine entfernte
+NameService Instanz per TCP weiter.
+
+\subsubsection{Konfigurationsparameter}
+
+\begin{itemize}
+    \item host: Der Hostname des entfernten NameService
+    \item Port: Der Port des entfernten NameService
+	\item Debug: Konfiguriert, ob debug ausgaben geloggt werden sollen.
+\end{itemize}
+
 
 \end{document}

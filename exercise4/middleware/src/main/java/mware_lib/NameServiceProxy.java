@@ -8,8 +8,6 @@ public class NameServiceProxy extends NameService {
     private String nameServiceHostName;
     private int nameServicePort;
 
-
-
     /**
      * Initialises the NameService stub. The actual name service can run anywhere on a given host/port
      *
@@ -29,6 +27,7 @@ public class NameServiceProxy extends NameService {
             OutputStream socketOutputStream = stubSocket.getOutputStream()) {
             byte[] serializedMessage = NameServiceRequestSerializer.serializeRebindMessage(servant, name);
             socketOutputStream.write(serializedMessage);
+            socketOutputStream.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -44,7 +43,7 @@ public class NameServiceProxy extends NameService {
             socketOutputStream.write(serializedMessage);
             socketOutputStream.flush();
             return socketInputStream.readObject();
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }

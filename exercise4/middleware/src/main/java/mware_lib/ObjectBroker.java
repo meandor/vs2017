@@ -5,7 +5,7 @@ package mware_lib;
  */
 public class ObjectBroker implements IObjectBroker {
 
-    private static NameService nameService;
+    NameService nameService;
     /**
      * Main entry point to the middleware.
      *
@@ -15,9 +15,13 @@ public class ObjectBroker implements IObjectBroker {
      * @return ObjectBroker
      */
     public static ObjectBroker init(String serviceHost, int listenPort, boolean debug) {
-        nameService = new NameServiceProxy(serviceHost, listenPort);
-        return null;
+        return new ObjectBroker(serviceHost, listenPort, debug);
     }
+
+    private ObjectBroker(String serviceHost, int listenPort, boolean debug) {
+        nameService = new NameServiceProxy(serviceHost, listenPort);
+    }
+
 
     /**
      * Returns the NameService (proxy Object).
@@ -25,7 +29,7 @@ public class ObjectBroker implements IObjectBroker {
      * @return NameService
      */
     public NameService getNameService() {
-        return null;
+        return nameService;
     }
 
     /**
