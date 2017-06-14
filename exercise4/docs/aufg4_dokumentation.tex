@@ -173,30 +173,35 @@ Der Nameservice Empfängt Nachrichten im folgenden Format:
 \subsection{IDL Compiler}
 \subsubsection{Aufgabe und Verantwortung}
 Der IDL Compiler hat die Aufgabe, eine gegebene Modulbeschreibung aus einer Datei
-im .idl - Format einzulesen und die der Beschreibung entsprechende abstrakte Java-Klasse 
-als Java-Code zu generieren. Die generierte Klasse wird auf Client und Serverseite eingebunden
-und zu einer konkreten Klasse abgeleitet. Instanzen davon werden als Proxy - Objekte
-für CORBA - Aufrufe verwendet.
-
+im .idl - Format einzulesen und daraus Java-Code zu generieren. 
+Zum Einen wird eine Abstrakte Klasse Java generiert.
+Diese wird auf Serverseite eingebunden und zu einer konkreten Klasse abgeleitet. 
+Darüber hinaus soll der Compiler eine Proxy - Klasse für die Clientseite generieren,
+welche die Methodenaufrufe über vordefinierte Schnittstellen an den ORB weiterleitet.
 
 \subsubsection{Schnittstelle}
 \begin{lstlisting}
 Compiler.main(String[] args)
 Ueber die main - Methode der Klasse Compiler kann der Compiler ausgefuehrt werden.
-Als erstes Argument muss der Pfad der .idl-Datei, als zweites Argument der Pfad zur 
-Ausgabedatei angegeben werden.
 \end{lstlisting}
+Zu übergebene Argumente sind:
+\begin{itemize}
+	\item args[0]: Pfad zur IDL - Datei
+	\item args[1]: Pfad zur Ausgabedatei der abstrakten Java - Klasse
+	\item args[2]: Pfad zur Ausgabedatei der Java Proxy - Klasse
+\end{itemize}
 
 \subsubsection{Entwurfsentscheidungen}
-Die Methoden zur Übersetzung der IDL - Beschreibung werden abstrakt in einem Interface 
-definiert. Die Eigentliche Übersetzung nimmt IDLToJavaTranslator (die Implementierung des 
+Die Methoden zur Übersetzung der IDL - Beschreibung werden gemäß des Adapter - Patterns
+in einem Interface definiert. Die Eigentliche Übersetzung nimmt IDLToJavaTranslator und
+der IDLToProxyTranslator (die Implementierung des 
 Interfaces) vor. So ist der Übersetzungsprozess logisch von der Syntax der zu übersetzenden
-Sprache getrennt, und die Testbarkeit der einzelnen Vorgänge gegeben.
+Sprache getrennt, und die Testbarkeit der einzelnen Vorgänge gegeben, außerdem können weitere
+zu generierende Klassendefinitionen einfach hinzugefügt werden.
 \subsubsection{Konfigurationsparameter}
 
 \begin{itemize}
-    \item Pfad zur Eingabedatei
-    \item Pfad zur Ausgabedatei (existierende Dateien werden überschrieben)    
+	\item -
 \end{itemize}
 
 \subsection{mware lib}
