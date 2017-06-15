@@ -10,7 +10,8 @@ repositories {
 }
 
 dependencies {
+    compile 'ch.qos.logback:logback-classic:1.2.3'
     testCompile 'junit:junit:4.12'
 }
 
-mainClassName = 'de.haw.vs.exercise4.Compiler'
+mainClassName = 'de.haw.vs.neptr.Compiler'

@@ -1,23 +1,26 @@
-package de.haw.vs.exercise4;
+package de.haw.vs.neptr.translator;
 
+import de.haw.vs.neptr.idlmodel.IDLClass;
+import de.haw.vs.neptr.idlmodel.MethodData;
+import de.haw.vs.neptr.idlmodel.SupportedDataTypes;
 import org.junit.Test;
 
-import static de.haw.vs.exercise4.IDLCompiler.SupportedDataTypes.DOUBLE;
+import static de.haw.vs.neptr.idlmodel.SupportedDataTypes.DOUBLE;
 import static org.junit.Assert.assertEquals;
 
-public class IDLToJavaTranslatorTests {
+public class ImplBaseJavaTranslatorTests {
 
-    private IDLToJavaTranslator javaGenerator = new IDLToJavaTranslator();
+    private ImplBaseJavaTranslator testee = new ImplBaseJavaTranslator();
 
     @Test
     public void testModuleDeclaration() {
-        String moduleDeclaration = javaGenerator.declareModule(new IDLmodule("math_ops"));
+        String moduleDeclaration = testee.declareModule(new IDLClass(null, "math_ops", null));
         assertEquals("package math_ops;", moduleDeclaration);
     }
 
     @Test
     public void testImplementNarrowCast() {
-        String narrowCastMethod = javaGenerator.declareNarrowCastMethod(new IDLclass("Calculator", "math_ops", null));
+        String narrowCastMethod = testee.declareNarrowCastMethod(new IDLClass("Calculator", "math_ops", null));
         String expected =
                 "\tpublic static _CalculatorImplBase narrowCast(Object rawObjectRef) {\n" +
                         "\t\treturn new _CalculatorProxy(rawObjectRef);\n" +
@@ -27,29 +30,22 @@ public class IDLToJavaTranslatorTests {
 
     @Test
     public void testOpenClassDeclaration() {
-        String classDeclaration = javaGenerator.openClassDeclaration(new IDLclass("Calculator", "math_ops", null));
+        String classDeclaration = testee.openClassDeclaration(new IDLClass("Calculator", "math_ops", null));
         String expected = "public abstract class _CalculatorImplBase {";
         assertEquals(expected, classDeclaration);
     }
 
     @Test
     public void testCloseClassDeclaration() {
-        String classDeclaration = javaGenerator.closeClassDeclaration();
+        String classDeclaration = testee.closeClassDeclaration();
         String expected = "}";
         assertEquals(expected, classDeclaration);
     }
 
     @Test
     public void testMethodDeclaration() {
-
-        IDLCompiler.MethodData methodData = new IDLCompiler.MethodData
-                (
-                        "add",
-                        DOUBLE,
-                        new IDLCompiler.SupportedDataTypes[]{DOUBLE, DOUBLE}
-                );
-
-        String classDeclaration = javaGenerator.declareMethod(methodData);
+        MethodData methodData = new MethodData("add", DOUBLE, new SupportedDataTypes[]{DOUBLE, DOUBLE});
+        String classDeclaration = testee.declareMethod(methodData);
         String expected = "\tpublic abstract double add(double a, double b) throws Exception;";
         assertEquals(expected, classDeclaration);
     }
