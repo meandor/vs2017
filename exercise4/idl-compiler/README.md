@@ -1,4 +1,9 @@
-# IDL Compiler
+# NEPTR
+> Creator, I am eager to commence the creation and propulsion of pies forever, but my pie-hucking appendage is...
+> malfunctioning, and my oven lamp is cold, and my tank treads do not roll!
+>
+> ~ NEPTR (Adventure Time)
+
 Interface Definition Language Java Compiler for the middleware.
 
 This application creates class and method stubs according to the IDL.
@@ -20,7 +25,7 @@ For a more detailed description take a look in the documentation or the tests.
 ## Usage
 To compile a <IDL-FILE-LOCATION>:
 ```bash
-./bin/idl-compiler <IDL-FILE-LOCATION> <OUTPUT-FILE-LOCATION> 
+./bin/neptr <IDL-FILE-LOCATION> <OUTPUT-FILE-LOCATION> 
 ```
 This will output the generated Java Classes in the <OUTPUT-FILE-LOCATION>.
 
