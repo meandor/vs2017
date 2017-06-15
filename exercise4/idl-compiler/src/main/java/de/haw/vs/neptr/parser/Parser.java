@@ -22,9 +22,6 @@ public class Parser {
     private final String IDL_KEYWORD_INT = "int";
     private final String IDL_KEYWORD_DOUBLE = "double";
     private final String IDL_KEYWORD_STRING = "string";
-    private final String JAVA_INT = "int";
-    private final String JAVA_DOUBLE = "double";
-    private final String JAVA_STRING = "String";
     private final Logger logger = LoggerFactory.getLogger(Parser.class);
 
     /**
