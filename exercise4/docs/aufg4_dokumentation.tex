@@ -38,11 +38,14 @@
 \textbf{Bearbeitungszeitraum:}
 \begin{itemize}
 	\item 11.06.2017 4 Stunden (DS)
+	\item 12.06.2017 2 Stunden (DS)
+	\item 14.06.2017 4 Stunden (DS)
+	\item 15.06.2017 5 Stunden (DS)
 \end{itemize}
 
 \textbf{Aktueller Stand:}
 \begin{itemize}
-	\item IDL Compiler begonnen
+	\item IDL Compiler fertig und getestet
     \item Namensdienst
     \item mware\_lib Library
 \end{itemize}
@@ -119,12 +122,12 @@ die die Middleware verwenden soll eingebunden werden muss. Die Middleware Librar
 nicht direkt über die Kommandozeile startbar.
 
 \subsection{Bausteinsicht}
-%\begin{figure}[H]
-%    \centering
-%    \includegraphics[width=0.5\textwidth]{component-diagram.png}
-%    \caption[seq-dia]{Komponentendiagramm der Middleware Infrastruktur}
-%    \label{fig:component-diagram}
-%\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{compiler-components.png}
+    \caption[compiler-components]{Komponentendiagramm des IDL-Compilers (Neptr)}
+    \label{fig:compiler-component-diagram}
+\end{figure}
 
 \subsection{Laufzeitsicht}
 %\begin{figure}[H]
@@ -172,37 +175,60 @@ Der Nameservice Empfängt Nachrichten im folgenden Format:
 
 \subsection{IDL Compiler}
 \subsubsection{Aufgabe und Verantwortung}
-Der IDL Compiler hat die Aufgabe, eine gegebene Modulbeschreibung aus einer Datei
-im .idl - Format einzulesen und daraus Java-Code zu generieren. 
-Zum Einen wird eine Abstrakte Klasse Java generiert.
-Diese wird auf Serverseite eingebunden und zu einer konkreten Klasse abgeleitet. 
-Darüber hinaus soll der Compiler eine Proxy - Klasse für die Clientseite generieren,
-welche die Methodenaufrufe über vordefinierte Schnittstellen an den ORB weiterleitet.
+Der IDL Compiler hat die Aufgabe, eine gegebene Modulbeschreibung aus einer \texttt{.idl-Datei} im IDL Format einzulesen
+und daraus Java-Code zu generieren.\\
+
+Es wird eine Abstrakte Klasse Java generiert (ImplBase bzw. Stub). Diese wird auf Serverseite eingebunden und zu einer
+konkreten Klasse abgeleitet.\\
+
+Darüber hinaus soll der Compiler eine Proxy - Klasse für die Clientseite generieren, welche die Methodenaufrufe auf dem
+entfernten Server Objekt weiterleitet und ausführt. Das Proxy Objekt wird mit der Abstrakten Klasse (Stub) im Client
+per narrowCast Methode erstellt.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Compiler_FDM.png}
+    \caption[fdm-compiler]{Fachliches Daten Modell des IDL-Compilers}
+    \label{fig:fdm-compiler}
+\end{figure}
 
 \subsubsection{Schnittstelle}
 \begin{lstlisting}
-Compiler.main(String[] args)
-Ueber die main - Methode der Klasse Compiler kann der Compiler ausgefuehrt werden.
+public class Compiler {
+    /**
+     * Ueber die main - Methode der Klasse Compiler kann der Compiler ausgefuehrt werden.
+     */
+    public static void main(String[] args);
+}
 \end{lstlisting}
 Zu übergebene Argumente sind:
 \begin{itemize}
 	\item args[0]: Pfad zur IDL - Datei
-	\item args[1]: Pfad zur Ausgabedatei der abstrakten Java - Klasse
-	\item args[2]: Pfad zur Ausgabedatei der Java Proxy - Klasse
+	\item args[1]: Pfad zum Ordner für die Ausgabedateien
 \end{itemize}
+
+Die erzeugten Binaries können wie folgt ausgeführt werden:\\
+
+\texttt{./bin/neptr <IDL-Dateipfad> <Ausgabe-Ordner>}
 
 \subsubsection{Entwurfsentscheidungen}
-Die Methoden zur Übersetzung der IDL - Beschreibung werden gemäß des Adapter - Patterns
-in einem Interface definiert. Die Eigentliche Übersetzung nimmt IDLToJavaTranslator und
-der IDLToProxyTranslator (die Implementierung des 
-Interfaces) vor. So ist der Übersetzungsprozess logisch von der Syntax der zu übersetzenden
-Sprache getrennt, und die Testbarkeit der einzelnen Vorgänge gegeben, außerdem können weitere
-zu generierende Klassendefinitionen einfach hinzugefügt werden.
-\subsubsection{Konfigurationsparameter}
+Der Compiler besteht aus vier Komponenten (siehe Abbildung \ref{fig:compiler-component-diagram}). In der
+Hauptkomponente (Compiler) ist der eigentliche Compiler mit seiner Hauptmethode. Diese wird nach außen frei gegeben.
 
-\begin{itemize}
-	\item -
-\end{itemize}
+Der Compiler benutzt den Parser um eine IDL-Datei zu parsen und daraus ein IDLModule zu erstellen (siehe Abbildung
+\ref{fig:fdm-compiler}). Diese IDLModule beinhaltet alle Klassen. Jede Klasse hat eine Ansammlung von Methoden.
+Der Compiler schreibt nachdem die IDL-Datei geparsed wurde alle erkannten Klassen im Modul der IDL-Datei mit Hilfe der
+Translator an den angegeben Ausgabepfad.\\
+
+Die Translator haben ein fest definiertes Interface. Dadurch können leichter neue Translator erstellt werden und
+Translator ausgetauscht werden. Außerdem ist dadurch der Übersetzungsprozess logisch von der Syntax der zu übersetzenden
+Klasse getrennt.
+Es gibt insgesamt zwei Translators. Einen um die Stubs (ImplBase) zu erstellen und einen
+um die Proxy Klassen zu erstellen. Die Translators sind also dafür zuständig die IDLModules zu kompilieren in die
+gewünschten Java Klassen.\\
+
+Die Parser Komponente und die IDLModel Komponente wurden mit Hilfe der vorgegeben Klassen aus der Aufgabe erstellt und
+erweitert.
 
 \subsection{mware lib}
 \subsubsection{Aufgabe und Verantwortung}
