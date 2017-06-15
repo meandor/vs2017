@@ -173,13 +173,13 @@ Der Nameservice Empfängt Nachrichten im folgenden Format:
     \item Port des NameServices
 \end{itemize}
 
-\subsection{IDL Compiler}
+\subsection{IDL Compiler (Neptr)}
 \subsubsection{Aufgabe und Verantwortung}
 Der IDL Compiler hat die Aufgabe, eine gegebene Modulbeschreibung aus einer \texttt{.idl-Datei} im IDL Format einzulesen
 und daraus Java-Code zu generieren.\\
 
-Es wird eine Abstrakte Klasse Java generiert (ImplBase bzw. Stub). Diese wird auf Serverseite eingebunden und zu einer
-konkreten Klasse abgeleitet.\\
+Es wird eine Abstrakte Java Klasse generiert (ImplBase bzw. Stub). Diese wird auf serverseitig eingebunden und zu einer
+konkreten Klasse abgeleitet, die die Methodenrümpfe implementiert.\\
 
 Darüber hinaus soll der Compiler eine Proxy - Klasse für die Clientseite generieren, welche die Methodenaufrufe auf dem
 entfernten Server Objekt weiterleitet und ausführt. Das Proxy Objekt wird mit der Abstrakten Klasse (Stub) im Client
@@ -213,7 +213,7 @@ Die erzeugten Binaries können wie folgt ausgeführt werden:\\
 
 \subsubsection{Entwurfsentscheidungen}
 Der Compiler besteht aus vier Komponenten (siehe Abbildung \ref{fig:compiler-component-diagram}). In der
-Hauptkomponente (Compiler) ist der eigentliche Compiler mit seiner Hauptmethode. Diese wird nach außen frei gegeben.
+Hauptkomponente (Compiler) ist der eigentliche Compiler mit seiner Mainmethode. Diese wird nach außen frei gegeben.
 
 Der Compiler benutzt den Parser um eine IDL-Datei zu parsen und daraus ein IDLModule zu erstellen (siehe Abbildung
 \ref{fig:fdm-compiler}). Diese IDLModule beinhaltet alle Klassen. Jede Klasse hat eine Ansammlung von Methoden.
