@@ -1,4 +1,4 @@
-package de.haw.vs.nameservice;
+package de.haw.vs.enchiridion;
 
 import org.junit.Before;
 import org.junit.Test;

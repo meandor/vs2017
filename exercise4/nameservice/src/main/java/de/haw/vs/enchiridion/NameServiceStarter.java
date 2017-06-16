@@ -1,7 +1,7 @@
-package de.haw.vs.nameservice;
+package de.haw.vs.enchiridion;
 
-import de.haw.vs.nameservice.connectionhandler.IServer;
-import de.haw.vs.nameservice.connectionhandler.Server;
+import de.haw.vs.enchiridion.connectionhandler.IServer;
+import de.haw.vs.enchiridion.connectionhandler.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +22,8 @@ public class NameServiceStarter {
     }
 
     String helpText() {
-        return "Execute: nameservice [PORT]\n" +
-                "Will start the nameservice at the given port.\n";
+        return "Execute: enchiridion [PORT]\n" +
+                "Will start the enchiridion at the given port.\n";
     }
 
     void startNameServiceServer(int port) {

@@ -1,4 +1,4 @@
-package de.haw.vs.nameservice.connectionhandler;
+package de.haw.vs.enchiridion.connectionhandler;
 
 /**
  * Interface for the NameService Server.

@@ -1,4 +1,4 @@
-package de.haw.vs.nameservice;
+package de.haw.vs.enchiridion;
 
 import org.junit.Test;
 
@@ -24,7 +24,7 @@ public class EndToEndTest {
     @Test
     public void testRebindAndResolveScenario() throws Exception {
         threadPool.submit(() -> NameServiceStarter.main(new String[]{"27017"}));
-        Thread.sleep(300);
+        Thread.sleep(1000);
         Runnable rebindClient = new RebindTestClient(27017, "localhost", rebindMessage());
         threadPool.submit(rebindClient);
         Thread.sleep(1000);

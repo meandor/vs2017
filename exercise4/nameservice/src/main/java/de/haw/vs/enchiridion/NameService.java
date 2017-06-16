@@ -1,4 +1,4 @@
-package de.haw.vs.nameservice;
+package de.haw.vs.enchiridion;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

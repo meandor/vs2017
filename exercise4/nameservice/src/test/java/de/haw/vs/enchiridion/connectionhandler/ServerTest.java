@@ -1,4 +1,4 @@
-package de.haw.vs.nameservice.connectionhandler;
+package de.haw.vs.enchiridion.connectionhandler;
 
 import org.junit.Before;
 import org.junit.Test;

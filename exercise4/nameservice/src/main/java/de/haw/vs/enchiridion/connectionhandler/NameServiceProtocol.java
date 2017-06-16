@@ -1,4 +1,4 @@
-package de.haw.vs.nameservice.connectionhandler;
+package de.haw.vs.enchiridion.connectionhandler;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

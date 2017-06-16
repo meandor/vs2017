@@ -1,6 +1,6 @@
-package de.haw.vs.nameservice.connectionhandler;
+package de.haw.vs.enchiridion.connectionhandler;
 
-import de.haw.vs.nameservice.NameService;
+import de.haw.vs.enchiridion.NameService;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
