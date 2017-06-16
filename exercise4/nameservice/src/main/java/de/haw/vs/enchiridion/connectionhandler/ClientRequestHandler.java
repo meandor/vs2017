@@ -9,14 +9,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class ClientRequestHandler implements IClientRequestHandler {
 
     private Socket socket;
     private volatile boolean stopping;
     private NameService nameService;
-    private final Logger log = LoggerFactory.getLogger(ClientRequestHandler.class);
     private ObjectOutputStream output;
+    private final Logger log = LoggerFactory.getLogger(ClientRequestHandler.class);
+    private final int clientTimeout = 10000;
 
     public ClientRequestHandler(Socket socket) {
         this.socket = socket;
@@ -61,13 +63,15 @@ public class ClientRequestHandler implements IClientRequestHandler {
         log.info("Starting Client Thread");
         InputStream in;
         this.output = null;
-
         try {
+            this.socket.setSoTimeout(this.clientTimeout);
             in = socket.getInputStream();
             this.output = new ObjectOutputStream(socket.getOutputStream());
             while (!stopping) {
                 this.handleIncomingRequest(IOUtils.toByteArray(in));
             }
+        } catch (SocketException e) {
+            log.warn("Client took too long", e);
         } catch (IOException e) {
             log.warn("Error during IO Operation", e);
         }
