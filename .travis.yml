@@ -1,4 +1,8 @@
 language: java
+
+jdk:
+  - oraclejdk8
+
 env:
  - TEST_DIR=exercise4/idl-compiler
  - TEST_DIR=exercise4/middleware
