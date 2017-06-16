@@ -43,7 +43,7 @@
 	\item 14.06.2017 4 Stunden (DS)
 	\item 14.06.2017 5 Stunden (FW)
 	\item 15.06.2017 5 Stunden (DS)
-	\item 15.06.2017 5 Stunden (DS)
+	\item 16.06.2017 5 Stunden (DS)
 \end{itemize}
 
 \textbf{Aktueller Stand:}
@@ -139,6 +139,13 @@ nicht direkt über die Kommandozeile startbar.
     \label{fig:nameservice-component-diagram}
 \end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{Middleware_Components.png}
+    \caption[middleware-components]{Komponentendiagramm der Middleware Library (mware\_lib)}
+    \label{fig:middleware-components-diagram}
+\end{figure}
+
 \subsection{Laufzeitsicht}
 %\begin{figure}[H]
 %    \centering
@@ -196,7 +203,7 @@ Die erzeugten Binaries können wie folgt ausgeführt werden:\\
 
 \texttt{./bin/enchiridion <Port>}
 
-\subsubsection{Entwurfsentscheidungen}
+\subsubsection{Entwurfsentscheidungen} \label{nameservice-entwurf}
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{nameservice-fdm.png}
@@ -310,33 +317,136 @@ gewünschten Java Klassen.\\
 Die Parser Komponente und die IDLModel Komponente wurden mit Hilfe der vorgegeben Klassen aus der Aufgabe erstellt und
 erweitert.
 
-\subsection{mware lib}
+\subsection{mware\_lib}
 \subsubsection{Aufgabe und Verantwortung}
-Die Bibiothek / das Package mware lib stellt die Kernfunktionalität bereit.
-Die Schnitstelle nach außen ist die Klasse ObjectBroker, die eine Referenz auf eine
-Implementierung des NameService Protokolls hält.
+Die Bibiothek mware\_lib stellt die Middleware für entfernte Methodenaufrufe dar. Sie ist vergleichbar mit einem ORB in
+einer CORBA Umgebung. Sie ist dafür zuständig, über den NameService Objekte über einen Namen anzusprechen und die
+Methoden der Objekte auf einem entfernten Server aufzurufen. Außerdem müssen Server mit Hilfe der Middleware Objekte im
+NameService anmelden können.
 
+Die Middleware muss also vom Client und dem Server eingebunden werden.
 
 \subsubsection{Schnittstelle}
 \begin{lstlisting}
-public NameService getNameService();
-Gibt die Referenz auf das Proxyobjekt fuer den NameService an den Aufrufer.
-public void shutDown();
-Beendet den Object Request Broker und seine Dependencies.
+public class ObjectBroker {
+    /**
+     * Main entry point to the middleware.
+     *
+     * @param serviceHost String host of NameService
+     * @param listenPort  int Port of NameService
+     * @param debug       boolean indicates extra logging
+     * @return ObjectBroker
+     */
+    public static ObjectBroker init(String serviceHost, int listenPort, boolean debug);
+
+    /**
+     * Returns the NameService (proxy Object / Client).
+     *
+     * @return NameService
+     */
+    public NameService getNameService();
+
+    /**
+     * Initiates the shutting down sequence for the middleware.
+     */
+    public void shutDown();
+}
+
+/**
+ * Interface for communication between ObjectBroker
+ */
+public class Communication {
+    /**
+     * Invokes a method for a given Object and returns the result
+     *
+     * @param ref       ObjectReference of the method
+     * @param method    String method name
+     * @param args      Object.. arguments of the method
+     * @return Object result of the called method
+     */
+    public Object invoke(ObjectReference ref, String method, Object.. args);
+
+    /**
+     * Starts the receiver
+     */
+    public void startReceiver();
+
+    /**
+     * Handles incoming requests, calls function locally and answers request
+     *
+     * @param clientSocket    Socket from incoming client
+     */
+    public Runnable handleIncomingRequest(Socket clientSocket);
+}
 \end{lstlisting}
 
 \subsubsection{Entwurfsentscheidungen}
-Der Object Request Broker wird gemäß Vorgabe in einer statischen Methode initialisiert.
-Hierbei wird ein Nameservice Proxyobjekt erzeugt, und zur weiteren Verwendung referenziert.
-Das Nameservice Proxyobjekt leitet alle Methodenaufrufe des NameService an eine entfernte
-NameService Instanz per TCP weiter.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Middleware_FDM.png}
+    \caption[fdm-middleware]{Fachliches Daten Modell des Middleware}
+    \label{fig:fdm-middleware}
+\end{figure}
+
+Der ObjectBroker wird gemäß Vorgabe in einer statischen Methode initialisiert. Außerdem wird er mit dem
+Singleton Pattern realisiert. Server und Client Anwendungen interagieren über den ObjectBroker mit der Middleware.
+Der ObjectBroker kann also zum Einen im Server Kontext und zum Anderen im Client Kontext benutzt werden.\\
+
+In der Communication Komponente der Middleware ist das Communication Modul. Dieses Modul ist für die Kommunikation
+zwischen verschiedenen Instanzen der Middleware zuständig (GIOP). Die Kommunikation wird über den Port 9002 via TCP
+geführt.
+
+Dazu wird die Anfrage des entfernten Methodenaufrufes eines Objektes an das Communication Modul der Middleware des
+Servers gesendet. Das Protokoll schickt serialisierte Objekte. Anfragen für entfernte Methodenaufrufe werden durch ein
+RemoteCall Objekt realisiert. Die Antworten werden als Objekte an den anfragenden Client zurückgeschickt.
+
+Wenn eine Methode aufgerufen wird, die nicht im entfernten Objekt exisitert, sendet das Communication Modul des Servers
+als Antwort eine RuntimeException an das CommunicationModul der Middleware des aufrufenden Clients.\\
+
+Das Communication Modul ist ein nebenläufiger Prozess, der startet, sobald der ObjektBroker initalisiert wird
+(\texttt{startReceiver}). Pro eintreffende Client Anfrage wird ein neuer Prozess gestartet
+(\texttt{handleIncomingRequest}), der die Anfrage bearbeitet und beantwortet. Dazu wird das ObjectBroker Singleton
+aufgerufen, um die Methode für das ObjectReference lokal auszuführen (\texttt{localCall} im ObjectBroker).\\
+
+Ausgehende Anfragen vom Communication Modul werden durch die Schnittstellenmethode \texttt{invoke} ausgeführt.
+Dabei wird die Anfrage an den Server gesendet, der aus der ObjectReference ersichtlich ist. Die Antwort der Anfrage
+wird dann als Objekt gelesen und weitergeleitet. Die Anfrage kann dabei mit einer RuntimeException beantwortet werden.
+Diese wird durch das Communication Modul dann einfach an die aufrufende Komponente weitergeleitet.
+
+Falls keine Antwort kommt (clientTimeout - 10s), wird auch eine RuntimeException an die aufrufende Komponente
+weitergeleitet.\\
+
+Der ObjectBroker beinhaltet zusätlich einen Client für den NameService in der NameService Komponente. Dieser sendet
+Nachrichten über das NameServiceProtocol (siehe Abschnitt \ref{nameservice-entwurf}). Er empfängt serialisierte
+ObjectReference Objekte. Er implementiert die clientseitigen Methoden für \texttt{resolve} und \texttt{rebind}.
+
+Den Hostnamen und den Port des NameService Servers bekommt er durch den ObjectBroker weitergereicht
+(\texttt{init} des ObjectBrokers). Der NameService wird durch den ObjectBroker also erstellt und ist in diesem
+referenziert. Der NameService beinhaltet zusätzlich eine Map, in der lokale Objekte mit einem Namen hinterlegt sind.
+Diese lokale Registry wird für einkommende Anfragen eines entfernten Methodenaufrufes verwendet. Mit dieser lokalen
+Registry können dann die Namen in lokale Objekte aufgelöst werden, die dann zum Ausführen der Methoden verwendet werden.
+Die lokale Registry ist threadsafe, damit parallele Anfragen bearbeitet werden können.\\
+
+Der ObjectBroker an sich ist ein Singleton, das eine Referenz zum Communication Modul und zum NameService (Proxy) hält.
+Ein entfernter Methodenaufruf wird über die vom Compiler erstellten Klassen ausgeführt.
+
+Dafür wird zunächst mit Hilfe des NameService des ObjectBrokers per \texttt{resolve} die ObjectReference geholt. Diese
+wird per \texttt{narrowCast} in ihr Stellvertreterobjekt transformiert (Proxy). Dieses Stellvertreterobjekt leitet alle
+Methodenaufrufe an die \texttt{remoteCall} Methode des ObjectBrokers weiter. Dieser delegiert das an sein Communication
+Modul, das die Antwort an den ObjectBroker zurückgibt. Der ObjectBroker gibt die Antwort dann an das
+Stellvertreterobjekt weiter. Diese Antwort kann eine RuntimeException sein.
+
+Ein lokaler Methodenaufruf wird vom Communication Modul an den ObjectBroker gesendet. Der ObjectBroker löst den Namen
+mit seinem NameService in ein lokales Objekt auf und führt die Methode auf diesem aus, wenn sie vorhanden ist. Das
+Ergebnis der Methode wird an das Communication Modul weitergeleitet. Ansonsten wird eine RuntimeException an das
+Communication Modul weitergeleitet.
 
 \subsubsection{Konfigurationsparameter}
 
 \begin{itemize}
-    \item host: Der Hostname des entfernten NameService
-    \item Port: Der Port des entfernten NameService
-	\item Debug: Konfiguriert, ob debug ausgaben geloggt werden sollen.
+    \item Host, der Hostname des entfernten NameService
+    \item Port, der Port des entfernten NameService
+	\item Debug, boolean konfiguriert, ob debug Nachrichten geloggt werden sollen
 \end{itemize}
 
 
