@@ -154,6 +154,13 @@ nicht direkt über die Kommandozeile startbar.
     \label{fig:full-seq-diagram}
 \end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{rebind-seq.png}
+    \caption[rebind-seq-diagram]{Sequenzdiagramm eines Rebinds von einem Objekt}
+    \label{fig:full-seq-diagram}
+\end{figure}
+
 \newpage
 
 \section{Subsysteme und Komponenten}
@@ -227,7 +234,7 @@ Der NameService besteht aus der Hauptkomponente und der ConnectionHandler Kompon
 \ref{fig:nameservice-component-diagram}).\\
 
 Die Hauptkomponente enthält den eigentlichen NameService. Der hat eine Registry, die eine Map darstellt, in der Namen
-auf Objektreferenzen abgebildet werden. Diese Registry ist Threadsafe, da mehrere Clients parallel auf diese
+auf Objektreferenzen abgebildet werden. Diese Registry ist threadsafe, da mehrere Clients parallel auf diese
 zugreifen müssen und diese eventuell verändern können.
 
 Der NameService an sich ist ein Singleton, wodurch sichergestellt wird, dass nur eine zentrale Stelle existiert, die
