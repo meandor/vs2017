@@ -41,13 +41,14 @@
 	\item 12.06.2017 2 Stunden (DS)
 	\item 14.06.2017 4 Stunden (DS)
 	\item 15.06.2017 5 Stunden (DS)
+	\item 15.06.2017 5 Stunden (DS)
 \end{itemize}
 
 \textbf{Aktueller Stand:}
 \begin{itemize}
 	\item IDL Compiler fertig und getestet
-    \item Namensdienst
-    \item mware\_lib Library
+    \item Namensdienst fertig und getestet
+    \item mware\_lib Library fertig und getestet
 \end{itemize}
 
 \textbf{Änderung des Entwurfs:}
@@ -59,22 +60,22 @@
 
 \section{Einführung und Ziele}
 Es soll eine einfache objektorientierte Middleware entworfen werden, die Methodenaufrufe
-eines entfernten Objektes ermöglicht.
+eines entfernten Objektes ermöglicht.\\
 
 Zur Orientierung gilt hierbei die CORBA Architektur. Genauer soll hier ein ORB zur
-Verfügung gestellt werden, der es ermöglicht Methoden von entfernten Objekten aufzurufen.
+Verfügung gestellt werden, der es ermöglicht Methoden von entfernten Objekten aufzurufen.\\
 
 Zur Abstraktion und Beschreibung der Schnittstellen der Objekte soll eine IDL verwendet werden.
-Diese IDL wird dann zur Erzeugung von Klassen- und Methodenrümpfen verwendet.
+Diese IDL wird dann zur Erzeugung von Klassen- und Methodenrümpfen verwendet.\\
 
 Außerdem beinhaltet der ORB einen Namensdienst, der Objektreferenzen in einem Netz mit Namen finden
-kann.
+kann.\\
 
 Die Middleware an sich soll durch eine Library abstrahiert und verwendbar sein.
 
 \subsection{Randbedingungen}
 Der Namensdienst soll auf einem entfernten Rechner unabhängig von der Middleware Library
-lauffähig sein. Der Port muss zur Laufzeit einstellbar sein.
+lauffähig sein. Der Port muss zur Laufzeit einstellbar sein.\\
 
 Der IDL-Compiler soll in einem Package oder einer \texttt{.jar} Datei zur Verfügung gestellt
 werden. Der Compiler soll folgende IDL Typen unterstützen:
@@ -97,10 +98,10 @@ module math_ops {
 };
 \end{lstlisting}
 
-Die Middleware Library soll in einem Package \texttt{mware\_lib} zusammengefasst werden.
+Die Middleware Library soll in einem Package \texttt{mware\_lib} zusammengefasst werden.\\
 
 Wenn eine Serverapplikation während eines entfernten Methodenaufrufes eine RuntimeException
-wirft, soll diese an den Aufrufer weitergeleitet werden.
+wirft, soll diese an den Aufrufer weitergeleitet werden.\\
 
 Es soll möglich sein, dass zwei oder mehrere Klienten die selbe Objektreferenz zeitgleich
 nutzen wollen. Das soll innerhalb der Middleware nicht zu Deadlocks führen.
@@ -129,6 +130,13 @@ nicht direkt über die Kommandozeile startbar.
     \label{fig:compiler-component-diagram}
 \end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{nameservice-components.png}
+    \caption[nameservice-components]{Komponentendiagramm des NameServices Server (Enchiridion)}
+    \label{fig:nameservice-component-diagram}
+\end{figure}
+
 \subsection{Laufzeitsicht}
 %\begin{figure}[H]
 %    \centering
@@ -144,33 +152,103 @@ nicht direkt über die Kommandozeile startbar.
 \subsection{NameService}
 \subsubsection{Aufgabe und Verantwortung}
 Der NameService bildet Namen auf Objektreferenzen ab. Er wird verwendet, um Objekte anhand
-ihres Namens zu finden und anzusprechen und um Objekte anzumelden.
+ihres Namens zu finden und anzusprechen und um Objekte anzumelden. Er besteht dabei aus einem Client und einem Server.
 
 \subsubsection{Schnittstelle}
+Die Schnittstellen zwischen dem Client und dem Server tauschen Nachrichten per TCP mittels
+u.g. Nachrichtenformat (Entwurfsentscheidungen) an gegebenem Port aus.
 \begin{lstlisting}
-Die Schnittstellen sind ansprechbar mittels u.g. 
-Nachrichtenformat per TCP an gegebenem Port. 
-public void rebind(Object servant, String name); 
-Bindet ein Objekt an einen Platzhalter im Namensdienst.
-public Object resolve(String name); 
-Loest eine Namensreferenz auf ein Java - Objekt auf.
-Das Ergebnis wird als serialisiertes Java - Objekt per TCP an den Aufrufer gesendet.
+public abstract class NameService {
+
+    /**
+     * Registers an Object (servant) at the NameService
+     *
+     * @param servant Object to register
+     * @param name    String representation of the object
+     */
+    public abstract void rebind(Object servant, String name);
+
+    /**
+     * Returns the Object reference from the given servant
+     *
+     * @param name String of servant
+     * @return general Object reference
+     */
+    public abstract Object resolve(String name);
+}
+
+public class NameServiceStarter {
+    /**
+     * Ueber die main - Methode der Klasse NameServiceStarter
+     * kann der NameService (Server) gestartet werden.
+     */
+    public static void main(String[] args);
+}
 \end{lstlisting}
+Zu übergebene Argumente sind:
+\begin{itemize}
+	\item args[0]: Port auf dem der NameService Server laufen soll
+\end{itemize}
+
+Die erzeugten Binaries können wie folgt ausgeführt werden:\\
+
+\texttt{./bin/enchiridion <Port>}
 
 \subsubsection{Entwurfsentscheidungen}
-Der Port, an dem der NameService läuft ist zur Laufzeit einstellbar. Das geschieht über
-den Startparameter.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{nameservice-fdm.png}
+    \caption[fdm-nameservice]{Fachliches Daten Modell des NameServices}
+    \label{fig:fdm-nameservice}
+\end{figure}
+
+Der NameService an sich besteht aus einem Server, der Anfragen entgegennehmen kann.
+Der Client des NameServices ist in der Middleware enthalten.
+
+Der Port, an dem der NameService läuft ist zur Laufzeit einstellbar. Das geschieht über den Startparameter.\\
 
 Der Nameservice Empfängt Nachrichten im folgenden Format:
 \begin{itemize}
-\item Byte 0: Art des Befehls. (0 = Rebind, 1 = Resolve, 2 = Shutdown) 
+\item Byte 0: Art des Befehls. (0 = Rebind, 1 = Resolve)
 \item Byte 1 - 11: Alias für rebind / resolve
-\item Byte 12 - n: Serialisiertes Objekt
+\item Byte 12 - n: Serialisiertes Referenz Objekt, nur für rebind benötigt
 \end{itemize}
+
+Der NameService besteht aus der Hauptkomponente und der ConnectionHandler Komponente (siehe Abbildung
+\ref{fig:nameservice-component-diagram}).\\
+
+Die Hauptkomponente enthält den eigentlichen NameService. Der hat eine Registry, die eine Map darstellt, in der Namen
+auf Objektreferenzen abgebildet werden. Diese Registry ist Threadsafe, da mehrere Clients parallel auf diese
+zugreifen müssen und diese eventuell verändern können.
+
+Der NameService an sich ist ein Singleton, wodurch sichergestellt wird, dass nur eine zentrale Stelle existiert, die
+die benötigten Informationen (Registry) enthält.
+
+In der Hauptkomponente ist außerdem ein NameServiceStarter enthalten, der den NameService Server mit dem übergebenen
+Port startet.\\
+
+Die ConnectionHandler Komponente ist für die einkommenden Verbindungen zuständig. In der Komponente ist der Server, der
+durch einen Prozess realisiert wird. Der Prozess lauscht auf dem Socket und nimmt eventuelle Client Anfragen entgegen.
+
+Jede einkommende Client Anfrage startet einen neuen ClientRequestHandler Prozess.\\
+
+Der ClientRequestHandler Prozess dekodiert die einkommende Nachricht des Clients und versucht diese zu bearbeiten.
+Mit Hilfe des Protokolls wird entweder ein Resolve oder ein Rebind durchgeführt.
+
+Bei einem Resolve wird die passende Objektreferenz aus der Registry des NameServices übergeben. Wenn keine gefunden
+wird, wird als Antwort das leere Element an den Client übergeben.
+
+Bei einem Rebind wird die mit übermittelte Objektreferenz mit dem gegebenen Namen in der Registry des NameServices
+hinterlegt.\\
+
+Wenn Fehler beim Bearbeiten der an den NameService Server übermittelten Nachrichten auftreten, wird die Nachricht an
+sich verworfen und die Verbindung des Clients serverseitig abgebaut. Wenn Client Anfragen zu lange brauchen, werden
+diese abbgebrochen und verworfen (timeout).
 
 \subsubsection{Konfigurationsparameter}
 \begin{itemize}
     \item Port des NameServices
+    \item Timeout für einkommende Nachrichten in Sekunden (10s)
 \end{itemize}
 
 \subsection{IDL Compiler (Neptr)}
@@ -184,13 +262,6 @@ konkreten Klasse abgeleitet, die die Methodenrümpfe implementiert.\\
 Darüber hinaus soll der Compiler eine Proxy - Klasse für die Clientseite generieren, welche die Methodenaufrufe auf dem
 entfernten Server Objekt weiterleitet und ausführt. Das Proxy Objekt wird mit der Abstrakten Klasse (Stub) im Client
 per narrowCast Methode erstellt.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{Compiler_FDM.png}
-    \caption[fdm-compiler]{Fachliches Daten Modell des IDL-Compilers}
-    \label{fig:fdm-compiler}
-\end{figure}
 
 \subsubsection{Schnittstelle}
 \begin{lstlisting}
@@ -212,6 +283,13 @@ Die erzeugten Binaries können wie folgt ausgeführt werden:\\
 \texttt{./bin/neptr <IDL-Dateipfad> <Ausgabe-Ordner>}
 
 \subsubsection{Entwurfsentscheidungen}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Compiler_FDM.png}
+    \caption[fdm-compiler]{Fachliches Daten Modell des IDL-Compilers}
+    \label{fig:fdm-compiler}
+\end{figure}
+
 Der Compiler besteht aus vier Komponenten (siehe Abbildung \ref{fig:compiler-component-diagram}). In der
 Hauptkomponente (Compiler) ist der eigentliche Compiler mit seiner Mainmethode. Diese wird nach außen frei gegeben.
 
