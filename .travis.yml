@@ -2,5 +2,6 @@ language: java
 env:
  - TEST_DIR=exercise4/idl-compiler
  - TEST_DIR=exercise4/middleware
+ - TEST_DIR=exercise4/nameservice
 
 before_install: cd $TEST_DIR
