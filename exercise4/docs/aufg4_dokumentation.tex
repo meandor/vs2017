@@ -220,7 +220,7 @@ Der Nameservice Empfängt Nachrichten im folgenden Format:
 \begin{itemize}
 \item Byte 0: Art des Befehls. (0 = Rebind, 1 = Resolve)
 \item Byte 1 - 11: Alias für rebind / resolve
-\item Byte 12 - n: Serialisiertes Referenz Objekt, nur für rebind benötigt
+\item Byte 12 - n: Serialisiertes Referenz Objekt (ObjectReference), nur für rebind benötigt
 \end{itemize}
 
 Der NameService besteht aus der Hauptkomponente und der ConnectionHandler Komponente (siehe Abbildung
@@ -423,6 +423,7 @@ ObjectReference Objekte. Er implementiert die clientseitigen Methoden für \text
 Den Hostnamen und den Port des NameService Servers bekommt er durch den ObjectBroker weitergereicht
 (\texttt{init} des ObjectBrokers). Der NameService wird durch den ObjectBroker also erstellt und ist in diesem
 referenziert. Der NameService beinhaltet zusätzlich eine Map, in der lokale Objekte mit einem Namen hinterlegt sind.
+Bei einem \texttt{rebind} werden die Objekte zusätzlich in dieser Map registriert.
 Diese lokale Registry wird für einkommende Anfragen eines entfernten Methodenaufrufes verwendet. Mit dieser lokalen
 Registry können dann die Namen in lokale Objekte aufgelöst werden, die dann zum Ausführen der Methoden verwendet werden.
 Die lokale Registry ist threadsafe, damit parallele Anfragen bearbeitet werden können.\\
