@@ -147,12 +147,12 @@ nicht direkt über die Kommandozeile startbar.
 \end{figure}
 
 \subsection{Laufzeitsicht}
-%\begin{figure}[H]
-%    \centering
-%    \includegraphics[width=1.0\textwidth]{sequence-diagram.png}
-%    \caption[seq-dia]{Eine ggT Berechnung mit Abbruch per Voting}
-%    \label{fig:seq-diagram}
-%\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{full-sequence.png}
+    \caption[full-seq-diagram]{Sequenzdiagramm eines entfernten Methodenaufrufes mit der Middleware}
+    \label{fig:full-seq-diagram}
+\end{figure}
 
 \newpage
 
@@ -440,7 +440,10 @@ Stellvertreterobjekt weiter. Diese Antwort kann eine RuntimeException sein.
 Ein lokaler Methodenaufruf wird vom Communication Modul an den ObjectBroker gesendet. Der ObjectBroker löst den Namen
 mit seinem NameService in ein lokales Objekt auf und führt die Methode auf diesem aus, wenn sie vorhanden ist. Das
 Ergebnis der Methode wird an das Communication Modul weitergeleitet. Ansonsten wird eine RuntimeException an das
-Communication Modul weitergeleitet.
+Communication Modul weitergeleitet.\\
+
+Bei einem \texttt{shutdown} im ObjectBroker wird das Communication Modul gestoppt (\texttt{stopReceiver}) und die
+eigene Referenz des ObjectBrokers im ObjectBroker auf das leere Element gesetzt (wegen Singleton).
 
 \subsubsection{Konfigurationsparameter}
 
