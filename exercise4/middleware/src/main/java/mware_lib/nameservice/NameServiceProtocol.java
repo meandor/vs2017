@@ -47,7 +47,7 @@ public class NameServiceProtocol {
         }
     }
 
-    static byte[] serializeObject(Object object) throws IOException {
+    public static byte[] serializeObject(Object object) throws IOException {
         try (ByteArrayOutputStream output = new ByteArrayOutputStream();
              ObjectOutput objectOutput = new ObjectOutputStream(output)) {
             objectOutput.writeObject(object);
