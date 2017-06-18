@@ -1,5 +1,8 @@
 package mware_lib;
 
+import mware_lib.nameservice.NameService;
+import mware_lib.nameservice.NameServiceProxy;
+
 /**
  * This class acts as the main entry point for the middleware.
  */

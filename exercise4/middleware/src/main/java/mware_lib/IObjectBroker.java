@@ -1,5 +1,7 @@
 package mware_lib;
 
+import mware_lib.nameservice.NameService;
+
 /**
  * Interface for the ObjectBroker.
  * The ObjectBroker should be used to interact with the library.

@@ -1,4 +1,4 @@
-package mware_lib;
+package mware_lib.nameservice;
 
 /**
  * Abstract class used as an Interface for the NameService.

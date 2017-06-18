@@ -1,5 +1,5 @@
 <configuration>
-    <contextName>NameService</contextName>
+    <contextName>Enchiridion</contextName>
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>>%date{HH:mm:ss.SSS} [%thread] %-5level %logger{15} - %m %n</pattern>
