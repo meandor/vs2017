@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'application'
 
-version = '0.1.1'
+version = '0.1.2-SNAPSHOT'
 group = 'de.haw.vs'
 sourceCompatibility = 1.8
 
