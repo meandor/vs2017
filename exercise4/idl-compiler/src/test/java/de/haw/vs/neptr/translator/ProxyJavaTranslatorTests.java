@@ -18,7 +18,7 @@ public class ProxyJavaTranslatorTests {
         String moduleDeclaration = testee.declareModule(new IDLClass(null, "math_ops", null));
         assertEquals("package math_ops;\n" +
                 "\n" +
-                "import mware_lib.nameservice.ObjectReference;\n" +
+                "import de.haw.vs.nameservice.ObjectReference;\n" +
                 "import mware_lib.ObjectBroker;\n", moduleDeclaration);
     }
 

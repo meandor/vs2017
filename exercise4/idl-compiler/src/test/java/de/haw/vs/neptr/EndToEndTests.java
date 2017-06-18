@@ -43,7 +43,7 @@ public class EndToEndTests {
 
         List<String> proxyExpectedContent = new ArrayList<>();
         proxyExpectedContent.add("package math_ops2;");
-        proxyExpectedContent.add("import mware_lib.nameservice.ObjectReference;");
+        proxyExpectedContent.add("import de.haw.vs.nameservice.ObjectReference;");
         proxyExpectedContent.add("import mware_lib.ObjectBroker;");
         proxyExpectedContent.add("public class _Calculator2Proxy extends _Calculator2ImplBase {");
         proxyExpectedContent.add("\tprivate ObjectBroker objectBroker;");
