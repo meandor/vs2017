@@ -1,5 +1,6 @@
 package mware_lib.nameservice;
 
+import de.haw.vs.nameservice.ObjectReference;
 import org.junit.Before;
 import org.junit.Test;
 

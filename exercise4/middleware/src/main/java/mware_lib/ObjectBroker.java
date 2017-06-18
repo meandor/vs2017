@@ -1,10 +1,9 @@
 package mware_lib;
 
+import de.haw.vs.nameservice.ObjectReference;
 import mware_lib.communication.Communication;
-
 import mware_lib.nameservice.NameService;
 import mware_lib.nameservice.NameServiceProxy;
-import mware_lib.nameservice.ObjectReference;
 
 /**
  * This class acts as the main entry point for the middleware.

@@ -1,5 +1,7 @@
 package mware_lib.nameservice;
 
+import de.haw.vs.nameservice.NameServiceProtocol;
+import de.haw.vs.nameservice.ObjectReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,6 +1,8 @@
 package de.haw.vs.enchiridion.connectionhandler;
 
 import de.haw.vs.enchiridion.NameService;
+import de.haw.vs.nameservice.NameServiceProtocol;
+import de.haw.vs.nameservice.ObjectReference;
 import org.junit.Before;
 import org.junit.Test;
 

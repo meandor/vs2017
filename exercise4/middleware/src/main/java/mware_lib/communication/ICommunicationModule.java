@@ -1,10 +1,11 @@
 package mware_lib.communication;
 
-import mware_lib.nameservice.ObjectReference;
+import de.haw.vs.nameservice.ObjectReference;
 
 import java.net.Socket;
 
 public interface ICommunicationModule {
+
     /**
      * Invokes a method for a given Object
      * and returns the result the method
