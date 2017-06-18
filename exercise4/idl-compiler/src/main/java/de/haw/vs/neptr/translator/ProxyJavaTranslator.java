@@ -8,16 +8,13 @@ import static de.haw.vs.neptr.translator.TranslatorUtil.getSupportedJavaDataType
 
 public class ProxyJavaTranslator implements ITranslator{
 
-    private final String JAVA_INT = "int";
-    private final String JAVA_DOUBLE = "double";
-    private final String JAVA_STRING = "String";
-
     @Override
     public String declareModule(IDLClass idlClass) {
         return "package " + idlClass.getModuleName() + ";" + "\n"
                 + "\n" +
                 "import mware_lib.ObjectBroker;" + "\n"
-                + "import mware_lib.ObjectReference;";
+                + "import mware_lib.communication.ICommunicationModule;" + "\n"
+                + "import mware_lib.communication.Communication;\n";
     }
 
     @Override
@@ -63,6 +60,8 @@ public class ProxyJavaTranslator implements ITranslator{
 
         if(methodData.getReturnType() != null){
             builder.append("\t\tObject returnValue = ");
+        } else{
+            builder.append("\t\t");
         }
 
         builder.append("this.communication.invoke(this.objectReference, ");
