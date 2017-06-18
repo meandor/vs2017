@@ -37,7 +37,7 @@ public interface ITranslator {
      * @param idlClass IDLClass to be translated
      * @return translated narrowCastMethod declaration
      */
-    public String declareNarrowCastMethod(IDLClass idlClass);
+    public String declareConstructingMethod(IDLClass idlClass);
 
     /**
      * Returns translated methods of class

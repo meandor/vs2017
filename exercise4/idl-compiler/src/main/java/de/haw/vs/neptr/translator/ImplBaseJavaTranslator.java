@@ -4,11 +4,9 @@ import de.haw.vs.neptr.idlmodel.IDLClass;
 import de.haw.vs.neptr.idlmodel.MethodData;
 import de.haw.vs.neptr.idlmodel.SupportedDataTypes;
 
-public class ImplBaseJavaTranslator implements ITranslator {
+import static de.haw.vs.neptr.translator.TranslatorUtil.getSupportedJavaDataTypeName;
 
-    private final String JAVA_INT = "int";
-    private final String JAVA_DOUBLE = "double";
-    private final String JAVA_STRING = "String";
+public class ImplBaseJavaTranslator implements ITranslator {
 
     @Override
     public String declareModule(IDLClass idlClass) {
@@ -26,7 +24,7 @@ public class ImplBaseJavaTranslator implements ITranslator {
     }
 
     @Override
-    public String declareNarrowCastMethod(IDLClass idlClass) {
+    public String declareConstructingMethod(IDLClass idlClass) {
         return "\tpublic static _" + idlClass.getClassName() + "ImplBase narrowCast(Object rawObjectRef) {\n" +
                 "\t\treturn new _" + idlClass.getClassName() + "Proxy(rawObjectRef);\n" +
                 "\t}";
@@ -41,12 +39,14 @@ public class ImplBaseJavaTranslator implements ITranslator {
         builder.append(methodData.getName());
         builder.append("(");
         char c = 'a';
+
         for (SupportedDataTypes type : methodData.getParamTypes()) {
             builder.append(getSupportedJavaDataTypeName(type));
             builder.append(" ");
             builder.append(c++);
             builder.append(", ");
         }
+
         builder.delete(builder.length() - 2, builder.length());
         builder.append(") throws Exception;");
         return builder.toString();
@@ -57,19 +57,4 @@ public class ImplBaseJavaTranslator implements ITranslator {
         return "_" + idlClass.getClassName() + "ImplBase.java";
     }
 
-    /**
-     * Get string representation of data type
-     */
-    private String getSupportedJavaDataTypeName(SupportedDataTypes type) {
-        switch (type) {
-            case INT:
-                return JAVA_INT;
-            case DOUBLE:
-                return JAVA_DOUBLE;
-            case STRING:
-                return JAVA_STRING;
-            default:
-                return null;
-        }
-    }
 }

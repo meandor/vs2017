@@ -6,6 +6,7 @@ import de.haw.vs.neptr.idlmodel.MethodData;
 import de.haw.vs.neptr.parser.Parser;
 import de.haw.vs.neptr.translator.ITranslator;
 import de.haw.vs.neptr.translator.ImplBaseJavaTranslator;
+import de.haw.vs.neptr.translator.ProxyJavaTranslator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +37,7 @@ public class Compiler {
         List<String> result = new ArrayList<>();
         result.add(translator.declareModule(idlClass));
         result.add(translator.openClassDeclaration(idlClass));
-        result.add(translator.declareNarrowCastMethod(idlClass));
+        result.add(translator.declareConstructingMethod(idlClass));
         for (MethodData methodData : idlClass.getMethods()) {
             result.add(translator.declareMethod(methodData));
         }
@@ -60,6 +61,7 @@ public class Compiler {
 
                 logger.info("Generating Java STUBS, writing to: " + outputFolder);
                 compiler.writeModuleClasses(outputFolder, module, new ImplBaseJavaTranslator());
+                compiler.writeModuleClasses(outputFolder, module, new ProxyJavaTranslator());
                 logger.info("Successfully compiled Java stubs");
             } catch (IOException e) {
                 logger.error("Could not write files", e);

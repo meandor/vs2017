@@ -24,7 +24,7 @@ class TestTranslator implements ITranslator {
     }
 
     @Override
-    public String declareNarrowCastMethod(IDLClass idLclass) {
+    public String declareConstructingMethod(IDLClass idLclass) {
         return "narrow-cast:" + idLclass.getClassName();
     }
 

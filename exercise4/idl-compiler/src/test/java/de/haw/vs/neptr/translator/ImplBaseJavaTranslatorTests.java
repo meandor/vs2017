@@ -20,7 +20,7 @@ public class ImplBaseJavaTranslatorTests {
 
     @Test
     public void testImplementNarrowCast() {
-        String narrowCastMethod = testee.declareNarrowCastMethod(new IDLClass("Calculator", "math_ops", null));
+        String narrowCastMethod = testee.declareConstructingMethod(new IDLClass("Calculator", "math_ops", null));
         String expected =
                 "\tpublic static _CalculatorImplBase narrowCast(Object rawObjectRef) {\n" +
                         "\t\treturn new _CalculatorProxy(rawObjectRef);\n" +
