@@ -12,7 +12,7 @@ public class ProxyJavaTranslator implements ITranslator{
     public String declareModule(IDLClass idlClass) {
         return "package " + idlClass.getModuleName() + ";" + "\n"
                 + "\n" +
-                "import mware_lib.nameservice.ObjectReference;" + "\n"
+                "import de.haw.vs.nameservice.ObjectReference;" + "\n"
                 + "import mware_lib.ObjectBroker;" + "\n";
     }
 
