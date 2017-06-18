@@ -1,7 +1,6 @@
 package de.haw.vs.enchiridion.connectionhandler;
 
 import de.haw.vs.enchiridion.NameService;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,11 +9,12 @@ import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClientRequestHandler implements IClientRequestHandler {
 
     private Socket socket;
-    private volatile boolean stopping;
     private NameService nameService;
     private ObjectOutputStream output;
     private final Logger log = LoggerFactory.getLogger(ClientRequestHandler.class);
@@ -31,25 +31,29 @@ public class ClientRequestHandler implements IClientRequestHandler {
     }
 
     @Override
-    public void handleIncomingRequest(byte[] request) throws IOException {
-        byte messageType = request[NameServiceProtocol.MSG_TYPE_POSITION];
+    public void handleIncomingRequest(InputStream in) throws IOException {
+        int nextByteOfData;
+        byte messageType;
+
+        List<Byte> fullMessage = new ArrayList<>();
+        while ((nextByteOfData = in.read()) != NameServiceProtocol.END_OF_MESSAGE_INT) {
+            fullMessage.add((byte) nextByteOfData);
+        }
+
+        byte[] request = this.toByteArray(fullMessage);
+        messageType = request[NameServiceProtocol.MSG_TYPE_POSITION];
+        String alias = NameServiceProtocol.extractAlias(request);
+
         switch (messageType) {
-            case NameServiceProtocol.SHUTDOWN:
-                this.stopping = true;
-                break;
             case NameServiceProtocol.REBIND:
                 try {
-                    String bindAlias = NameServiceProtocol.extractAlias(request);
-                    Object bindObject = NameServiceProtocol.extractObject(request);
-                    this.nameService.rebind(bindObject, bindAlias);
+                    this.nameService.rebind(NameServiceProtocol.extractObject(request), alias);
                 } catch (ClassNotFoundException e) {
                     log.warn("Could not parse rebind message properly", e);
                 }
                 break;
             case NameServiceProtocol.RESOLVE:
-                String resolveAlias = NameServiceProtocol.extractAlias(request);
-                Object resolved = this.nameService.resolve(resolveAlias);
-                output.writeObject(resolved);
+                output.writeObject(this.nameService.resolve(alias));
                 output.flush();
                 break;
             default:
@@ -67,26 +71,30 @@ public class ClientRequestHandler implements IClientRequestHandler {
             this.socket.setSoTimeout(this.clientTimeout);
             in = socket.getInputStream();
             this.output = new ObjectOutputStream(socket.getOutputStream());
-            while (!stopping) {
-                this.handleIncomingRequest(IOUtils.toByteArray(in));
-            }
+            this.handleIncomingRequest(in);
         } catch (SocketException e) {
             log.warn("Client took too long", e);
         } catch (IOException e) {
             log.warn("Error during IO Operation", e);
         }
 
-
         try {
+            Thread.sleep(200);
             this.output.close();
             this.socket.close();
         } catch (IOException e) {
             log.warn("Could not close client socket", e);
+        } catch (InterruptedException e) {
+            log.warn("Could not wait before closing socket", e);
         }
         log.info("Stopping Client Thread");
     }
 
-    public boolean isStopping() {
-        return stopping;
+    private byte[] toByteArray(List<Byte> list) {
+        byte[] result = new byte[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            result[i] = list.get(i);
+        }
+        return result;
     }
 }

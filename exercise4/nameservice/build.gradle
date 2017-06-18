@@ -4,6 +4,7 @@ apply plugin: 'application'
 
 version = '0.1.1-SNAPSHOT'
 group = 'de.haw.vs'
+sourceCompatibility = 1.8
 
 repositories {
     jcenter()
@@ -11,7 +12,6 @@ repositories {
 
 dependencies {
     compile 'ch.qos.logback:logback-classic:1.2.3'
-    compile 'commons-io:commons-io:2.5'
     testCompile 'junit:junit:4.12'
 }
 

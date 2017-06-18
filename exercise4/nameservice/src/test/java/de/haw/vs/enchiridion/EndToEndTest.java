@@ -1,7 +1,10 @@
 package de.haw.vs.enchiridion;
 
+import de.haw.vs.enchiridion.connectionhandler.NameServiceProtocol;
+import de.haw.vs.enchiridion.connectionhandler.ObjectReference;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,18 +31,16 @@ public class EndToEndTest {
         Runnable rebindClient = new RebindTestClient(27017, "localhost", rebindMessage());
         threadPool.submit(rebindClient);
         Thread.sleep(1000);
-        assertEquals("ase", NameService.getInstance().resolve("test"));
+        assertEquals(new ObjectReference("test", "localhost", 42), NameService.getInstance().resolve("test"));
         threadPool.shutdown();
     }
 
     private byte[] rebindMessage() {
-        return new byte[]{
-                0x0,
-                0x74, 0x65, 0x73, 0x74,
-                0x0, 0x0, 0x0, 0x0,
-                0x0, 0x0, 0x0, 0x0,
-                (byte) 0xAC, (byte) 0xED, 0x0, 0x5,
-                0x74, 0x0, 0x3, 0x61, 0x73, 0x65};
-
+        try {
+            return NameServiceProtocol.buildRebindMessage(new ObjectReference("test", "localhost", 42), "test");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
