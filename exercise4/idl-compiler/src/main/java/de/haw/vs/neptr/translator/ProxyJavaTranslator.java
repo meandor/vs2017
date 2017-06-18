@@ -64,7 +64,10 @@ public class ProxyJavaTranslator implements ITranslator{
         }
 
         builder.append("this.objectBroker.invoke(this.objectReference, ");
+
+        builder.append("\"");
         builder.append(methodData.getName());
+        builder.append("\"");
 
         c = 'a';
         for (SupportedDataTypes ignored : methodData.getParamTypes()) {
