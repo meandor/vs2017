@@ -6,6 +6,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 
+import static org.junit.Assert.assertEquals;
+
 
 public class NameServiceProxyTest {
 
@@ -36,8 +38,9 @@ public class NameServiceProxyTest {
     @Test
     public void testResolveObject() throws Exception {
         NameServiceProxy proxy = new NameServiceProxy("localhost", 8888);
-        Object wurst = new ObjectReference("zumsel", "localhost", 1337);
-        proxy.rebind(wurst, "zumsel");
+        Object expected = new ObjectReference("zumsel", "localhost", 1337);
+        Object actual = proxy.resolve("zumsel");
         Thread.sleep(500);
+        assertEquals(expected, actual);
     }
 }

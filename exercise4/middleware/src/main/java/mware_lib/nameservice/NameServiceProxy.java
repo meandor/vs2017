@@ -2,6 +2,7 @@ package mware_lib.nameservice;
 
 import de.haw.vs.nameservice.NameServiceProtocol;
 import de.haw.vs.nameservice.ObjectReference;
+import mware_lib.NameService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,23 +54,26 @@ public class NameServiceProxy extends NameService {
 
     @Override
     public Object resolve(String name) {
+        Object result = null;
         try {
             Socket socket = new Socket(nameServiceHostName, nameServicePort);
-            OutputStream socketOutputStream = socket.getOutputStream();
-            ObjectInputStream socketInputStream = new ObjectInputStream(socket.getInputStream());
+            OutputStream out = socket.getOutputStream();
+            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
-            byte[] messageType = new byte[]{NameServiceProtocol.RESOLVE};
-            byte[] alias = NameServiceProtocol.aliasBytes(name);
-            byte[] serializedMessage = new byte[messageType.length + alias.length];
-            System.arraycopy(messageType, 0, serializedMessage, 0, messageType.length);
-            System.arraycopy(alias, 0, serializedMessage, messageType.length, alias.length);
+            byte[] message = NameServiceProtocol.buildResolveMessage(name);
 
-            socketOutputStream.write(serializedMessage);
-            socketOutputStream.flush();
-            return socketInputStream.readObject();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            out.write(message);
+            out.flush();
+            Thread.sleep(200);
+            result = in.readObject();
+            Thread.sleep(200);
+            out.close();
+            in.close();
+            socket.close();
+
+        } catch (IOException | ClassNotFoundException | InterruptedException e) {
+            log.warn("Something went wrong while trying to resolve: " + name, e);
         }
+        return result;
     }
 }
