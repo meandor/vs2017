@@ -1,0 +1,4 @@
+module math_ops2 {
+  class Calculator2 {
+  };
+};
