@@ -1,14 +1,19 @@
 package mware_lib;
 
+import mware_lib.communication.Communication;
+
 import mware_lib.nameservice.NameService;
 import mware_lib.nameservice.NameServiceProxy;
+import mware_lib.nameservice.ObjectReference;
 
 /**
  * This class acts as the main entry point for the middleware.
  */
 public class ObjectBroker implements IObjectBroker {
 
-    NameService nameService;
+    private NameService nameService;
+    private Communication communication;
+
     /**
      * Main entry point to the middleware.
      *
@@ -22,7 +27,9 @@ public class ObjectBroker implements IObjectBroker {
     }
 
     private ObjectBroker(String serviceHost, int listenPort, boolean debug) {
-        nameService = new NameServiceProxy(serviceHost, listenPort);
+        this.nameService = new NameServiceProxy(serviceHost, listenPort);
+        this.communication = new Communication();
+        this.communication.startReceiver();
     }
 
 
@@ -40,5 +47,9 @@ public class ObjectBroker implements IObjectBroker {
      */
     public void shutDown() {
 
+    }
+
+    public Object remoteCall(ObjectReference alias, String methodName, Object... args) {
+        return communication.invoke(alias, methodName, args);
     }
 }

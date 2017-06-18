@@ -63,7 +63,7 @@ public class ProxyJavaTranslator implements ITranslator{
             builder.append("\t\t");
         }
 
-        builder.append("this.objectBroker.remoteCall(this.objectReference.getAlias(), ");
+        builder.append("this.objectBroker.remoteCall(this.objectReference, ");
 
         builder.append("\"");
         builder.append(methodData.getName());
