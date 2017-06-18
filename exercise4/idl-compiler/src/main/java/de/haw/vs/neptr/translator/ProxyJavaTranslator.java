@@ -32,7 +32,7 @@ public class ProxyJavaTranslator implements ITranslator{
     public String declareConstructingMethod(IDLClass idlClass) {
         return "\tpublic " + "_" +  idlClass.getClassName() + "Proxy(Object rawReference) {\n" +
                 "\t\tObjectReference objectReference = (ObjectReference) rawReference; \n" +
-                "\t\tthis.objectBroker = ObjectBroker.init(objectReference.getHost(), objectReference.getPort(), false);\n" +
+                "\t\tthis.objectBroker = ObjectBroker.init(objectReference.getHostname(), objectReference.getPort(), false);\n" +
                 "\t\tthis.objectReference = objectReference;" + "\n"
                 + "\t}";
     }
