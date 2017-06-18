@@ -12,7 +12,7 @@ public class ProxyJavaTranslator implements ITranslator{
     public String declareModule(IDLClass idlClass) {
         return "package " + idlClass.getModuleName() + ";" + "\n"
                 + "\n" +
-                "import mware_lib.ObjectReference;" + "\n"
+                "import mware_lib.nameservice.ObjectReference;" + "\n"
                 + "import mware_lib.ObjectBroker;" + "\n";
     }
 
@@ -63,7 +63,7 @@ public class ProxyJavaTranslator implements ITranslator{
             builder.append("\t\t");
         }
 
-        builder.append("this.objectBroker.invoke(this.objectReference, ");
+        builder.append("this.objectBroker.remoteCall(this.objectReference.getAlias(), ");
 
         builder.append("\"");
         builder.append(methodData.getName());
