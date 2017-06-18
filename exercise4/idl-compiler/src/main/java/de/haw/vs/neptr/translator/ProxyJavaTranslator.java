@@ -12,15 +12,14 @@ public class ProxyJavaTranslator implements ITranslator{
     public String declareModule(IDLClass idlClass) {
         return "package " + idlClass.getModuleName() + ";" + "\n"
                 + "\n" +
-                "import mware_lib.ObjectBroker;" + "\n"
-                + "import mware_lib.communication.ICommunicationModule;" + "\n"
-                + "import mware_lib.communication.Communication;\n";
+                "import mware_lib.ObjectReference;" + "\n"
+                + "import mware_lib.ObjectBroker;" + "\n";
     }
 
     @Override
     public String openClassDeclaration(IDLClass idlClass) {
         return "public class _" +  idlClass.getClassName() + "Proxy extends _" +  idlClass.getClassName() + "ImplBase {" + "\n"
-                + "\tprivate ICommunicationModule communication;\n"
+                + "\tprivate ObjectBroker objectBroker;\n"
                 + "\tprivate ObjectReference objectReference;";
     }
 
@@ -33,7 +32,7 @@ public class ProxyJavaTranslator implements ITranslator{
     public String declareConstructingMethod(IDLClass idlClass) {
         return "\tpublic " + "_" +  idlClass.getClassName() + "Proxy(Object rawReference) {\n" +
                 "\t\tObjectReference objectReference = (ObjectReference) rawReference; \n" +
-                "\t\tthis.communication = new Communication();\n" +
+                "\t\tthis.objectBroker = ObjectBroker.init(objectReference.getHost(), objectReference.getPort(), false);\n" +
                 "\t\tthis.objectReference = objectReference;" + "\n"
                 + "\t}";
     }
@@ -64,7 +63,7 @@ public class ProxyJavaTranslator implements ITranslator{
             builder.append("\t\t");
         }
 
-        builder.append("this.communication.invoke(this.objectReference, ");
+        builder.append("this.objectBroker.invoke(this.objectReference, ");
         builder.append(methodData.getName());
 
         c = 'a';
