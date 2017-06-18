@@ -32,7 +32,6 @@ public class NameServiceProxyTest {
     public void testRebindObject() throws Exception {
         testee.rebind("TestObject", "zumsel");
         Thread.sleep(500);
-
     }
 
     @Test
