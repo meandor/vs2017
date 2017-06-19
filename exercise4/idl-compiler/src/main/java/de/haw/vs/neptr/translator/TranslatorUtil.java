@@ -1,5 +1,6 @@
 package de.haw.vs.neptr.translator;
 
+import de.haw.vs.neptr.idlmodel.MethodData;
 import de.haw.vs.neptr.idlmodel.SupportedDataTypes;
 
 class TranslatorUtil {
@@ -24,5 +25,18 @@ class TranslatorUtil {
             default:
                 return null;
         }
+    }
+
+    public static void writeMethodArguments(StringBuilder builder, MethodData methodData) {
+        char c = 'a';
+
+        for (SupportedDataTypes type : methodData.getParamTypes()) {
+            builder.append(getSupportedJavaDataTypeName(type));
+            builder.append(" ");
+            builder.append(c++);
+            builder.append(", ");
+        }
+
+        builder.delete(builder.length() - 2, builder.length());
     }
 }

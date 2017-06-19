@@ -45,16 +45,10 @@ public class ProxyJavaTranslator implements ITranslator{
         builder.append(" ");
         builder.append(methodData.getName());
         builder.append("(");
-        char c = 'a';
-        
-        for (SupportedDataTypes type : methodData.getParamTypes()) {
-            builder.append(getSupportedJavaDataTypeName(type));
-            builder.append(" ");
-            builder.append(c++);
-            builder.append(", ");
-        }
-        
-        builder.delete(builder.length() - 2, builder.length());
+
+        TranslatorUtil.writeMethodArguments(builder, methodData);
+
+
         builder.append(") throws Exception {\n");
 
         if(methodData.getReturnType() != null){
@@ -69,7 +63,7 @@ public class ProxyJavaTranslator implements ITranslator{
         builder.append(methodData.getName());
         builder.append("\"");
 
-        c = 'a';
+        char c = 'a';
         for (SupportedDataTypes ignored : methodData.getParamTypes()) {
             builder.append(", ");
             builder.append(c++);

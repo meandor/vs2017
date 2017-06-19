@@ -38,16 +38,9 @@ public class ImplBaseJavaTranslator implements ITranslator {
         builder.append(" ");
         builder.append(methodData.getName());
         builder.append("(");
-        char c = 'a';
 
-        for (SupportedDataTypes type : methodData.getParamTypes()) {
-            builder.append(getSupportedJavaDataTypeName(type));
-            builder.append(" ");
-            builder.append(c++);
-            builder.append(", ");
-        }
+        TranslatorUtil.writeMethodArguments(builder, methodData);
 
-        builder.delete(builder.length() - 2, builder.length());
         builder.append(") throws Exception;");
         return builder.toString();
     }
