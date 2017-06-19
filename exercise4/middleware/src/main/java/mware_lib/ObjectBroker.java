@@ -1,8 +1,10 @@
 package mware_lib;
 
 import de.haw.vs.nameservice.ObjectReference;
-import mware_lib.communication.Communication;
+import mware_lib.communication.CommunicationModule;
 import mware_lib.nameservice.NameServiceProxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class acts as the main entry point for the middleware.
@@ -10,7 +12,10 @@ import mware_lib.nameservice.NameServiceProxy;
 public class ObjectBroker implements IObjectBroker {
 
     private NameService nameService;
-    private Communication communication;
+    private CommunicationModule communicationModule;
+    private boolean debug;
+    private static ObjectBroker instance;
+    private final Logger logger = LoggerFactory.getLogger(ObjectBroker.class);
 
     /**
      * Main entry point to the middleware.
@@ -21,13 +26,17 @@ public class ObjectBroker implements IObjectBroker {
      * @return ObjectBroker
      */
     public static ObjectBroker init(String serviceHost, int listenPort, boolean debug) {
-        return new ObjectBroker(serviceHost, listenPort, debug);
+        if (instance == null) {
+            instance = new ObjectBroker(serviceHost, listenPort, debug);
+        }
+        return instance;
     }
 
     private ObjectBroker(String serviceHost, int listenPort, boolean debug) {
+        this.debug = debug;
         this.nameService = new NameServiceProxy(serviceHost, listenPort);
-        this.communication = new Communication();
-        this.communication.startReceiver();
+        this.communicationModule = new CommunicationModule();
+        this.communicationModule.startReceiver();
     }
 
 
@@ -37,7 +46,7 @@ public class ObjectBroker implements IObjectBroker {
      * @return NameService
      */
     public NameService getNameService() {
-        return nameService;
+        return this.nameService;
     }
 
     /**
@@ -47,7 +56,11 @@ public class ObjectBroker implements IObjectBroker {
 
     }
 
-    public Object remoteCall(ObjectReference alias, String methodName, Object... args) {
-        return communication.invoke(alias, methodName, args);
+    public Object remoteCall(ObjectReference ref, String methodName, Object... args) {
+        return communicationModule.invoke(ref, methodName, args);
+    }
+
+    public Object localCall(ObjectReference ref, String methodName, Object... args) {
+        return null;
     }
 }

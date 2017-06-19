@@ -4,18 +4,15 @@ import de.haw.vs.nameservice.ObjectReference;
 
 import java.net.Socket;
 
-public interface ICommunicationModule {
+public interface ICommunication {
 
     /**
-     * Invokes a method for a given Object
-     * and returns the result the method
-     * of the method method
+     * Invokes a method for a given remote Object and returns the result of the method
      *
      * @param ref    Alias of the remote object
      * @param method remote function name
      * @param args   Arguments to the remote function
-     * @return Object result of the called
-     * ObjectReference of String method name Object . . arguments
+     * @return Object result of the called ObjectReference of String method name Object . . arguments
      */
     Object invoke(ObjectReference ref, String method, Object... args);
 
