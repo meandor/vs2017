@@ -1,13 +1,18 @@
 package mware_lib.communication;
 
+import ch.qos.logback.classic.Logger;
 import de.haw.vs.nameservice.NameServiceProtocol;
 import de.haw.vs.nameservice.ObjectReference;
+import mware_lib.ObjectBroker;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 
 public class CommunicationModule implements ICommunication {
+
+    private final Logger logger = (Logger) LoggerFactory.getLogger(CommunicationModule.class);
 
     @Override
     public Object invoke(ObjectReference ref, String method, Object... args) {
@@ -32,8 +37,8 @@ public class CommunicationModule implements ICommunication {
 
             return result;
 
-        } catch (IOException | InterruptedException | ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.debug(e.toString());
             return new RuntimeException("Method not found");
         }
     }

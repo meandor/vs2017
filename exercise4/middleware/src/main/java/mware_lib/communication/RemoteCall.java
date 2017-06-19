@@ -1,6 +1,7 @@
 package mware_lib.communication;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class RemoteCall implements Serializable{
 
@@ -14,6 +15,7 @@ public class RemoteCall implements Serializable{
         this.alias = alias;
         this.methodName = methodName;
         this.args = args;
+
     }
 
     public String getMethodName() {
@@ -38,5 +40,27 @@ public class RemoteCall implements Serializable{
 
     public void setAlias(String alias) {
         this.alias = alias;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        RemoteCall that = (RemoteCall) o;
+
+        if (methodName != null ? !methodName.equals(that.methodName) : that.methodName != null) return false;
+        // Probably incorrect - comparing Object[] arrays with Arrays.equals
+        if (!Arrays.equals(args, that.args)) return false;
+        return alias != null ? alias.equals(that.alias) : that.alias == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = methodName != null ? methodName.hashCode() : 0;
+        result = 31 * result + Arrays.hashCode(args);
+        result = 31 * result + (alias != null ? alias.hashCode() : 0);
+        return result;
     }
 }
