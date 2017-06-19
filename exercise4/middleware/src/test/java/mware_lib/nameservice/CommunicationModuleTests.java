@@ -21,7 +21,7 @@ public class CommunicationModuleTests {
     @Test
     public void testInvokeBadCase() {
         // All errors (in this case connection refused) should result in an runtime exception
-        Object result = testee.invoke(new ObjectReference("wurst", "localhost", 8018), "fly");
+        Object result = testee.invoke(new ObjectReference("soyawurst", "localhost", 8018), "fly");
         assertEquals(result.getClass(), RuntimeException.class);
     }
 
@@ -48,9 +48,9 @@ public class CommunicationModuleTests {
 
         new Thread(echoServer).start();
 
-        ObjectReference or = new ObjectReference("wurst", "localhost", port);
+        ObjectReference or = new ObjectReference("soyawurst", "localhost", port);
         Object result = testee.invoke(or, "fly");
-        RemoteCall call = new RemoteCall("wurst","fly");
+        RemoteCall call = new RemoteCall("soyawurst","fly");
         assertEquals(call, result);
 
     }
