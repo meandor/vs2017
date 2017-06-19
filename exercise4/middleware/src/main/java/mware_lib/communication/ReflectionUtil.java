@@ -3,13 +3,15 @@ package mware_lib.communication;
 import java.lang.reflect.InvocationTargetException;
 
 public class ReflectionUtil {
+
+
     public Object call(Object object, String method, Object... args) {
         Class<?>[] argTypes = new Class<?>[args.length];
         for(int i = 0;i<argTypes.length;i++){
             argTypes[i]=toClass(args[i]);
         }
         try {
-            return object.getClass().getMethod(method, argTypes).invoke(object, args);
+            return object.getClass().getDeclaredMethod(method, argTypes).invoke(object, args);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -22,8 +24,6 @@ public class ReflectionUtil {
         }else if(o.getClass()==Double.class){
             return double.class;
         }
-
-
         return o.getClass();
     }
 
