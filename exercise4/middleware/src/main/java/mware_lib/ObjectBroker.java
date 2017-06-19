@@ -3,8 +3,9 @@ package mware_lib;
 import de.haw.vs.nameservice.ObjectReference;
 import mware_lib.communication.CommunicationModule;
 import mware_lib.nameservice.NameServiceProxy;
-import org.slf4j.Logger;
+import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Level;
 
 /**
  * This class acts as the main entry point for the middleware.
@@ -13,9 +14,8 @@ public class ObjectBroker implements IObjectBroker {
 
     private NameService nameService;
     private CommunicationModule communicationModule;
-    private boolean debug;
     private static ObjectBroker instance;
-    private final Logger logger = LoggerFactory.getLogger(ObjectBroker.class);
+    private final Logger logger = (Logger) LoggerFactory.getLogger(ObjectBroker.class);
 
     /**
      * Main entry point to the middleware.
@@ -28,12 +28,15 @@ public class ObjectBroker implements IObjectBroker {
     public static ObjectBroker init(String serviceHost, int listenPort, boolean debug) {
         if (instance == null) {
             instance = new ObjectBroker(serviceHost, listenPort, debug);
+            if(debug) {
+                Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+                root.setLevel(Level.DEBUG);
+            }
         }
         return instance;
     }
 
     private ObjectBroker(String serviceHost, int listenPort, boolean debug) {
-        this.debug = debug;
         this.nameService = new NameServiceProxy(serviceHost, listenPort);
         this.communicationModule = new CommunicationModule();
         this.communicationModule.startReceiver();
