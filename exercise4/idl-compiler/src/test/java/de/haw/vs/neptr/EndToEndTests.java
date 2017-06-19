@@ -50,7 +50,7 @@ public class EndToEndTests {
         proxyExpectedContent.add("\tprivate ObjectReference objectReference;");
         proxyExpectedContent.add("\tpublic _Calculator2Proxy(Object rawReference) {");
         proxyExpectedContent.add("\t\tObjectReference objectReference = (ObjectReference) rawReference; ");
-        proxyExpectedContent.add("\t\tthis.objectBroker = ObjectBroker.init(objectReference.getHostname(), objectReference.getPort(), false);");
+        proxyExpectedContent.add("\t\tthis.objectBroker = ObjectBroker.init(\"\", 0, false);");
         proxyExpectedContent.add("\t\tthis.objectReference = objectReference;");
         proxyExpectedContent.add("\t}");
         proxyExpectedContent.add("}");

@@ -28,7 +28,7 @@ public class ProxyJavaTranslatorTests {
         String expected =
                 "\tpublic _CalculatorProxy(Object rawReference) {\n" +
                         "\t\tObjectReference objectReference = (ObjectReference) rawReference; \n" +
-                        "\t\tthis.objectBroker = ObjectBroker.init(objectReference.getHostname(), objectReference.getPort(), false);\n" +
+                        "\t\tthis.objectBroker = ObjectBroker.init(\"\", 0, false);\n" +
                         "\t\tthis.objectReference = objectReference;\n" +
                         "\t}";
         assertEquals(expected, constructor);
