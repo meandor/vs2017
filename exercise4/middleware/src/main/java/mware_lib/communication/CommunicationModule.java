@@ -1,12 +1,11 @@
 package mware_lib.communication;
 
 import ch.qos.logback.classic.Logger;
-import de.haw.vs.nameservice.NameServiceProtocol;
 import de.haw.vs.nameservice.ObjectReference;
-import mware_lib.ObjectBroker;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
@@ -45,12 +44,6 @@ public class CommunicationModule implements ICommunication {
 
     @Override
     public void startReceiver() {
-
+        new Thread(new Receiver()).start();
     }
-
-    @Override
-    public Runnable handleIncomingRequest(Socket clientSocket) {
-        return null;
-    }
-
 }

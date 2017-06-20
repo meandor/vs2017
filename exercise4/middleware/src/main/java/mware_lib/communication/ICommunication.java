@@ -2,8 +2,6 @@ package mware_lib.communication;
 
 import de.haw.vs.nameservice.ObjectReference;
 
-import java.net.Socket;
-
 public interface ICommunication {
 
     /**
@@ -20,11 +18,4 @@ public interface ICommunication {
      * Starts the receiver
      */
     void startReceiver();
-
-    /**
-     * Handles incoming requests , calls function locally and answers request
-     *
-     * @param clientSocket Socket from incoming client
-     */
-    Runnable handleIncomingRequest(Socket clientSocket);
 }

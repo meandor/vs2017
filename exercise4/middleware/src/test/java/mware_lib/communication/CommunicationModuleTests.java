@@ -1,4 +1,4 @@
-package mware_lib.nameservice;
+package mware_lib.communication;
 
 import de.haw.vs.nameservice.ObjectReference;
 import mware_lib.communication.CommunicationModule;
