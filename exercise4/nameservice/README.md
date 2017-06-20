@@ -20,3 +20,8 @@ To build the nameservice:
 ./gradlew distZip
 ```
 This will output the zipped application in `./build/distributions/`
+
+To install it to your local maven repository:
+```bash
+./gradlew install
+```
