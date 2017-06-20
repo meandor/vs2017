@@ -55,6 +55,7 @@ public class CommunicationModule implements ICommunication {
 
     @Override
     public void shutdown() {
+        logger.debug("Shutting down receiver");
         this.receiver.interrupt();
     }
 }

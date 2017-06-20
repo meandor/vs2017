@@ -60,6 +60,7 @@ public class ObjectBroker implements IObjectBroker {
      * Initiates the shutting down sequence for the middleware.
      */
     public void shutDown() {
+        logger.debug("Initiating Shutdown");
         this.communicationModule.shutdown();
         instance = null;
     }

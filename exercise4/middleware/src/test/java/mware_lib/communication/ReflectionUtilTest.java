@@ -18,6 +18,6 @@ public class ReflectionUtilTest {
     @Test
     public void testCallNull() {
         Object result = testee.call(null, "getAlias");
-        assertEquals(result, "a");
+        assertEquals(NullPointerException.class, result.getClass());
     }
 }
