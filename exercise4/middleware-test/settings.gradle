@@ -1,5 +1,1 @@
-include ':middleware'
-project(':middleware').projectDir = new File('../middleware')
-include ':nameservice-protocol'
-project(':nameservice-protocol').projectDir = new File('../nameservice-protocol')
 rootProject.name = 'middleware-test'
