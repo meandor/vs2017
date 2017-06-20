@@ -1,12 +1,14 @@
 plugins {
     id 'net.researchgate.release' version '2.4.0'
     id 'java-library'
+    id 'maven'
 }
 
 group = 'de.haw.vs'
 sourceCompatibility = 1.8
 
 repositories {
+    mavenLocal()
     jcenter()
 }
 
