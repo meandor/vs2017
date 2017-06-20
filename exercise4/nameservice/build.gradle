@@ -1,12 +1,13 @@
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'application'
+apply plugin: 'maven'
 
-version = '0.1.2-SNAPSHOT'
 group = 'de.haw.vs'
 sourceCompatibility = 1.8
 
 repositories {
+    mavenLocal()
     jcenter()
 }
 
