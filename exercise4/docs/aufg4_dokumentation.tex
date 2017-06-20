@@ -396,8 +396,10 @@ Singleton Pattern realisiert. Server und Client Anwendungen interagieren über d
 Der ObjectBroker kann also zum Einen im Server Kontext und zum Anderen im Client Kontext benutzt werden.\\
 
 In der Communication Komponente der Middleware ist das Communication Modul. Dieses Modul ist für die Kommunikation
-zwischen verschiedenen Instanzen der Middleware zuständig (GIOP). Die Kommunikation wird über den Port 9002 via TCP
-geführt.
+zwischen verschiedenen Instanzen der Middleware zuständig (GIOP).
+Der Hostname des Servers wird nicht direkt übergeben, sondern per Java - API
+dynamisch ermittelt. Wir behalten uns vor, für das Praktikum ein Netzwerkinterface anzugeben.
+Die Kommunikation wird über den Port 9002 via TCP geführt. 
 
 Dazu wird die Anfrage des entfernten Methodenaufrufes eines Objektes an das Communication Modul der Middleware des
 Servers gesendet. Die Antworten werden als Objekte an den anfragenden Client zurückgeschickt.
@@ -408,7 +410,7 @@ als Antwort eine RuntimeException an das CommunicationModul der Middleware des a
 Das Communication Modul ist ein nebenläufiger Prozess, der startet, sobald der ObjektBroker initalisiert wird
 (\texttt{startReceiver}). Pro eintreffende Client Anfrage wird ein neuer Prozess gestartet
 (\texttt{handleIncomingRequest}), der die Anfrage bearbeitet und beantwortet. Dazu wird das ObjectBroker Singleton
-aufgerufen, um die Methode für das ObjectReference lokal auszuführen (\texttt{localCall} im ObjectBroker).\\
+aufgerufen, um die Methode für das ObjectReference - Objekt lokal auszuführen (\texttt{localCall} im ObjectBroker).\\
 ObjectReference ist Teil des Nameservice - Protokolls und im Abschnitt 'Protokolle' näher beschrieben.
 
 Ausgehende Anfragen vom Communication Modul werden durch die Schnittstellenmethode \texttt{invoke} ausgeführt.
