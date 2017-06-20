@@ -223,12 +223,8 @@ Der Client des NameServices ist in der Middleware enthalten.
 
 Der Port, an dem der NameService läuft ist zur Laufzeit einstellbar. Das geschieht über den Startparameter.\\
 
-Der Nameservice Empfängt Nachrichten im folgenden Format:
-\begin{itemize}
-\item Byte 0: Art des Befehls. (0 = Rebind, 1 = Resolve)
-\item Byte 1 - 11: Alias für rebind / resolve
-\item Byte 12 - n: Serialisiertes Referenz Objekt (ObjectReference), nur für rebind benötigt
-\end{itemize}
+Das Protokoll des Nameservice ist als seperate Bibliothek implementiert und im Abschnitt
+'Protokolle' weiter beschrieben.
 
 Der NameService besteht aus der Hauptkomponente und der ConnectionHandler Komponente (siehe Abbildung
 \ref{fig:nameservice-component-diagram}).\\
@@ -404,8 +400,7 @@ zwischen verschiedenen Instanzen der Middleware zuständig (GIOP). Die Kommunika
 geführt.
 
 Dazu wird die Anfrage des entfernten Methodenaufrufes eines Objektes an das Communication Modul der Middleware des
-Servers gesendet. Das Protokoll schickt serialisierte Objekte. Anfragen für entfernte Methodenaufrufe werden durch ein
-RemoteCall Objekt realisiert. Die Antworten werden als Objekte an den anfragenden Client zurückgeschickt.
+Servers gesendet. Die Antworten werden als Objekte an den anfragenden Client zurückgeschickt.
 
 Wenn eine Methode aufgerufen wird, die nicht im entfernten Objekt exisitert, sendet das Communication Modul des Servers
 als Antwort eine RuntimeException an das CommunicationModul der Middleware des aufrufenden Clients.\\
@@ -414,6 +409,7 @@ Das Communication Modul ist ein nebenläufiger Prozess, der startet, sobald der 
 (\texttt{startReceiver}). Pro eintreffende Client Anfrage wird ein neuer Prozess gestartet
 (\texttt{handleIncomingRequest}), der die Anfrage bearbeitet und beantwortet. Dazu wird das ObjectBroker Singleton
 aufgerufen, um die Methode für das ObjectReference lokal auszuführen (\texttt{localCall} im ObjectBroker).\\
+ObjectReference ist Teil des Nameservice - Protokolls und im Abschnitt 'Protokolle' näher beschrieben.
 
 Ausgehende Anfragen vom Communication Modul werden durch die Schnittstellenmethode \texttt{invoke} ausgeführt.
 Dabei wird die Anfrage an den Server gesendet, der aus der ObjectReference ersichtlich ist. Die Antwort der Anfrage
@@ -460,5 +456,21 @@ eigene Referenz des ObjectBrokers im ObjectBroker auf das leere Element gesetzt 
 	\item Debug, boolean konfiguriert, ob debug Nachrichten geloggt werden sollen
 \end{itemize}
 
+\section{Protokolle}
+\subsection{Nameservice-Protokoll}
+Alle Protokolle die der Nameservice verwendet, sind in einer externen Bibliothek implementiert.
+Dies schließt das Protokoll für Methodenaufrufe des Nameservice, und das serialisierbare
+ObjectReference-Objekt mit ein.
+
+Für Methodenaufrufe (rebind / resolve) empfängt der Nameservice Nachrichten im folgenden Format:
+\begin{itemize}
+\item Byte 0: Art des Befehls. (0 = Rebind, 1 = Resolve)
+\item Byte 1 - 11: Alias für rebind / resolve
+\item Byte 12 - n: Serialisiertes Referenz Objekt (ObjectReference), nur für rebind benötigt
+\end{itemize}
+
+Nachrichten dieser Form können mit statischen Methoden in der Klasse NameServiceProtocol generiert werden.
+
+Das serialisierte Referenzobjekt (ObjectReference) enthält 
 
 \end{document}
