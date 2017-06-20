@@ -55,7 +55,7 @@
 
 \textbf{Änderung des Entwurfs:}
 \begin{itemize}
-    \item Keine Änderungen
+    \item Protokolle in extra Kapitel genauer beschrieben
 \end{itemize}
 
 \newpage
@@ -471,6 +471,14 @@ Für Methodenaufrufe (rebind / resolve) empfängt der Nameservice Nachrichten im
 
 Nachrichten dieser Form können mit statischen Methoden in der Klasse NameServiceProtocol generiert werden.
 
-Das serialisierte Referenzobjekt (ObjectReference) enthält 
+Das serialisierte Referenzobjekt (ObjectReference) enthält Hostname, Port und Alias (im Nameservice hinterlegte Namensreferenz) des 
+entfernten Objektes.
 
+\subsection{Protokoll für entfernte Methodenaufrufe}
+
+Das Protokoll für entfernte Methodenaufrufe ist als serialisiertes Objekt in der Klasse 
+RemoteCall (teil der Middleware) implementiert. Es enthält den Alias des aufzurufenden Objektes,
+sowie Name und Argumente der aufzurufenden Methode.
+In diesem Protokoll kommunizieren der Client mit dem Server.
+Rückgabewerte des Servers werden ohne Protokoll als serialisierte Objekte geschickt.
 \end{document}
