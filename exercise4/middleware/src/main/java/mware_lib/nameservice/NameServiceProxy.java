@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class NameServiceProxy extends NameService {
 
-    private int serverPort = 9002;
+    private int servicePort = 9002;
     private String nameServiceHostName;
     private int nameServicePort;
     private ConcurrentMap<String, Object> localRegistry;
@@ -39,7 +39,7 @@ public class NameServiceProxy extends NameService {
         try {
             Socket socket = new Socket(nameServiceHostName, nameServicePort);
             OutputStream out = socket.getOutputStream();
-            ObjectReference ref = new ObjectReference(name, InetAddress.getLocalHost().getHostName(), serverPort);
+            ObjectReference ref = new ObjectReference(name, InetAddress.getLocalHost().getHostName(), servicePort);
             byte[] message = NameServiceProtocol.buildRebindMessage(ref, name);
             out.write(message);
             out.flush();
