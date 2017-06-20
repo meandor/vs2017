@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class CommunicationModuleTests {
+public class CommunicationModuleTest {
 
     private CommunicationModule testee;
     private final int port = 1337;

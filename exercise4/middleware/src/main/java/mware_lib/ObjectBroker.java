@@ -28,18 +28,21 @@ public class ObjectBroker implements IObjectBroker {
      */
     public static ObjectBroker init(String serviceHost, int listenPort, boolean debug) {
         if (instance == null) {
-            instance = new ObjectBroker(serviceHost, listenPort, debug);
             if (debug) {
                 Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
                 root.setLevel(Level.DEBUG);
             }
+            instance = new ObjectBroker(serviceHost, listenPort);
         }
         return instance;
     }
 
-    private ObjectBroker(String serviceHost, int listenPort, boolean debug) {
+    private ObjectBroker(String serviceHost, int listenPort) {
+        logger.debug("Starting ORB");
         this.nameService = new NameServiceProxy(serviceHost, listenPort);
+        logger.debug("Binding NameService");
         this.communicationModule = new CommunicationModule();
+        logger.debug("Started CommunicationModule");
         this.communicationModule.startReceiver();
     }
 
@@ -66,7 +69,7 @@ public class ObjectBroker implements IObjectBroker {
     }
 
     public Object localCall(ObjectReference ref, String methodName, Object... args) {
-        Object resolved = nameService.resolve(ref.getAlias());
+        Object resolved = ((NameServiceProxy) nameService).resolveLocally(ref.getAlias());
         return ReflectionUtil.call(resolved, methodName, args);
     }
 }

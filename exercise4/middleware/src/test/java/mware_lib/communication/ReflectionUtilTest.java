@@ -8,7 +8,6 @@ public class ReflectionUtilTest {
 
     private ReflectionUtil testee = new ReflectionUtil();
 
-
     @Test
     public void testCall() {
         Object o = new RemoteCall("a", "b");
@@ -16,5 +15,9 @@ public class ReflectionUtilTest {
         assertEquals(result, "a");
     }
 
-
+    @Test
+    public void testCallNull() {
+        Object result = testee.call(null, "getAlias");
+        assertEquals(result, "a");
+    }
 }

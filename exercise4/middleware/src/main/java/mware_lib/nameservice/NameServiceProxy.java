@@ -78,4 +78,8 @@ public class NameServiceProxy extends NameService {
         }
         return result;
     }
+
+    public Object resolveLocally(String name) {
+        return this.localRegistry.getOrDefault(name, null);
+    }
 }

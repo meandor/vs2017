@@ -19,18 +19,24 @@ public class Receiver implements Runnable {
 
     @Override
     public void run() {
-        log.info("Starting Communication Module Receiver");
+        log.debug("Starting Communication Module Receiver");
         try {
             ServerSocket serverSocket = new ServerSocket(port);
-            while (!stopping) {
+            while (!isStopping()) {
                 Socket clientSocket = serverSocket.accept();
+                log.debug("Got remote request");
                 IncomingRequestHandler clientRequest = new IncomingRequestHandler(clientSocket);
                 threadPool.submit(clientRequest);
+                if (Thread.interrupted()) {
+                    this.stopping = true;
+                }
             }
+            serverSocket.close();
+            threadPool.shutdownNow();
         } catch (IOException e) {
             log.warn("Can not open server socket", e);
         }
-        log.info("Stopped Communication Module Receiver");
+        log.debug("Stopped Communication Module Receiver");
     }
 
     public boolean isStopping() {

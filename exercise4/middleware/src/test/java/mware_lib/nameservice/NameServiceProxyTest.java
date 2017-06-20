@@ -16,8 +16,12 @@ public class NameServiceProxyTest {
     @Before
     public void setUp() throws Exception {
         testee = new NameServiceProxy("localhost", 8888);
+        startTestNameService(8888);
+    }
+
+    public static void startTestNameService(int port) throws InterruptedException {
         Runnable startServer = () -> {
-            TestNameService nameService = new TestNameService(8888);
+            TestNameService nameService = new TestNameService(port);
             try {
                 nameService.startServer();
             } catch (IOException e) {
