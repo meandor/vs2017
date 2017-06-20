@@ -2,6 +2,7 @@ package mware_lib;
 
 import de.haw.vs.nameservice.ObjectReference;
 import mware_lib.communication.CommunicationModule;
+import mware_lib.communication.ReflectionUtil;
 import mware_lib.nameservice.NameServiceProxy;
 import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,7 @@ public class ObjectBroker implements IObjectBroker {
     }
 
     public Object localCall(ObjectReference ref, String methodName, Object... args) {
-        return null;
+        Object resolved = nameService.resolve(ref.getAlias());
+        return ReflectionUtil.call(resolved, methodName, args);
     }
 }

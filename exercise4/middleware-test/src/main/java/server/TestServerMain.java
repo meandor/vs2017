@@ -10,5 +10,6 @@ public class TestServerMain {
         NameService nameService = objectBroker.getNameService();
         Calculator calculator = new Calculator();
         nameService.rebind(calculator, "zumsel");
+        objectBroker.
     }
 }

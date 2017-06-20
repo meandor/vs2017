@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 public class ReflectionUtil {
 
 
-    public Object call(Object object, String method, Object... args) {
+    public static Object call(Object object, String method, Object... args) {
         Class<?>[] argTypes = new Class<?>[args.length];
         for(int i = 0;i<argTypes.length;i++){
             argTypes[i]=toClass(args[i]);
@@ -18,7 +18,7 @@ public class ReflectionUtil {
         return null;
     }
 
-    private Class<?> toClass(Object o){
+    private static Class<?> toClass(Object o){
         if(o.getClass()==Integer.class){
             return int.class;
         }else if(o.getClass()==Double.class){

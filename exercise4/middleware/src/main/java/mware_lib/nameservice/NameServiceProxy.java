@@ -37,6 +37,7 @@ public class NameServiceProxy extends NameService {
         try {
             Socket socket = new Socket(nameServiceHostName, nameServicePort);
             OutputStream out = socket.getOutputStream();
+            // TODO: Pass the host + port of server here
             ObjectReference ref = new ObjectReference(name, this.nameServiceHostName, this.nameServicePort);
             byte[] message = NameServiceProtocol.buildRebindMessage(ref, name);
             out.write(message);
