@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Arrays;
 
@@ -23,8 +22,7 @@ public class CommunicationModule implements ICommunication {
     public Object invoke(ObjectReference ref, String method, Object... args) {
         logger.debug("Starting call: " + ref.getAlias() + " - " + method + " with " + Arrays.toString(args));
         try {
-            InetAddress inetAddress = InetAddress.getByName(ref.getHostname());
-            Socket socket = new Socket(inetAddress, ref.getPort());
+            Socket socket = new Socket(ref.getHostname(), ref.getPort());
 
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
