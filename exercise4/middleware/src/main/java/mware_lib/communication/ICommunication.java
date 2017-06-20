@@ -18,4 +18,6 @@ public interface ICommunication {
      * Starts the receiver
      */
     void startReceiver();
+
+    void shutdown();
 }

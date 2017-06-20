@@ -3,7 +3,7 @@ package mware_lib.communication;
 import java.io.Serializable;
 import java.util.Arrays;
 
-public class RemoteCall implements Serializable{
+public class RemoteCall implements Serializable {
 
     private static final long serialVersionUID = 8233528997584469393L;
 
@@ -62,5 +62,14 @@ public class RemoteCall implements Serializable{
         result = 31 * result + Arrays.hashCode(args);
         result = 31 * result + (alias != null ? alias.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "RemoteCall{" +
+                "methodName='" + methodName + '\'' +
+                ", args=" + Arrays.toString(args) +
+                ", alias='" + alias + '\'' +
+                '}';
     }
 }

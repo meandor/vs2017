@@ -1,12 +1,12 @@
 package mware_lib;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import de.haw.vs.nameservice.ObjectReference;
 import mware_lib.communication.CommunicationModule;
 import mware_lib.communication.ReflectionUtil;
 import mware_lib.nameservice.NameServiceProxy;
-import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
-import ch.qos.logback.classic.Level;
 
 /**
  * This class acts as the main entry point for the middleware.
@@ -29,8 +29,8 @@ public class ObjectBroker implements IObjectBroker {
     public static ObjectBroker init(String serviceHost, int listenPort, boolean debug) {
         if (instance == null) {
             instance = new ObjectBroker(serviceHost, listenPort, debug);
-            if(debug) {
-                Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+            if (debug) {
+                Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
                 root.setLevel(Level.DEBUG);
             }
         }
@@ -57,7 +57,8 @@ public class ObjectBroker implements IObjectBroker {
      * Initiates the shutting down sequence for the middleware.
      */
     public void shutDown() {
-
+        this.communicationModule.shutdown();
+        instance = null;
     }
 
     public Object remoteCall(ObjectReference ref, String methodName, Object... args) {
