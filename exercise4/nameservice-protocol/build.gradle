@@ -3,7 +3,6 @@ plugins {
     id 'java-library'
 }
 
-version = '0.1.2-SNAPSHOT'
 group = 'de.haw.vs'
 sourceCompatibility = 1.8
 
