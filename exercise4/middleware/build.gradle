@@ -1,13 +1,13 @@
 apply plugin: 'java-library'
 apply plugin: 'idea'
+apply plugin: 'maven'
 
 group = 'de.haw.vs'
 sourceCompatibility = 1.8
-version = '0.1.1-SNAPSHOT'
 
 repositories {
-    jcenter()
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
