@@ -1,4 +1,7 @@
-apply plugin: 'java-library'
+plugins {
+    id 'net.researchgate.release' version '2.4.0'
+    id 'java-library'
+}
 
 version = '0.1.2-SNAPSHOT'
 group = 'de.haw.vs'
@@ -11,4 +14,3 @@ repositories {
 dependencies {
     testCompile('junit:junit:4.12')
 }
-
