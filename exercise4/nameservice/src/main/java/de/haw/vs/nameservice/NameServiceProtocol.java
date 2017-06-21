@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class NameServiceProtocol {
@@ -44,12 +43,12 @@ public class NameServiceProtocol {
     public static byte[] aliasBytes(String alias) {
         int diff = alias.length() - NameServiceProtocol.ALIAS_LENGTH;
         if (diff == 0) {
-            return alias.getBytes(StandardCharsets.UTF_8);
+            return alias.getBytes();
         } else if (diff > 0) {
-            return alias.substring(0, NameServiceProtocol.ALIAS_LENGTH).getBytes(StandardCharsets.UTF_8);
+            return alias.substring(0, NameServiceProtocol.ALIAS_LENGTH).getBytes();
         } else {
             byte[] result = new byte[NameServiceProtocol.ALIAS_LENGTH];
-            byte[] aliasBytes = alias.getBytes(StandardCharsets.UTF_8);
+            byte[] aliasBytes = alias.getBytes();
             System.arraycopy(aliasBytes, 0, result, 0, aliasBytes.length);
             return result;
         }
