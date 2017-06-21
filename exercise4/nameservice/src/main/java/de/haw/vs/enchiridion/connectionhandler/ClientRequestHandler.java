@@ -41,12 +41,15 @@ public class ClientRequestHandler implements IClientRequestHandler {
             fullMessage.add((byte) nextByteOfData);
         }
 
+        log.info(String.valueOf(fullMessage));
+
         byte[] request = this.toByteArray(fullMessage);
         messageType = request[NameServiceProtocol.MSG_TYPE_POSITION];
         String alias = NameServiceProtocol.extractAlias(request);
-
+        log.info("message-type byte:" + messageType);
         switch (messageType) {
             case NameServiceProtocol.REBIND:
+                log.info("Rebinding");
                 try {
                     this.nameService.rebind(NameServiceProtocol.extractObject(request), alias);
                 } catch (ClassNotFoundException e) {
@@ -54,6 +57,7 @@ public class ClientRequestHandler implements IClientRequestHandler {
                 }
                 break;
             case NameServiceProtocol.RESOLVE:
+                log.info("Resolving");
                 output.writeObject(this.nameService.resolve(alias));
                 output.flush();
                 break;
