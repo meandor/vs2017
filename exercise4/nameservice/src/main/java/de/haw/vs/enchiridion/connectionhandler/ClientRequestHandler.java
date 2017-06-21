@@ -49,6 +49,7 @@ public class ClientRequestHandler implements IClientRequestHandler {
 
         switch (messageType) {
             case NameServiceProtocol.REBIND:
+                log.info("Rebinding");
                 try {
                     this.nameService.rebind(NameServiceProtocol.extractObject(request), alias);
                 } catch (ClassNotFoundException e) {
@@ -56,6 +57,7 @@ public class ClientRequestHandler implements IClientRequestHandler {
                 }
                 break;
             case NameServiceProtocol.RESOLVE:
+                log.info("Resolving");
                 output.writeObject(this.nameService.resolve(alias));
                 output.flush();
                 break;
