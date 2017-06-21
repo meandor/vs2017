@@ -1,0 +1,17 @@
+Press ENTER to exit...
+java.lang.reflect.InvocationTargetException
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:497)
+        at mware_lib.communication.ReflectionUtil.call(ReflectionUtil.java:11)
+        at mware_lib.ObjectBroker.localCall(ObjectBroker.java:76)
+        at mware_lib.communication.IncomingRequestHandler.run(IncomingRequestHandler.java:37)
+        at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+        at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+        at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: Your mum said you should not bet
+        at server.Account.deposit(Account.java:25)
+        ... 12 more
