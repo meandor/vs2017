@@ -25,7 +25,7 @@ public class NameServiceProxy extends NameService {
     /**
      * Constructs the NameServiceProxy.
      *
-     * @param nameServiceHostName String Hostname of NameService Server
+     * /@param nameServiceHostName String Hostname of NameService Server
      * @param nameServicePort     int Port of NameService Server
      */
     public NameServiceProxy(String nameServiceHostName, int nameServicePort) {
