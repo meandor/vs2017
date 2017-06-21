@@ -1,0 +1,18 @@
+balance=122.0
+balance=120.0
+balance=233.0
+balance=0.0
+Your mum said you should not bet
+Returned null for invalid object - O.K.
+Concurrency test:
+Waiting for threads to finish..
+1
+Cod and rice twice
+1
+1
+1
+1
+1
+done.
+Shutting down Object Broker
+Done. Exiting.
