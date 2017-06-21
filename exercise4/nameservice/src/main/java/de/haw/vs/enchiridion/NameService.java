@@ -29,8 +29,8 @@ public class NameService {
     }
 
     public Object resolve(String name) {
-        Object resolved =  this.registry.getOrDefault(name, null);
-        logger.info("Resolved " + name+ " to " + resolved);
+        Object resolved = this.registry.get(name);
+        logger.info("Resolved " + name + " to " + resolved);
         return resolved;
     }
 }
