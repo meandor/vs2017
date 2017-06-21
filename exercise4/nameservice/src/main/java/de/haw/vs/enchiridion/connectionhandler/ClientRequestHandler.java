@@ -41,6 +41,8 @@ public class ClientRequestHandler implements IClientRequestHandler {
             fullMessage.add((byte) nextByteOfData);
         }
 
+        log.info(String.valueOf(fullMessage));
+
         byte[] request = this.toByteArray(fullMessage);
         messageType = request[NameServiceProtocol.MSG_TYPE_POSITION];
         String alias = NameServiceProtocol.extractAlias(request);
