@@ -1,5 +1,8 @@
 package de.haw.vs.nameservice;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -16,6 +19,8 @@ public class NameServiceProtocol {
 
     public static String extractAlias(byte[] message) {
         byte[] aliasBytes = Arrays.copyOfRange(message, MSG_TYPE_POSITION + 1, ALIAS_LENGTH - 1);
+        Logger logger = LoggerFactory.getLogger(NameServiceProtocol.class);
+        logger.info("alias-bytes:" + Arrays.toString(aliasBytes));
         return new String(aliasBytes, StandardCharsets.UTF_8).replaceAll("\0", "");
     }
 
