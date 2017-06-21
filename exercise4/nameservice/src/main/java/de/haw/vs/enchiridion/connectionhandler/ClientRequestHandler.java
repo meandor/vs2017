@@ -96,10 +96,12 @@ public class ClientRequestHandler implements IClientRequestHandler {
     }
 
     private byte[] toByteArray(List<Byte> list) {
+        log.info("Starting to byte array");
         byte[] result = new byte[list.size()];
         for (int i = 0; i < list.size(); i++) {
             result[i] = list.get(i);
         }
+        log.info("Finished to byte array");
         return result;
     }
 }
