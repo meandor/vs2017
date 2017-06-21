@@ -4,7 +4,7 @@ apply plugin: 'application'
 apply plugin: 'maven'
 
 group = 'de.haw.vs'
-sourceCompatibility = 1.8
+sourceCompatibility = 1.7
 
 repositories {
     mavenLocal()
