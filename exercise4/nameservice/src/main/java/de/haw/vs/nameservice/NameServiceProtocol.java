@@ -21,7 +21,7 @@ public class NameServiceProtocol {
         byte[] aliasBytes = Arrays.copyOfRange(message, MSG_TYPE_POSITION + 1, ALIAS_LENGTH - 1);
         Logger logger = LoggerFactory.getLogger(NameServiceProtocol.class);
         logger.info("alias-bytes:" + Arrays.toString(aliasBytes));
-        String alias = new String(aliasBytes, StandardCharsets.UTF_8);
+        String alias = new String(aliasBytes);
         logger.info("alias: " + alias);
         logger.info("cleaned alias: " + alias.replaceAll("\0", ""));
         return alias.replaceAll("\0", "");
