@@ -3,12 +3,21 @@ apply plugin: 'idea'
 apply plugin: 'maven'
 
 group = 'de.haw.vs'
-sourceCompatibility = 1.8
+sourceCompatibility = 1.7
 
 repositories {
     mavenCentral()
     jcenter()
 }
+
+jar {
+    manifest {
+    }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
 
 dependencies {
     compile('ch.qos.logback:logback-classic:1.2.3')
