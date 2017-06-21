@@ -38,7 +38,7 @@ public class CommunicationModule implements ICommunication {
             in.close();
             out.close();
             socket.close();
-            logger.debug("got result: " + result.toString());
+            //logger.debug("got result: " + result.toString());
             return result;
         } catch (Exception e) {
             logger.debug("did not get any result", e);
