@@ -24,9 +24,10 @@ public class NameServiceProxy extends NameService {
 
     /**
      * Constructs the NameServiceProxy.
-     *
+     * <p>
      * /@param nameServiceHostName String Hostname of NameService Server
-     * @param nameServicePort     int Port of NameService Server
+     *
+     * @param nameServicePort int Port of NameService Server
      */
     public NameServiceProxy(String nameServiceHostName, int nameServicePort) {
         this.nameServiceHostName = nameServiceHostName;
@@ -75,6 +76,9 @@ public class NameServiceProxy extends NameService {
 
         } catch (IOException | ClassNotFoundException | InterruptedException e) {
             log.warn("Something went wrong while trying to resolve: " + name, e);
+        }
+        if (result != null) {
+            log.info(result.toString());
         }
         return result;
     }
