@@ -28,8 +28,10 @@ public class ObjectBroker implements IObjectBroker {
      */
     public static ObjectBroker init(String serviceHost, int listenPort, boolean debug) {
         if (instance == null) {
-            Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-            root.setLevel(Level.DEBUG);
+            if (debug) {
+                Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+                root.setLevel(Level.DEBUG);
+            }
             instance = new ObjectBroker(serviceHost, listenPort);
         }
         return instance;
