@@ -47,8 +47,9 @@ public class ClientRequestHandler implements IClientRequestHandler {
         byte[] request = this.toByteArray(fullMessage);
         log.info("array: " + Arrays.toString(request));
         messageType = request[NameServiceProtocol.MSG_TYPE_POSITION];
-        String alias = NameServiceProtocol.extractAlias(request);
         log.info("message-type byte:" + messageType);
+        String alias = NameServiceProtocol.extractAlias(request);
+        log.info(alias);
         switch (messageType) {
             case NameServiceProtocol.REBIND:
                 log.info("Rebinding");
