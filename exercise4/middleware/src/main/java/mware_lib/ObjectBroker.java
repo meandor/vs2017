@@ -8,8 +8,6 @@ import mware_lib.communication.ReflectionUtil;
 import mware_lib.nameservice.NameServiceProxy;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
-
 /**
  * This class acts as the main entry point for the middleware.
  */
@@ -71,12 +69,6 @@ public class ObjectBroker implements IObjectBroker {
 
     public Object localCall(ObjectReference ref, String methodName, Object... args) {
         Object resolved = ((NameServiceProxy) nameService).resolveLocally(ref.getAlias());
-        Object result = ReflectionUtil.call(resolved, methodName, args);
-        if (result.getClass() == InvocationTargetException.class) {
-            InvocationTargetException e = (InvocationTargetException) result;
-            return e.getCause();
-        } else {
-            return result;
-        }
+        return ReflectionUtil.call(resolved, methodName, args);
     }
 }

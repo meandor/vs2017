@@ -1,5 +1,7 @@
 package mware_lib.communication;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class ReflectionUtil {
 
     public static Object call(Object object, String method, Object... args) {
@@ -9,8 +11,9 @@ public class ReflectionUtil {
         }
         try {
             return object.getClass().getDeclaredMethod(method, argTypes).invoke(object, args);
+        } catch (InvocationTargetException e) {
+            return e.getCause();
         } catch (Exception e) {
-            e.printStackTrace();
             return e;
         }
     }
@@ -23,5 +26,4 @@ public class ReflectionUtil {
         }
         return o.getClass();
     }
-
 }
