@@ -12,10 +12,10 @@ import java.util.Arrays;
 public class CommunicationModule implements ICommunication {
 
     private final Logger logger = LoggerFactory.getLogger(CommunicationModule.class);
-    private Thread receiver;
+    private Receiver receiver;
 
     public CommunicationModule() {
-        this.receiver = new Thread(new Receiver());
+        this.receiver = new Receiver();
     }
 
     @Override
@@ -48,12 +48,12 @@ public class CommunicationModule implements ICommunication {
 
     @Override
     public void startReceiver() {
-        this.receiver.start();
+        new Thread(this.receiver).start();
     }
 
     @Override
     public void shutdown() {
         logger.debug("Shutting down receiver");
-        this.receiver.interrupt();
+        this.receiver.shutDown();
     }
 }

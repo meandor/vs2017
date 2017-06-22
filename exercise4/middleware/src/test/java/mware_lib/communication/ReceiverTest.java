@@ -32,23 +32,23 @@ public class ReceiverTest {
         Thread.sleep(400);
     }
 
-//    @Test
-//    public void localCallForNullReceived() throws Exception {
-//        Socket clientSocket = new Socket("localhost", 9002);
-//        ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
-//        ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
-//
-//        out.writeObject(new RemoteCall("foobar", "doFoo"));
-//        out.flush();
-//        out.writeObject(new RemoteCall("foobar", "doFoo"));
-//        out.flush();
-//        Thread.sleep(200);
-//        Object result = in.readObject();
-//        assertEquals(NullPointerException.class, result.getClass());
-//        out.close();
-//        in.close();
-//        clientSocket.close();
-//    }
+    @Test
+    public void localCallForNullReceived() throws Exception {
+        Socket clientSocket = new Socket("localhost", 9002);
+        ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+        ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
+
+        out.writeObject(new RemoteCall("foobar", "doFoo"));
+        out.flush();
+        out.writeObject(new RemoteCall("foobar", "doFoo"));
+        out.flush();
+        Thread.sleep(200);
+        Object result = in.readObject();
+        assertEquals(NullPointerException.class, result.getClass());
+        out.close();
+        in.close();
+        clientSocket.close();
+    }
 
     @Test
     public void localSuccessfulCallReceived() throws Exception {

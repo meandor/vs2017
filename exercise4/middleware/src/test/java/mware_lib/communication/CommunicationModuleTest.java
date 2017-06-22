@@ -60,7 +60,6 @@ public class CommunicationModuleTest {
     }
 
     @Test
-    @Ignore
     public void testInvokeGoodCase() throws Exception {
         ObjectReference ref = new ObjectReference("zumsel", "localhost", this.port);
         Object result = testee.invoke(ref, "foobar", "boo", "baz");

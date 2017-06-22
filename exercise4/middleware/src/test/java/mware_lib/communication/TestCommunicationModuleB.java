@@ -35,7 +35,7 @@ public class TestCommunicationModuleB implements Runnable {
                 logger.info("Got wrong remote call");
                 out.writeObject(new RuntimeException("Method not found"));
             }
-            Thread.sleep(200);
+            Thread.sleep(1);
             in.close();
             out.close();
             clientSocket.close();
