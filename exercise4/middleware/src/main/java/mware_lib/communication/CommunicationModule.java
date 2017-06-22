@@ -30,10 +30,10 @@ public class CommunicationModule implements ICommunication {
             RemoteCall remoteCall = new RemoteCall(ref.getAlias(), method, args);
             out.writeObject(remoteCall);
             out.flush();
-            Thread.sleep(200);
+            Thread.sleep(1);
 
             Object result = in.readObject();
-            Thread.sleep(200);
+            Thread.sleep(1);
 
             in.close();
             out.close();

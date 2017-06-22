@@ -31,14 +31,14 @@ public class IncomingRequestHandler implements Runnable {
 
             RemoteCall call = (RemoteCall) in.readObject();
             logger.debug("Found RemoteCall");
-            Thread.sleep(200);
+            Thread.sleep(1);
 
             ObjectBroker orb = ObjectBroker.init("alreadyExists", 0, false);
             Object result = orb.localCall(new ObjectReference(call.getAlias(), "nonsense", 0), call.getMethodName(), call.getArgs());
             logger.debug("Start sending result");
             out.writeObject(result);
             logger.debug("Result send");
-            Thread.sleep(200);
+            Thread.sleep(1);
             in.close();
             out.close();
             clientSocket.close();
