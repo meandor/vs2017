@@ -44,18 +44,21 @@
 	\item 14.06.2017 5 Stunden (FW)
 	\item 15.06.2017 5 Stunden (DS)
 	\item 16.06.2017 5 Stunden (DS)
+	\item 21.06.2017 3 Stunden (DS,FW)
+	\item 22.06.2017 2 Stunden (DS,FW)
 \end{itemize}
 
 \textbf{Aktueller Stand:}
 \begin{itemize}
 	\item IDL Compiler fertig und getestet
     \item Namensdienst fertig und getestet
-    \item mware\_lib Library fertig
+    \item mware\_lib Library fertig und getestet
 \end{itemize}
 
 \textbf{Änderung des Entwurfs:}
 \begin{itemize}
     \item Protokolle in extra Kapitel genauer beschrieben
+    \item Stopping Bit im Protokoll hinzugefügt
 \end{itemize}
 
 \newpage
@@ -469,6 +472,7 @@ Für Methodenaufrufe (rebind / resolve) empfängt der Nameservice Nachrichten im
 \item Byte 0: Art des Befehls. (0 = Rebind, 1 = Resolve)
 \item Byte 1 - 11: Alias für rebind / resolve
 \item Byte 12 - n: Serialisiertes Referenz Objekt (ObjectReference), nur für rebind benötigt
+\item Byte n+1: Stopping byte (-1)
 \end{itemize}
 
 Nachrichten dieser Form können mit statischen Methoden in der Klasse NameServiceProtocol generiert werden.
