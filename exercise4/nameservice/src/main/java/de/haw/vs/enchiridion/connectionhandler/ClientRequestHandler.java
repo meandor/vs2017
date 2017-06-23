@@ -11,7 +11,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ClientRequestHandler implements IClientRequestHandler {
@@ -42,14 +41,9 @@ public class ClientRequestHandler implements IClientRequestHandler {
             fullMessage.add((byte) nextByteOfData);
         }
 
-        log.info(String.valueOf(fullMessage));
-
         byte[] request = this.toByteArray(fullMessage);
-        log.info("array: " + Arrays.toString(request));
         messageType = request[NameServiceProtocol.MSG_TYPE_POSITION];
-        log.info("message-type byte:" + messageType);
         String alias = NameServiceProtocol.extractAlias(request);
-        log.info(alias);
         switch (messageType) {
             case NameServiceProtocol.REBIND:
                 log.info("Rebinding");
