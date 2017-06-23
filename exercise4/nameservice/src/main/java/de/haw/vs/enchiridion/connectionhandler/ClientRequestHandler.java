@@ -21,6 +21,7 @@ public class ClientRequestHandler implements IClientRequestHandler {
     private ObjectOutputStream output;
     private final Logger log = LoggerFactory.getLogger(ClientRequestHandler.class);
     private final int clientTimeout = 10000;
+    private final int socketDelay = 2;
 
     public ClientRequestHandler(Socket socket) {
         this.socket = socket;
@@ -87,7 +88,7 @@ public class ClientRequestHandler implements IClientRequestHandler {
         }
 
         try {
-            Thread.sleep(200);
+            Thread.sleep(this.socketDelay);
             this.output.close();
             this.socket.close();
         } catch (IOException e) {
@@ -99,12 +100,10 @@ public class ClientRequestHandler implements IClientRequestHandler {
     }
 
     private byte[] toByteArray(List<Byte> list) {
-        log.info("Starting to byte array");
         byte[] result = new byte[list.size()];
         for (int i = 0; i < list.size(); i++) {
             result[i] = list.get(i);
         }
-        log.info("Finished to byte array");
         return result;
     }
 }
