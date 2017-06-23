@@ -11,14 +11,12 @@ repositories {
 }
 
 jar {
-    from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    }
+    from configurations.runtime
 }
-
 
 dependencies {
     compile('ch.qos.logback:logback-classic:1.2.3')
+    compile project(':nameservice-protocol')
     testCompile('junit:junit:4.12')
 }
 

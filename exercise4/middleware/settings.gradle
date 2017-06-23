@@ -1,1 +1,3 @@
+include ':nameservice-protocol'
+project(':nameservice-protocol').projectDir = new File('../nameservice-protocol')
 rootProject.name = 'candy-kingdom'
