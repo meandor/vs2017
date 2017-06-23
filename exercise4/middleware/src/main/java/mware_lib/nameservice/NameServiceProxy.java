@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentMap;
 public class NameServiceProxy extends NameService {
 
     private int servicePort = 9002;
-    private final long waitBetweenCommunication = 200;
     private String nameServiceHostName;
     private int nameServicePort;
     private ConcurrentMap<String, Object> localRegistry;
@@ -45,14 +44,11 @@ public class NameServiceProxy extends NameService {
             byte[] message = NameServiceProtocol.buildRebindMessage(ref, name);
             out.write(message);
             out.flush();
-            Thread.sleep(waitBetweenCommunication);
             out.close();
             socket.close();
             this.localRegistry.put(name, servant);
         } catch (IOException e) {
             log.warn("Message could not be send", e);
-        } catch (InterruptedException e) {
-            log.warn("Was not able to wait before closing socket", e);
         }
     }
 
@@ -68,14 +64,12 @@ public class NameServiceProxy extends NameService {
 
             out.write(message);
             out.flush();
-            Thread.sleep(waitBetweenCommunication);
             result = in.readObject();
-            Thread.sleep(waitBetweenCommunication);
             out.close();
             in.close();
             socket.close();
 
-        } catch (IOException | ClassNotFoundException | InterruptedException e) {
+        } catch (IOException | ClassNotFoundException e) {
             log.warn("Something went wrong while trying to resolve: " + name, e);
         }
 
