@@ -21,7 +21,6 @@ public class ClientRequestHandler implements IClientRequestHandler {
     private ObjectOutputStream output;
     private final Logger log = LoggerFactory.getLogger(ClientRequestHandler.class);
     private final int clientTimeout = 10000;
-    private final int socketDelay = 2;
 
     public ClientRequestHandler(Socket socket) {
         this.socket = socket;
@@ -88,13 +87,10 @@ public class ClientRequestHandler implements IClientRequestHandler {
         }
 
         try {
-            Thread.sleep(this.socketDelay);
             this.output.close();
             this.socket.close();
         } catch (IOException e) {
             log.warn("Could not close client socket", e);
-        } catch (InterruptedException e) {
-            log.warn("Could not wait before closing socket", e);
         }
         log.info("Stopping Client Thread");
     }
