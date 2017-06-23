@@ -22,7 +22,7 @@ public class ReceiverTest {
     public void setUp() throws Exception {
         this.testee = new Receiver();
         NameServiceProxyTest.startTestNameService(8890);
-        this.orb = ObjectBroker.init("localhost", 8890, true);
+        this.orb = ObjectBroker.init("localhost", 8890, false);
         Thread.sleep(200);
     }
 
@@ -40,9 +40,6 @@ public class ReceiverTest {
 
         out.writeObject(new RemoteCall("foobar", "doFoo"));
         out.flush();
-        out.writeObject(new RemoteCall("foobar", "doFoo"));
-        out.flush();
-        Thread.sleep(200);
         Object result = in.readObject();
         assertEquals(NullPointerException.class, result.getClass());
         out.close();
@@ -59,7 +56,6 @@ public class ReceiverTest {
 
         out.writeObject(new RemoteCall("foobar", "length"));
         out.flush();
-        Thread.sleep(200);
         Object result = in.readObject();
         assertEquals("foobar".length(), result);
     }

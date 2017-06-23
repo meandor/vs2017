@@ -13,6 +13,7 @@ public class CommunicationModule implements ICommunication {
 
     private final Logger logger = LoggerFactory.getLogger(CommunicationModule.class);
     private Receiver receiver;
+    private final int socketDelay = 2;
 
     public CommunicationModule() {
         this.receiver = new Receiver();
@@ -30,15 +31,14 @@ public class CommunicationModule implements ICommunication {
             RemoteCall remoteCall = new RemoteCall(ref.getAlias(), method, args);
             out.writeObject(remoteCall);
             out.flush();
-            Thread.sleep(1);
+            Thread.sleep(this.socketDelay);
 
             Object result = in.readObject();
-            Thread.sleep(1);
+            Thread.sleep(this.socketDelay);
 
             in.close();
             out.close();
             socket.close();
-            //logger.debug("got result: " + result.toString());
             return result;
         } catch (Exception e) {
             logger.debug("did not get any result", e);
